@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en" layout:decorate="~{include/user}"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:th="http://www.thymeleaf.org">
+
+<div layout:fragment="content">
+  <div class="row">
+    <div class="col col-sm-10 col-md-8 mx-auto">
+      <div class="page_title mb-4">
+        <h2 class="memomentKkukkkuk fw-normal pt-3 pb-2">마이페이지</h2>
+        <p>반려동물과 나의 기억저장소 <b class="text-primary">Animal Memory <i class="fa-solid fa-paw"></i></b></p>
+      </div>
+      <div class="card rounded-3">
+        <div class="card-body p-4">
+          <h4 class="memomentKkukkkuk fw-normal pb-3">
+            <i class="fa-solid fa-face-smile text-primary"></i> [[${memberDTO.nickname}]] ([[${memberDTO.username}]])
+          </h4>
+          <ul class="ps-3">
+            <li class="mb-1"><b>이메일</b> : [[${memberDTO.email}]]</li>
+            <li class="mb-1"><b>연락처</b> : [[${memberDTO.tel}]]</li>
+            <li class="mb-1"><b>지역</b> : [[${memberDTO.sido}]]/[[${memberDTO.sigungu}]]</li>
+            <li class=""><b>시터 인증</b> :
+              <span th:if="${memberDTO.sitter}">인증 완료<i class="fa-solid fa-circle-check text-info"></i></span>
+              <span th:unless="${memberDTO.sitter}">미인증</span>
+            </li>
+          </ul>
+          <div class="d-flex gap-2 justify-content-start align-items-center mt-3">
+            <a th:href="@{/member/modifyMember(mid=${memberDTO.mid})}" class="btn btn-main w-100">내 정보 수정</a>
+            <button type="button" class="btn btn-gray w-100" data-bs-toggle="modal" data-bs-target="#howToSitterModal">시터 인증 신청</button>
+          </div>
+        </div>
+      </div>
+      <div class="card rounded-3 mt-3">
+        <div class="card-body p-4">
+          <h4 class="memomentKkukkkuk fw-normal pb-3">
+            <i class="fa-solid fa-paw text-primary"></i>
+            반려동물 정보
+          </h4>
+          <div th:if="${#lists.isEmpty(petDTOs)}">
+            등록한 반려동물 정보가 없어요
+          </div>
+          <ul th:unless="${#lists.isEmpty(petDTOs)}" class="d-flex flex-column gap-2">
+            <li th:each="pet:${petDTOs}">
+             <div class="card bg-primary bg-opacity-10 border-0 rounded-3 p-3">
+               <p>
+                 <span th:if="${pet.type=='dog'}"><i class="fa-solid fa-dog"></i></span>
+                 <span th:if="${pet.type=='cat'}"><i class="fa-solid fa-cat"></i></span>
+                 <b>[[${pet.name}]]</b>/<span>[[${pet.age}]]살</span>
+               </p>
+             </div>
+            </li>
+          </ul>
+          <div class="d-flex gap-2 justify-content-start align-items-center mt-3">
+            <a th:href="@{/member/modifyPet(mid=${memberDTO.mid})}" class="btn btn-main w-100">반려동물 정보 수정</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div id="howToSitterModal" class="modal modal-w-380" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered modal-400">
+      <div class="modal-content">
+        <div class="modal-header border-bottom-0 p-4">
+          <h5 class="modal-title">시터 인증<i class="fa-solid fa-circle-check text-info"></i> 신청방법</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body px-4 py-0">
+          <p class="mb-3">시터 인증을 받은 회원만 <a href="/sitter/list" class="text-info text-link">돌보미 게시판</a>에서 구직 게시글 및 댓글을 작성할 수 있어요!</p>
+          <b>시터 인증을 위해 아래 내용을 이메일로 보내주세요.</b>
+          <ul class="mb-3">
+            <li>- 이름 / 가입한 연락처 / 활동 지역</li>
+            <li>- 반려동물 돌봄 경험 또는 관련 자격증 사본 (있을 경우)</li>
+          </ul>
+          <p><b>보낼 곳</b>: admin@animory.com</p>
+          <p>확인 후 1~2일 내에 인증 여부를 안내드려요.</p>
+        </div>
+        <div class="modal-footer border-top-0 p-4">
+          <button type="button" class="btn btn-lg btn-main w-100" data-bs-dismiss="modal">확인</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script layout:fragment="pagescript" th:inline="javascript">
+
+</script>

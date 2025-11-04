@@ -16,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 @Log4j2
@@ -53,6 +54,12 @@ public class UserServiceImpl implements UserService {
   }
 
   @Override
+  public MemberDTO getMemberById(Long mid) {
+    Member member = memberRepository.findById(mid).orElse(null);
+    return entityToDTO(Objects.requireNonNull(member));
+  }
+
+  @Override
   public MemberDTO getMemberByUsername(String username) {
       return entityToDTO(memberRepository.findByUsername(username));
   }
@@ -70,7 +77,8 @@ public class UserServiceImpl implements UserService {
 
   @Override
   public void modifySitter(MemberDTO memberDTO) {
-    Member member = memberRepository.findMemberById(memberDTO.getMid());
+    Member member = memberRepository.findById(memberDTO.getMid())
+        .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 회원입니다."));
     member.setSitter(memberDTO.isSitter());
     memberRepository.save(member);
   }

@@ -16,5 +16,5 @@ public class PetDTO {
   private String name;
   @NotEmpty
   private int age;
-  private String owner;
+  private Long mid;
 }

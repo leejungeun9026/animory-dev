@@ -74,7 +74,7 @@
         position: fixed;
         z-index: 99999;
         right: 68px;
-        top: 15px;
+        top: 16.5px;
     }
     .header .btn_menu {
         display: block;
@@ -91,9 +91,6 @@
 
 
 @media all and (max-width: 768px) { /* breakpoints-md */
-    html {
-        font-size: 14px;
-    }
 
 }
 /* breakpoints-md 768 끝 */
@@ -107,9 +104,16 @@
 
 
 @media all and (max-width: 450px) {
+    html {
+        font-size: 14px;
+    }
+
     /* header */
     .header .logo {
         max-width: 160px;
+    }
+    .header .sign {
+        top: 17.65px;
     }
     .main_header .gnb > li > a > p {
         font-size: 1.125rem;

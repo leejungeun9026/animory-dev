@@ -122,6 +122,11 @@ ul, ol, li {
     white-space: pre-wrap;
 }
 
+.text-link {
+    text-decoration: underline;
+    text-underline-offset: 0.125rem;
+}
+
 /* text-overflow */
 .text-overflew-line-1 {
     text-overflow: ellipsis;
@@ -320,4 +325,11 @@ ul, ol, li {
 .badge-warning {
     color: var(--bs-warning);
     background: rgba(var(--bs-warning-rgb), 0.175);
+}
+
+.modal-360 {
+    max-width: 360px;
+}
+.modal-400 {
+    max-width: 400px;
 }

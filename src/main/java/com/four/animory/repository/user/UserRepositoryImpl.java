@@ -4,6 +4,8 @@ import com.four.animory.domain.user.Member;
 import com.four.animory.domain.user.QMember;
 import com.four.animory.domain.user.QPet;
 import com.four.animory.dto.user.MemberListPetCountDTO;
+import com.four.animory.dto.user.PetDTO;
+import com.querydsl.core.group.GroupBy;
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.JPQLQuery;
 import org.springframework.data.jpa.repository.support.QuerydslRepositorySupport;
@@ -37,7 +39,6 @@ public class UserRepositoryImpl extends QuerydslRepositorySupport implements Use
             qPet.count().as("petCount")
         ));
 
-    List<MemberListPetCountDTO> result = query.fetch();
-    return result;
+    return query.fetch();
   }
 }
