@@ -34,7 +34,7 @@
           <div class="d-flex align-items-end mb-2">
             <small>총 12개 (1/2페이지)</small>
             <div sec:authorize="isAuthenticated()" class="ms-auto">
-              <a href="/notice/register" class="btn btn-lg btn-main px-4"><i class="fa-solid fa-pencil"></i> 글쓰기</a>
+              <a href="/notice/register" class="btn btn-lg btn-main px-4"><i class="fa-solid fa-pencil"></i></a>
             </div>
           </div>
           <table class="table border-top align-middle">
@@ -49,46 +49,29 @@
             </tr>
             </thead>
             <tbody>
-            <tr>
-              <td>1</td>
+            <tr th:each="notice : ${responseDTO.dtoList}">
+              <td th:text="${notice.bno}">1</td>
               <td>
                 <div class="py-2">
-                  <a href="" class="d-block mb-1">
-                    <h5 class="text-overflew-line-2">로컬 병원 목록입니다.</h5>
+                  <a th:href="@{/notice/view(bno=${notice.bno})}" class="d-block mb-1">
+                      <h5 class="text-overflew-line-2">
+                          <span th:if="${notice.isPinned}" class="me-1" aria-hidden="true">📌</span>
+                          <span th:text="${notice.title}">글 제목 자리</span>
+                      </h5>
+
                   </a>
                   <div class="d-flex gap-2 flex-nowrap text-secondary">
                     <p>관리자</p>
-                    <p>2025-10-10</p>
-                    <p class="ms-auto"><i class="fa-regular fa-eye me-1"></i>12</p>
+                    <p th:text="${#temporals.format(notice.regDate, 'yyyy-MM-dd')}">2025-10-10</p>
+                    <p class="ms-auto"><i class="fa-regular fa-eye me-1"></i><span th:text="${notice.readCount}">12</span></p>
                     <p><i class="fa-regular fa-heart me-1 text-danger"></i>56</p>
                     <p><i class="fa-regular fa-comment-dots me-1"></i>5</p>
                   </div>
                 </div>
               </td>
             </tr>
-            <tr>
-              <td>1</td>
-              <td>
-                <div class="py-2">
-                  <div class="d-flex gap-2 flex-nowrap mb-2">
-                    <p class="badge badge-info">구직중</p>
-                    <p class="badge badge-danger">&#x1F525; 돌봄 일해요</p>
-                    <p class="badge badge-outline-secondary">강아지</p>
-                  </div>
-                  <a href="" class="tr_title d-block mb-1">
-                    <h5 class="text-overflew-line-2">아래는 시터 목록입니다.</h5>
-                  </a>
-                  <div class="d-flex gap-2 flex-nowrap text-secondary">
-                    <p>관리자</p>
-                    <p>2025-10-10</p>
-                    <p class="ms-auto"><i class="fa-regular fa-eye me-1"></i>12</p>
-                    <p><i class="fa-regular fa-heart me-1 text-danger"></i>56</p>
-                    <p><i class="fa-regular fa-comment-dots me-1"></i>8</p>
-                  </div>
-                </div>
-              </td>
-            </tr>
-            <tr>
+
+            <tr th:if="${#lists.isEmpty(responseDTO.dtoList)}">
               <td colspan="2">
                 <p class="py-3 text-center">게시글이 없어요</p>
               </td>

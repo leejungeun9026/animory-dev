@@ -23,7 +23,7 @@ public class NoticeBoardDTO {
     private boolean isPinned;
     private LocalDateTime regDate;
     private LocalDateTime updateDate;
-    private Long mno;
+    private String author;
     //private List<NoticeFile> fileDTOs;
 
 
