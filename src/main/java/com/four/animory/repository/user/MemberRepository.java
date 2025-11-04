@@ -13,11 +13,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import java.util.List;
 
 @Repository
-public interface MemberRepository extends JpaRepository<Member,Integer>, UserRepository {
+public interface MemberRepository extends JpaRepository<Member,Long>, UserRepository {
   Member findByUsername(String username);
 
   @Query("SELECT m.sitter FROM Member m WHERE m.id = :memberId")
   boolean findSitterById(@RequestParam Long memberId);
-
-  Member findMemberById(Long mid);
 }

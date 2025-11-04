@@ -11,6 +11,7 @@ import java.util.List;
 
 public interface UserService {
   int register(UserRegisterDTO userRegisterDTO);
+  MemberDTO getMemberById(Long mid);
   MemberDTO getMemberByUsername(String username);
   List<MemberListPetCountDTO>  getMemberListPetCount();
   boolean getSitterById(Long mid);
@@ -61,7 +62,7 @@ public interface UserService {
         .name(pet.getName())
         .age(pet.getAge())
         .type(pet.getType())
-        .owner(pet.getMember().getNickname())
+        .mid(pet.getMember().getId())
         .build();
   }
 }

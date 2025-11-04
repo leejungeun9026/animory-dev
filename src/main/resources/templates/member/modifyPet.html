@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en" layout:decorate="~{include/user}"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:th="http://www.thymeleaf.org">
+
+<div layout:fragment="content">
+  <div class="row">
+    <div class="col col-sm-10 col-md-8 mx-auto">
+      <div class="page_title mb-4">
+        <h2 class="memomentKkukkkuk fw-normal pt-3 pb-2">반려동물 정보 수정</h2>
+        <p>반려동물과 나의 기억저장소 <b class="text-primary">Animal Memory <i class="fa-solid fa-paw"></i></b></p>
+      </div>
+      <div class="card rounded-3">
+        <div class="card-body p-4">
+          <form action="/member/modifyPet" method="post" class="mb-0">
+            <h4 class="memomentKkukkkuk fw-normal py-3">
+              반려동물 정보
+              <i class="fa-solid fa-paw text-primary"></i>
+            </h4>
+            <div id="petInfo">
+              <div th:if="${#lists.isEmpty(petDTOs)}"></div>
+              <ul id="petList" th:unless="${#lists.isEmpty(petDTOs)}">
+                <li class="mb-3" th:each="pet, stat :${petDTOs}">
+                  <div class="card bg-light border-0 rounded-3 py-4 px-3">
+                    <input type="text"  th:name="'petDTO[' + ${stat.index} + '].pid'" th:value="${pet.pid}">
+                    <input type="text"  th:name="'petDTO[' + ${stat.index} + '].mid'" th:value="${pet.mid}">
+
+                    <div class="mb-2">
+                      <div class="d-flex justify-content-start align-items-baseline gap-2">
+                        <p>우리 반려동물은</p>
+                        <input type="radio" class="btn-check"  th:name="'petDTO[' + ${stat.index} + '].type'" th:id="'dog' + ${stat.index}" value="dog" autocomplete="off" th:checked="${pet.type == 'dog'}" required>
+                        <label class="btn btn-outline-main" th:for="'dog' + ${stat.index}">
+                          <i class="fa-solid fa-dog"></i> 강아지
+                        </label>
+                        <input type="radio" class="btn-check"  th:name="'petDTO[' + ${stat.index} + '].type'" th:id="'cat' + ${stat.index}" value="cat" autocomplete="off" th:checked="${pet.type == 'cat'}" required>
+                        <label class="btn btn-outline-main" th:for="'cat' + ${stat.index}">
+                          <i class="fa-solid fa-cat"></i> 고양이
+                        </label>
+                        <p>예요!</p>
+                      </div>
+                    </div>
+                    <div class="mb-2">
+                      <label class="form-label" th:for="'petname' + ${stat.index}">이름</label>
+                      <input type="text" class="form-control mb-2" th:name="'petDTO[' + ${stat.index} + '].name'" th:id="'petname' + ${stat.index}"
+                             placeholder="반려동물 이름을 입력해주세요"
+                             th:value="${pet.name}"
+                             required maxlength="20"
+                             pattern="^[가-힣A-Za-z0-9 ]{1,20}$">
+                    </div>
+                    <div class="mb-2">
+                      <label class="form-label" th:for="'petage' + ${stat.index}">나이<span class="text-danger"> (필수)</span></label>
+                      <input type="text" class="form-control mb-2" th:name="'petDTO[' + ${stat.index} + '].age'"  th:id="'petage' + ${stat.index}"
+                             placeholder="숫자만 (0~30)"
+                             th:value="${pet.age}"
+                             required inputmode="numeric" maxlength="2" >
+                    </div>
+                    <button type="button" class="btnRemovePet btn btn-gray mx-auto">이 정보 지우기</button>
+                  </div>
+                </li>
+              </ul>
+            </div>
+              <button type="button" id="btnAddPet" class="btn btn-lg btn-outline-main w-100 mb-3">
+                <i class="fa-solid fa-circle-plus me-2"></i> 반려동물 추가하기
+              </button>
+            <button type="submit" class="btn btn-lg btn-main w-100">저장하기</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script layout:fragment="pagescript" th:inline="javascript">
+    /////// 반려동물 정보 추가 삭제하기 ///////
+    const btnAddPet = document.getElementById("btnAddPet");
+    const petInfo = document.getElementById("petInfo");
+    const petList = document.getElementById("petList");
+
+    function Li(idx){
+        return `<li class="mb-3">
+                  <div class="card bg-light border-0 rounded-3 py-4 px-3">
+                    <div class="mb-2">
+                      <div class="d-flex justify-content-start align-items-baseline gap-2">
+                        <p>우리 반려동물은</p>
+                        <input type="radio" class="btn-check" name="petDTO[${idx}].type" id="dog${idx}" value="dog" autocomplete="off" required>
+                        <label class="btn btn-outline-main" for="dog${idx}">
+                          <i class="fa-solid fa-dog"></i> 강아지
+                        </label>
+                        <input type="radio" class="btn-check" name="petDTO[${idx}].type" id="cat${idx}" value="cat" autocomplete="off" required>
+                        <label class="btn btn-outline-main" for="cat${idx}">
+                          <i class="fa-solid fa-cat"></i> 고양이
+                        </label>
+                        <p>예요! <span class="text-danger"> (필수)</span></p>
+                      </div>
+                    </div>
+                    <div class="mb-2">
+                      <label class="form-label" for="petname${idx}">이름<span class="text-danger"> (필수)</span></label>
+                      <input type="text" class="form-control mb-2" name="petDTO[${idx}].name" id="petname${idx}"
+                         placeholder="반려동물 이름을 입력해주세요"
+                         required maxlength="20"
+                         pattern="^[가-힣A-Za-z0-9 ]{1,20}$">
+                    </div>
+                    <div class="mb-2">
+                      <label class="form-label" for="petage${idx}">나이<span class="text-danger"> (필수)</span></label>
+                      <input type="text" class="form-control mb-2" name="petDTO[${idx}].age" id="petage${idx}"
+                         placeholder="숫자만 (0~30)"
+                         required inputmode="numeric" maxlength="2" >
+                    </div>
+                    <button type="button" class="btnRemovePet btn btn-gray mx-auto">이 정보 지우기</button>
+                  </div>
+                </li>`
+    }
+
+    function reindexPets() {
+        const items = [...petList.querySelectorAll("li")];
+
+        items.forEach((li, idx) => {
+            // name 속성 재정렬
+            li.querySelectorAll("[name]").forEach(el => {
+                el.name = el.name.replace(/petDTO\[\d+\]\./, `petDTO[${idx}].`);
+            });
+
+            // id / for 재정렬 (겹치지 않게)
+            li.querySelectorAll("[id]").forEach(el => {
+                el.id = el.id.replace(/\d+$/, "") + idx;
+            });
+            li.querySelectorAll("label[for]").forEach(label => {
+                label.htmlFor = label.htmlFor.replace(/\d+$/, "") + idx;
+            });
+        });
+    }
+
+    btnAddPet.addEventListener("click", function(e){
+        e.preventDefault()
+        const liCnt = petList.querySelectorAll("li").length
+        if (liCnt >= 10){
+            alert ("반려동물은 10마리까지만 등록가능합니다")
+            return
+        }
+        petList.insertAdjacentHTML("beforeend", Li(liCnt));
+    })
+
+    petList.addEventListener("click", (e) => {
+        if (!e.target.classList.contains("btnRemovePet")) return;
+        e.preventDefault();
+        const li = e.target.closest("li");
+        if (li) {
+            li.remove();
+            reindexPets(); // 삭제 후 즉시 재정렬
+        }
+    });
+
+
+</script>
