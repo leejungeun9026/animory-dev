@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en" layout:decorate="~{include/user}"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity6">
+
+<div layout:fragment="content">
+<!-- /* view 화면 html 코드 작성 부분 */ -->
+  <div class="page_title mb-4 mb-md-5">
+    <h3 class="memomentKkukkkuk fw-normal mb-2">커뮤니티</h3>
+    <small class="text-secondary">커뮤니티 글쓰기는 회원만 가능합니다</small>
+  </div>
+  <div class="board_area">
+    <div class="row g-4">
+      <div class="col-12 col-sm-10 col-md-8 col-lg-6 mx-auto">
+        <section class="search_area">
+          <form action="">
+            <div class="d-flex gap-2">
+              <select name="" id="" class="form-select form-select-sm w-auto flex-shrink-1">
+                <option value="tc">제목+내용</option>
+                <option value="t">제목</option>
+                <option value="c">내용</option>
+                <option value="w">작성자</option>
+              </select>
+              <input name="keyword" type="text" class="form-control form-control-sm" placeholder="검색어를 입력하세요">
+              <button type="submit" class="btn btn-sm btn-secondary text-nowrap"><i class="fa-solid fa-magnifying-glass me-1"></i>검색</button>
+              <button type="button" class="btn btn-sm btn-gray text-nowrap">초기화</button>
+            </div>
+          </form>
+        </section>
+      </div>
+      <div class="col-12">
+        <section class="search_result_area">
+          <div class="d-flex align-items-end mb-2">
+            <small>총 12개 (1/2페이지)</small>
+            <div sec:authorize="isAuthenticated()" class="ms-auto">
+              <a href="/free/register" class="btn btn-lg btn-main px-4"><i class="fa-solid fa-pencil"></i> 글쓰기</a>
+            </div>
+          </div>
+          <table class="table border-top align-middle">
+            <colgroup>
+              <col style="width:40px;">
+              <col style="width:calc(100% - 40px);">
+            </colgroup>
+            <thead>
+            <tr>
+              <td>no.</td>
+              <td>내용</td>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="board : ${freeboardList}">
+              <td th:text="${board.bno}"></td>
+              <td>
+                <div class="py-2">
+                  <div class="d-flex gap-2 flex-nowrap mb-2">
+                    <p class="badge badge-success" th:text="${board.btype}"></p>
+                  </div>
+                  <a th:href="@{/free/view/{bno}(bno=${board.bno})}" class="d-block mb-1">
+                    <h5 class="text-overflew-line-2" >[[${board.title}]]</h5>
+                  </a>
+                  <div class="d-flex gap-2 flex-nowrap text-secondary">
+                    <p th:text="${board.writer}">작성자</p>
+                    <p th:text="${#temporals.format(board.updateDate, 'yyyy.MM.dd HH:mm')}"></p>
+                    <p class="ms-auto"><i class="fa-regular fa-eye me-1"></i>
+                        <span th:text="${board.readcount}"></span>
+                    </p>
+                    <p><i class="fa-regular fa-heart me-1 text-danger"></i>
+                        <span th:text="${board.likecount}"></span>
+                    </p>
+                    <p><i class="fa-regular fa-comment-dots me-1"></i>
+                        <span th:text="${board.replycount}"></span>
+                    </p>
+                  </div>
+                </div>
+              </td>
+            </tr>
+            </tbody>
+          </table>
+        </section>
+      </div>
+      <div class="col-12 col-sm-10 col-md-8 col-lg-6 mx-auto">
+        <section class="paging_area">
+          <nav aria-label="Page navigation">
+            <ul class="pagination pagination-sm justify-content-center mb-0">
+              <li class="page-item disabled" >
+                <a class="page-link"><i class="fa-solid fa-angles-left"></i></a>
+              </li>
+              <li class="page-item">
+                <a class="page-link"><i class="fa-solid fa-chevron-left"></i></a>
+              </li>
+              <li class="page-item active">
+                <a class="page-link">1</a>
+              </li>
+              <li class="page-item">
+                <a class="page-link">2</a>
+              </li>
+              <li class="page-item">
+                <a class="page-link"><i class="fa-solid fa-chevron-right"></i></a>
+              </li>
+              <li class="page-item">
+                <a class="page-link"><i class="fa-solid fa-angles-right"></i></a>
+              </li>
+            </ul>
+          </nav>
+        </section>
+      </div>
+    </div>
+
+
+
+  </div>
+<!-- /* //view 화면 html 코드 작성 끝 */ -->
+</div>
+
+<script layout:fragment="pagescript" th:inline="javascript">
+// 페이지에 필요한 스크립트 작성 부분
+
+// 페이지에 필요한 스크립트 작성 끝
+</script>

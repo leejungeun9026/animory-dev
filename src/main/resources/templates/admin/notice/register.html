@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en" layout:decorate="~{include/admin}"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:th="http://www.thymeleaf.org">
+<div layout:fragment="content">
+  <div class="page_title d-flex align-items-center mb-3">
+    <h2>공지사항 글쓰기</h2>
+  </div>
+  <div class="board_area">
+    <form action="" method="post" enctype="multipart/form-data">
+      <div class="mb-2">
+        <div class="form-check">
+          <input class="form-check-input" type="checkbox" value="" id="pinned">
+          <label class="form-check-label" for="pinned">
+            상단 고정
+          </label>
+        </div>
+      </div>
+      <div class="mb-2">
+        <input type="text" name="title" class="form-control" placeholder="제목을 입력해주세요" required="">
+      </div>
+      <div class="mb-2">
+        <textarea name="content" id="content" cols="30" rows="10" class="form-control" placeholder="내용을 입력해주세요" required=""></textarea>
+      </div>
+      <div class="mb-3">
+        <input type="file" name="files" class="form-control" multiple="">
+      </div>
+      <div class="button_wrap">
+        <div class="row g-2">
+          <div class="col-6 col-md-auto ms-md-auto">
+            <a href="/admin/notice/list" class="btn btn-lg btn-gray w-100">취소</a>
+          </div>
+          <div class="col-6 col-md-auto">
+            <button class="btn btn-lg btn-primary w-100">저장</button>
+          </div>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script layout:fragment="pagescript" th:inline="javascript">
+
+</script>

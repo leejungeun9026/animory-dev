@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity6">
+<head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1, shrink-to-fit=no" name="viewport"/>
+  <meta content="" name="description"/>
+  <meta content="" name="author"/>
+  <!-- jQuery -->
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+  <!-- Bootstrap -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+  <!-- axios -->
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  <!-- Fonts - pretendard -->
+  <link as="style"
+        crossorigin
+        href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard-dynamic-subset.css"
+        rel="stylesheet">
+  <!-- fontawesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/brands.min.css" rel="stylesheet">
+  <!-- stylesheet-->
+  <link href="/css/reset.css" rel="stylesheet">
+  <link href="/css/style.css" rel="stylesheet">
+  <link href="/css/admin_layout.css" rel="stylesheet">
+  <title>애니모리 관리자페이지</title>
+</head>
+<body>
+  <div id="#wrap" class="admin" layout:fragment="wrap">
+    <header>
+      <nav class="navbar flex-nowrap bg-dark border-bottom border-body" data-bs-theme="dark">
+        <div class="container-fluid">
+          <a class="navbar-brand" href="/admin/dashboard">애니모리 관리자</a>
+<!--          <ul class="navbar-nav flex-row gap-3">-->
+<!--            <li class="nav-item">-->
+<!--              <a class="nav-link" href="/admin/member/list">회원관리</a>-->
+<!--            </li>-->
+<!--            <li class="nav-item">-->
+<!--              <a class="nav-link" href="/admin/notice/list">공지사항</a>-->
+<!--            </li>-->
+<!--          </ul>-->
+          <div class="ms-auto">
+            <a href="/member/logout">로그아웃</a>
+          </div>
+        </div>
+      </nav>
+    </header>
+    <div class="d-flex">
+      <div class="lt-nav">
+        <ul class="list-group list-group-flush">
+          <li class="list-group-item">
+            <a href="/admin/member/list">유저 관리</a>
+          </li>
+          <li class="list-group-item">
+            <a href="/admin/notice/list">공지사항</a>
+          </li>
+        </ul>
+      </div>
+      <div class="rt-content">
+        <div class="inner">
+          <div class="container-fluid py-3">
+            <div layout:fragment="content"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <th:block layout:fragment="mainscript">
+    <!--    <script src="/js/reply_axios.js"></script>-->
+    <th:block layout:fragment="pagescript">
+    </th:block>
+  </th:block>
+</body>
+</html>

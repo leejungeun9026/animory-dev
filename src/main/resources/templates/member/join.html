@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en" layout:decorate="~{include/user}"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:th="http://www.thymeleaf.org">
+
+<div layout:fragment="content">
+  <div class="row">
+    <div class="col col-sm-10 col-md-8 mx-auto">
+      <div class="page_title mb-4">
+        <h2 class="memomentKkukkkuk fw-normal pt-3 pb-2">회원가입</h2>
+        <p>반려동물과 나의 기억저장소 <b class="text-primary">Animal Memory <i class="fa-solid fa-paw"></i></b></p>
+      </div>
+      <div class="card rounded-3">
+        <div class="card-body p-4">
+          <form action="/member/joinRegister" method="post" class="mb-0">
+            <section class="member_info mb-4">
+              <h4 class="memomentKkukkkuk fw-normal py-3">
+                사용자 정보
+                <i class="fa-solid fa-face-smile text-primary"></i>
+              </h4>
+              <div class="mb-3">
+                <label class="form-label" for="username">아이디<span class="text-danger"> (필수)</span></label>
+                <input type="text" class="form-control mb-2" name="member.username" id="username"
+                       placeholder="영문+숫자(4~20자)"
+                       required
+                       minlength="4" maxlength="20"
+                       pattern="^[A-Za-z][A-Za-z0-9_]{3,19}$"
+                       autocomplete="username">
+              </div>
+              <div class="mb-3">
+                <label class="form-label" for="password">비밀번호<span class="text-danger"> (필수)</span></label>
+                <input type="password" class="form-control mb-2" name="member.password"
+                       id="password" placeholder="영문/숫자/특수문자 4~20자"
+                       required
+                       minlength="4" maxlength="20"
+                       pattern="^(?=.*[A-Za-z])(?=.*\d)(?=.*[!@#$%^&*()_\-+=\[{\]}|\\:;',.<>/?]).{8,20}$"
+                       autocomplete="new-password">
+              </div>
+              <div class="mb-3">
+                <label class="form-label" for="nickname">닉네임<span class="text-danger"> (필수)</span></label>
+                <input type="text" class="form-control mb-2" name="member.nickname" id="nickname" placeholder="닉네임 2~20자(한글/영문/숫자)"
+                       required
+                       minlength="2" maxlength="20"
+                       pattern="^[가-힣A-Za-z0-9 _.\-]{2,20}$">
+              </div>
+              <div class="mb-3">
+                <label class="form-label" for="email">이메일<span class="text-danger"> (필수)</span></label>
+                <input type="email" class="form-control mb-2" name="member.email" id="email"
+                       placeholder="예) animory@naver.com" required autocomplete="email">
+              </div>
+              <div class="mb-3">
+                <label class="form-label" for="tel">연락처<span class="text-danger"> (필수)</span></label>
+                <input type="text" class="form-control mb-2" name="member.tel" id="tel"
+                       required
+                       inputmode="numeric" maxlength="13"
+                       pattern="^01[0-9]-\d{3,4}-\d{4}$"
+                       autocomplete="tel-national">
+              </div>
+              <div class="mb-3">
+                <label class="form-label" for="sido">거주 지역<span class="text-danger"> (필수)</span></label>
+                <div class="d-flex align-items-center gap-2">
+                  <select name="member.sido" id="sido" class="form-select" required>
+                    <option value="" data-sido-id="">시/도</option>
+                  </select>
+                  <span>&gt;</span>
+                  <select name="member.sigungu" id="sigungu" class="form-select" disabled required>
+                    <option value="">시/군/구</option>
+                  </select>
+                </div>
+              </div>
+            </section>
+            <section class="mb-4">
+              <h4 class="memomentKkukkkuk fw-normal py-3">
+                반려동물 정보
+                <i class="fa-solid fa-paw text-primary"></i>
+              </h4>
+              <div id="petInfo">
+                <ul id="petList">
+                </ul>
+              </div>
+                <button type="button" id="btnAddPet" class="btn btn-lg btn-outline-main w-100 mb-3">
+                  <i class="fa-solid fa-circle-plus me-2"></i> 반려동물 추가하기
+                </button>
+            </section>
+            <button type="submit" class="btn btn-lg btn-main w-100">회원가입</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script layout:fragment="pagescript" th:inline="javascript">
+    /////// 정규화 ///////
+
+
+
+
+    /////// 사용자 정보 - 시도,시군구 정보 초기화 ///////
+    const sido = document.querySelector("#sido")
+    const sigungu = document.querySelector("#sigungu")
+
+    async function loadSido(){
+        const {data} = await axios.get('/api/regions/sido');
+        sido.innerHTML = `<option value="">시/도</option>` +
+            data.map(s=>`<option value="${s.name}" data-sido-id="${s.id}">${s.name}</option>`).join('');
+    }
+
+    async function loadSigungu(sidoId) {
+        if (!sidoId) {
+            sigungu.innerHTML = '<option value="">시/군/구</option>';
+            sigungu.disabled = true;
+            return;
+        }
+        const { data } = await axios.get('/api/regions/sigungu', { params: { sidoId } });
+        sigungu.innerHTML = '<option value="">시/군/구</option>' +
+            data.map(g => `<option value="${g.name}">${g.name}</option>`).join('');
+        sigungu.disabled = false;
+    }
+
+    sido.addEventListener('change', (e) => {
+        const selectedOption = e.target.selectedOptions[0]; // 선택된 <option> 요소
+        const sidoId = selectedOption.dataset.sidoId;       // data-sidoid 값 읽기
+        loadSigungu(sidoId);
+    });
+
+    loadSido()
+
+
+    /////// 반려동물 정보 추가 삭제하기 ///////
+    const btnAddPet = document.getElementById("btnAddPet");
+    const petInfo = document.getElementById("petInfo");
+    const petList = document.getElementById("petList");
+    let i = 0;
+    function Li(idx){
+        return `<li class="mb-3">
+                  <div class="card bg-light border-0 rounded-3 py-4 px-3">
+                    <div class="mb-2">
+                      <div class="d-flex justify-content-start align-items-baseline gap-2">
+                        <p>우리 반려동물은</p>
+                        <input type="radio" class="btn-check" name="pets[${idx}].type" id="dog${idx}" value="dog" autocomplete="off" required>
+                        <label class="btn btn-outline-main" for="dog${idx}">
+                          <i class="fa-solid fa-dog"></i> 강아지
+                        </label>
+                        <input type="radio" class="btn-check" name="pets[${idx}].type" id="cat${idx}" value="cat" autocomplete="off" required>
+                        <label class="btn btn-outline-main" for="cat${idx}">
+                          <i class="fa-solid fa-cat"></i> 고양이
+                        </label>
+                        <p>예요! <span class="text-danger"> (필수)</span></p>
+                      </div>
+                    </div>
+                    <div class="mb-2">
+                      <label class="form-label" for="petname${idx}">이름<span class="text-danger"> (필수)</span></label>
+                      <input type="text" class="form-control mb-2" name="pets[${idx}].name" id="petname${idx}"
+                         placeholder="반려동물 이름을 입력해주세요"
+                         required maxlength="20"
+                         pattern="^[가-힣A-Za-z0-9 ]{1,20}$">
+                    </div>
+                    <div class="mb-2">
+                      <label class="form-label" for="petage${idx}">나이<span class="text-danger"> (필수)</span></label>
+                      <input type="text" class="form-control mb-2" name="pets[${idx}].age" id="petage${idx}"
+                         placeholder="숫자만 (0~30)"
+                         required inputmode="numeric" maxlength="2" >
+                    </div>
+                    <button type="button" class="btnRemovePet btn btn-gray mx-auto">이 정보 지우기</button>
+                  </div>
+                </li>`
+    }
+
+    function reindexPets() {
+        const items = [...petList.querySelectorAll("li")];
+
+        items.forEach((li, idx) => {
+            // name 속성 재정렬
+            li.querySelectorAll("[name]").forEach(el => {
+                el.name = el.name.replace(/pets\[\d+\]\./, `pets[${idx}].`);
+            });
+
+            // id / for 재정렬 (겹치지 않게)
+            li.querySelectorAll("[id]").forEach(el => {
+                el.id = el.id.replace(/\d+$/, "") + idx;
+            });
+            li.querySelectorAll("label[for]").forEach(label => {
+                label.htmlFor = label.htmlFor.replace(/\d+$/, "") + idx;
+            });
+        });
+    }
+
+    btnAddPet.addEventListener("click", function(e){
+        e.preventDefault()
+        const liCnt = petList.querySelectorAll("li").length
+        if (liCnt >= 10){
+            alert ("반려동물은 10마리까지만 등록가능합니다")
+            return
+        }
+        petList.insertAdjacentHTML("beforeend", Li(liCnt));
+    })
+
+    petList.addEventListener("click", (e) => {
+        if (!e.target.classList.contains("btnRemovePet")) return;
+        e.preventDefault();
+        const li = e.target.closest("li");
+        if (li) {
+            li.remove();
+            reindexPets(); // 삭제 후 즉시 재정렬
+        }
+    });
+
+
+</script>

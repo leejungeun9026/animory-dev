@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en" layout:decorate="~{include/user}"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity6"
+      xmlns:th="http://www.thymeleaf.org">
+
+<div layout:fragment="content">
+  <!-- /* view 화면 html 코드 작성 부분 */ -->
+  <div class="page_title mb-4">
+    <a class="d-inline-flex align-items-baseline" href="/sitter/list">
+      <small class="text-danger">OO게시판 <i class="fa-solid fa-chevron-right fs-xs"></i></small>
+    </a>
+    <h3 class="memomentKkukkkuk fw-normal mt-2">게시글 작성</h3>
+  </div>
+  <div class="board_area">
+    <form action="" enctype="multipart/form-data" method="post">
+      <div class="mb-2">
+        <div class="d-flex align-items-center gap-1">
+          <select class="form-select" id="sido" name="sido" required>
+            <option data-sido-id="" value="">시/도</option>
+          </select>
+          <select class="form-select" disabled id="sigungu" name="sigungu" required>
+            <option value="">시/군/구</option>
+          </select>
+        </div>
+      </div>
+      <div class="mb-2">
+        <input class="form-control" name="title" placeholder="제목을 입력해주세요" required type="text">
+      </div>
+      <div class="mb-2">
+        <textarea class="form-control" cols="30" id="content" name="content" placeholder="시간과 장소 및 급여를 자세히 알려주세요!(최대 1000자)"
+                  required rows="10"></textarea>
+      </div>
+      <div class="mb-3">
+        <input class="form-control" multiple name="files" type="file">
+      </div>
+      <div class="button_wrap">
+        <div class="row g-2">
+          <div class="col-6 col-md-auto ms-md-auto">
+            <a class="btn btn-lg btn-gray w-100" href="/sitter/list">취소</a>
+          </div>
+          <div class="col-6 col-md-auto">
+            <button class="btn btn-lg btn-main w-100">저장</button>
+          </div>
+        </div>
+      </div>
+    </form>
+  </div>
+  <!-- /* //view 화면 html 코드 작성 끝 */ -->
+</div>
+
+<script layout:fragment="pagescript" th:inline="javascript">
+    /////// 사용자 정보 - 시도,시군구 정보 초기화 ///////
+    const sido = document.querySelector("#sido")
+    const sigungu = document.querySelector("#sigungu")
+
+    async function loadSido() {
+        const memberSido = /*[[${memberDTO != null ? memberDTO.sido : null}]]*/ null;
+        const memberSiGungu = /*[[${memberDTO != null ? memberDTO.sigungu : null}]]*/ null;
+        const {data: sidoList} = await axios.get('/api/regions/sido');
+        sido.innerHTML = `<option value="">시/도</option>` +
+            sidoList.map(s =>
+                `<option value="${s.name}" data-sido-id="${s.id}" ${s.name === memberSido ? 'selected' : ''}>${s.name}</option>`
+            ).join('');
+        const selectedOption = sido.selectedOptions[0]; // 선택된 <option> 요소
+        const sidoId = selectedOption.dataset.sidoId;       // data-sidoid 값 읽기
+
+        // loadSigungu랑 거의 같음
+        // memberSiGungu 를 가지고 selected 하는 부분만 다름
+        if (!sidoId) {
+            sigungu.innerHTML = '<option value="">시/군/구</option>';
+            sigungu.disabled = true;
+            return;
+        }
+        const {data: sigunguList} = await axios.get('/api/regions/sigungu', {params: {sidoId}});
+        sigungu.innerHTML = '<option value="">시/군/구</option>' +
+            sigunguList.map(g => `<option value="${g.name}" ${g.name === memberSiGungu ? 'selected' : ''}>${g.name}</option>`).join('');
+        sigungu.disabled = false;
+
+    }
+
+    async function loadSigungu(sidoId) {
+        if (!sidoId) {
+            sigungu.innerHTML = '<option value="">시/군/구</option>';
+            sigungu.disabled = true;
+            return;
+        }
+        const {data} = await axios.get('/api/regions/sigungu', {params: {sidoId}});
+        sigungu.innerHTML = '<option value="">시/군/구</option>' +
+            data.map(g => `<option value="${g.name}">${g.name}</option>`).join('');
+        sigungu.disabled = false;
+    }
+
+    sido.addEventListener('change', (e) => {
+        const selectedOption = e.target.selectedOptions[0]; // 선택된 <option> 요소
+        const sidoId = selectedOption.dataset.sidoId;       // data-sidoid 값 읽기
+        loadSigungu(sidoId);
+    });
+
+    loadSido()
+
+</script>

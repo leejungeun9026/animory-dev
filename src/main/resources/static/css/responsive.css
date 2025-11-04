@@ -1,0 +1,118 @@
+@charset "UTF-8";
+
+@media all and (max-width: 1400px) { /* breakpoints-xxl */
+}
+/* breakpoints-xxl 1400 끝 */
+
+@media all and (max-width: 1200px) { /* breakpoints-xl */
+
+}
+/* breakpoints-xl 1200 끝 */
+
+
+
+@media all and (max-width: 992px) { /* breakpoints-lg */
+    :root {
+        --header-height: 60px;
+        --footer-height: 200px;
+    }
+
+    /* header change */
+    .header .container-fluid {
+        height: var(--header-height);
+    }
+    .header nav {
+        position: absolute;
+        z-index: 999;
+        left: -100%;
+        top: var(--header-height);
+        width: 100%;
+        height: calc(100vh - var(--header-height));
+        background: #f9f9f9;
+        overflow-y: auto;
+        /* scrollbar 숨기기 */
+        -ms-overflow-style: none;  /* Internet Explorer 10+ */
+        scrollbar-width: none;  /* Firefox */
+    }
+    .header nav::-webkit-scrollbar {
+        /* chrome에서 scrollbar 숨기기 */
+        display: none;  /* Safari and Chrome */
+    }
+    .header nav .gnb {
+        position: static;
+        left: none;
+        top: none;
+        transform: none;
+        width: 100%;
+        max-width: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: start;
+        gap: 0;
+    }
+    .header nav .gnb > li {
+        width: 100%;
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    .header nav .gnb > li:last-of-type {
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    .header nav .gnb > li > a {
+        width: 100%;
+    }
+    .header nav .gnb > li > a > .icon-wrap {
+        display: none;
+    }
+    .header nav .gnb > li.on > a {
+        background: rgba(var(--bs-secondary-rgb),1);
+        color: #000000;
+        font-weight: 800;
+    }
+
+    .header .sign {
+        position: fixed;
+        z-index: 99999;
+        right: 68px;
+        top: 15px;
+    }
+    .header .btn_menu {
+        display: block;
+        position: absolute;
+        right: calc(var(--bs-gutter-x)* .5);
+        top: 50%;
+        transform: translateY(-50%);
+        cursor: pointer;
+    }
+
+}
+/* breakpoints-lg 992 끝 */
+
+
+
+@media all and (max-width: 768px) { /* breakpoints-md */
+    html {
+        font-size: 14px;
+    }
+
+}
+/* breakpoints-md 768 끝 */
+
+
+
+@media all and (max-width: 576px) { /* breakpoints-sm */
+}
+/* breakpoints-sm 576 끝 */
+
+
+
+@media all and (max-width: 450px) {
+    /* header */
+    .header .logo {
+        max-width: 160px;
+    }
+    .main_header .gnb > li > a > p {
+        font-size: 1.125rem;
+    }
+
+}

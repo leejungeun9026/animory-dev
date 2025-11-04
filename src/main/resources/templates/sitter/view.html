@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en" layout:decorate="~{include/user}"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:th="http://www.thymeleaf.org">
+
+<div layout:fragment="content">
+<!-- /* view 화면 html 코드 작성 부분 */ -->
+  <div class="page_title mb-4">
+    <a href="/sitter/list" class="d-inline-flex align-items-baseline">
+      <small class="text-danger">돌보미 게시판 <i class="fa-solid fa-chevron-right fs-xs"></i></small>
+    </a>
+    <h3 class="memomentKkukkkuk fw-normal mt-2">게시글 보기</h3>
+  </div>
+  <div class="board_area">
+    <div class="card rounded-3">
+      <div class="card-body">
+        <table class="table table-borderless">
+          <thead>
+            <tr>
+              <td class="tb_title border-bottom pb-3 px-0">
+                <div class="d-flex gap-2 flex-nowrap align-items-end mb-2">
+                  <div class="d-flex gap-2 flex-nowrap align-items-center">
+                    <p class="badge badge-success">구인완료</p>
+                    <p class="badge badge-warning">&#x1F440; 돌봄 구해요</p>
+                    <p class="badge badge-outline-secondary">강아지</p>
+                  </div>
+                  <!-- 로그인 사용자 == 글작성자 같을 경우만 노출 -->
+                  <div class="d-flex gap-1 flex-nowrap ms-auto">
+                    <a href="" class="btn btn-danger">삭제</a>
+                    <a href="" class="btn btn-gray">수정</a>
+                  </div>
+                  <!-- // 로그인 사용자 == 글작성자 같을 경우만 노출 끝 -->
+                </div>
+                <h4 class="py-2">제목 최대 길이는 10자까지 입니다 두줄로 넘어갈 때 테스트 입니다.</h4>
+                <div class="d-flex gap-2 flex-nowrap text-secondary">
+                  <p>작성자</p>
+                  <p>2025-10-10</p>
+                  <p class="ms-auto"><i class="fa-regular fa-eye me-1"></i>12</p>
+                  <p><i class="fa-regular fa-heart me-1 text-danger"></i>56</p>
+                  <p><i class="fa-regular fa-comment-dots me-1"></i>8</p>
+                </div>
+              </td>
+            </tr>
+          </thead>
+          <tbody>
+            <!-- 첨부파일이 있으면 노출 -->
+            <tr>
+              <td class="px-0 py-3">
+                <ul>
+                  <li>
+                    <div class="img_wrap">
+                      <img src="/images/hellokitty.jpg" alt="">
+                    </div>
+                  </li>
+                </ul>
+              </td>
+            </tr>
+            <!-- 첨부파일이 있으면 노출 끝 -->
+            <tr>
+              <td class="px-0 py-3">
+                <div class="tb_content">내용 어쩌고저쩌고</div>
+              </td>
+            </tr>
+            <tr>
+              <td class="px-0 pt-3">
+                <p><i class="fa-regular fa-comment-dots me-1"></i>댓글 <b class="text-danger">8</b></p>
+                <div class="reply_list_area">
+                  <ul>
+                    <li class="reply_list border-bottom">
+                      <div class="d-flex justify-content-start align-items-start gap-2 py-2">
+                        <div class="flex-grow-1">
+                          <b>댓작성자</b>
+                          <div class="replyContent">어쩌고저쩌고</div>
+                        </div>
+                        <div class="flex-shrink-1">
+                          <div class="btn-group">
+                            <button type="button" class="btn btn-xs rounded-2 btn-outline-gray" data-bs-toggle="dropdown" aria-expanded="false">
+                              <i class="fa-solid fa-ellipsis"></i>
+                            </button>
+                            <ul class="dropdown-menu">
+                              <li><a class="dropdown-item" href="">수정</a></li>
+                              <li><a class="dropdown-item" href="">삭제</a></li>
+                              <li><a class="btnReReplyWriteView dropdown-item">대댓글 달기</a></li>
+                            </ul>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="reply_depth2 ps-4">
+                        <ul>
+                          <li class="rerpley_list border-top">
+                            <div class="d-flex justify-content-start align-items-start gap-2 py-2">
+                              <div class="flex-grow-1">
+                                <b>대댓작성자</b>
+                                <div class="replyContent">어쩌고저쩌고</div>
+                              </div>
+                              <div class="flex-shrink-1">
+                                <div class="btn-group">
+                                  <button type="button" class="btn btn-xs rounded-2 btn-outline-gray" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <i class="fa-solid fa-ellipsis"></i>
+                                  </button>
+                                  <ul class="dropdown-menu">
+                                    <li><a class="dropdown-item" href="">수정</a></li>
+                                    <li><a class="dropdown-item" href="">삭제</a></li>
+                                  </ul>
+                                </div>
+                              </div>
+                            </div>
+                          </li>
+                          <li class="border-top">
+                            <div class="d-flex justify-content-start align-items-start gap-2 py-2">
+                              <div class="flex-grow-1">
+                                <b>댓작성자</b>
+                                <div class="replyContent">어쩌고저쩌고</div>
+                              </div>
+                              <div class="flex-shrink-1">
+                                <div class="btn-group">
+                                  <button type="button" class="btn btn-xs rounded-2 btn-outline-gray" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <i class="fa-solid fa-ellipsis"></i>
+                                  </button>
+                                  <ul class="dropdown-menu">
+                                    <li><a class="dropdown-item" href="">수정</a></li>
+                                    <li><a class="dropdown-item" href="">삭제</a></li>
+                                  </ul>
+                                </div>
+                              </div>
+                            </div>
+                          </li>
+                        </ul>
+                      </div>
+                    </li>
+                    <li class="reply_list border-bottom">
+                      <div class="d-flex justify-content-start align-items-start gap-2 py-2">
+                        <div class="flex-grow-1">
+                          <b>댓작성자</b>
+                          <div class="replyContent">어쩌고저쩌고</div>
+                        </div>
+                        <div class="flex-shrink-1">
+                          <div class="btn-group">
+                            <button type="button" class="btn btn-xs rounded-2 btn-outline-gray" data-bs-toggle="dropdown" aria-expanded="false">
+                              <i class="fa-solid fa-ellipsis"></i>
+                            </button>
+                            <ul class="dropdown-menu">
+                              <li><a class="dropdown-item" href="">수정</a></li>
+                              <li><a class="dropdown-item" href="">삭제</a></li>
+                              <li><a class="btnReReplyWriteView dropdown-item">대댓글 달기</a></li>
+                            </ul>
+                          </div>
+                        </div>
+                      </div>
+                    </li>
+                    <li class="reply_list border-bottom">
+                      <div class="d-flex justify-content-start align-items-start gap-2 py-2">
+                        <div class="flex-grow-1">
+                          <b>댓작성자</b>
+                          <div class="replyContent">어쩌고저쩌고</div>
+                        </div>
+                        <div class="flex-shrink-1">
+                          <div class="btn-group">
+                            <button type="button" class="btn btn-xs rounded-2 btn-outline-gray" data-bs-toggle="dropdown" aria-expanded="false">
+                              <i class="fa-solid fa-ellipsis"></i>
+                            </button>
+                            <ul class="dropdown-menu">
+                              <li><a class="dropdown-item" href="">수정</a></li>
+                              <li><a class="dropdown-item" href="">삭제</a></li>
+                              <li><a class="btnReReplyWriteView dropdown-item">대댓글 달기</a></li>
+                            </ul>
+                          </div>
+                        </div>
+                      </div>
+                    </li>
+                  </ul>
+                </div>
+                <div class="reply_write_area pt-3">
+                  <div class="mb-2">
+                    <textarea name="replyText" id="replyText" class="form-control" placeholder="댓글 내용을 입력해주세요(최대 1000자)"></textarea>
+                  </div>
+                  <div class="d-flex">
+                    <button class="btnReplyRegister ms-auto btn btn-main">댓글 쓰기</button>
+                  </div>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+<!-- /* //view 화면 html 코드 작성 끝 */ -->
+</div>
+
+<script layout:fragment="pagescript" th:inline="javascript">
+  /////// 대댓글 textarea toggle ///////
+  const btnReReplyWriteViews = document.querySelectorAll(".btnReReplyWriteView")
+  function reReplyStr() {
+      return `<div class="reReplyWriteArea">
+                <div class="d-flex justify-content-start align-items-start gap-2 py-2">
+                  <div class="flex-grow-1">
+                    <div class="mb-2">
+                      <textarea name="reReplyText" id="reReplyText" class="form-control" placeholder="대댓글 내용을 입력해주세요(최대 1000자)"></textarea>
+                    </div>
+                    <div class="d-flex">
+                      <button class="btnReReplyRegister ms-auto btn btn-main">대댓글 쓰기</button>
+                    </div>
+                  </div>
+                  <div class="flex-shrink-1">
+                    <button class="btnReReplyWriteClose btn btn-xs btn-outline-danger">
+                      <i class="fa-solid fa-xmark"></i>
+                    </button>
+                  </div>
+                </div>
+              </div>`
+  }
+
+  btnReReplyWriteViews.forEach(btn => {
+      btn.addEventListener("click", function(e){
+          e.preventDefault()
+          const li = e.target.closest("li.reply_list")
+          console.log(li)
+          // 대댓글 영역이 없으면 만들고 변수 초기화
+          if (li.querySelector(".reply_depth2") == null) {
+              li.insertAdjacentHTML("beforeend", `<div class="reply_depth2 ps-4"></div>`)
+          }
+          const depth2 = li.querySelector(".reply_depth2")
+
+          // 대댓글창이 이미 열려있으면 return, 아니면 추가하기
+          if (depth2.querySelector(".reReplyWriteArea") != null) {
+              return
+          }
+          depth2.insertAdjacentHTML("beforeend", reReplyStr())
+
+          const btnReReplyWriteClose = depth2.querySelector(".btnReReplyWriteClose")
+          btnReReplyWriteClose.addEventListener("click", () => {
+              btnReReplyWriteClose.closest(".reReplyWriteArea").remove()
+          })
+      })
+  })
+
+
+
+</script>
