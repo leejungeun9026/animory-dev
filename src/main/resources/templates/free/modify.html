@@ -10,10 +10,11 @@
     <a class="d-inline-flex align-items-baseline" href="/free/list">
       <small class="text-danger">커뮤니티<i class="fa-solid fa-chevron-right fs-xs"></i></small>
     </a>
-    <h3 class="memomentKkukkkuk fw-normal mt-2">게시글 작성</h3>
+    <h3 class="memomentKkukkkuk fw-normal mt-2">게시글 수정</h3>
   </div>
   <div class="board_area">
-    <form action="/free/register" enctype="multipart/form-data" method="post">
+    <form action="/free/modify" enctype="multipart/form-data" method="post" entype>
+        <input type="hidden" name="bno" th:value="${freeBoard.bno}">
       <div class="mb-2">
         <select class="form-select w-auto" id="btype" name="btype" required>
           <option value="">카테고리(필수)</option>
@@ -22,23 +23,24 @@
         </select>
       </div>
       <div class="mb-2">
-        <input class="form-control" name="title" placeholder="제목을 입력해주세요" required type="text">
+        <label class="form-label">제목</label>
+        <input class="form-control" name="title" required type="text" th:value="${freeBoard.title}">
       </div>
       <div class="mb-2">
         <input type="hidden" name="writer" value="닉네임">
-        <textarea class="form-control" cols="30" id="content" name="content" placeholder="내용을 입력해주세요." required rows="10"></textarea>
+        <label class="form-label">내용</label>
+        <textarea class="form-control" cols="30" id="content" name="content" required rows="10">[[${freeBoard.content}]]
+        </textarea>
       </div>
       <div class="mb-3">
         <input class="form-control" multiple name="files" type="file">
       </div>
       <div class="button_wrap">
         <div class="row g-2">
-          <div class="col-6 col-md-auto ms-md-auto">
-            <a class="btn btn-lg btn-gray w-100" href="/free/list">취소</a>
-          </div>
-          <div class="col-6 col-md-auto">
-            <button type="submit" class="btn btn-lg btn-main w-100">저장</button>
-          </div>
+            <div class="col d-flex justify-content-end gap-2">
+                <button type="submit" class="btn btn-info">수정완료</button>
+                <a class="btn btn-gray" th:href="@{/free/view/{bno}(bno=${freeBoard.bno})}">목록</a>
+            </div>
         </div>
       </div>
     </form>

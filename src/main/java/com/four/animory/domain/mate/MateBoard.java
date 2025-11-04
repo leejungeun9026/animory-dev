@@ -13,7 +13,7 @@ import java.util.Set;
 @Table(name = "tbl_mate_board")
 @Getter
 @Setter
-@ToString(exclude = {"member", "fileSet"})
+@ToString(exclude = "member")
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor

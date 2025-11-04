@@ -29,6 +29,6 @@ public class FreeBoardDTO {
     private LocalDateTime regDate;
     private LocalDateTime updateDate;
     private List<FreeFile> fileDTOs;
-
     private int replycount;
+    private Long mno; // 로그인 회원 ID용 필드
 }
