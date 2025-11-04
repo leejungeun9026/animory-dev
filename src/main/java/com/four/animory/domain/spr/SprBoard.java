@@ -58,4 +58,6 @@ public class SprBoard extends BaseEntity {
     public void updateReadCount(){
         this.readcount = this.readcount + 1;
     }
+
+    public void updateRecommend(){this.recommend = this.recommend + 1;}
 }

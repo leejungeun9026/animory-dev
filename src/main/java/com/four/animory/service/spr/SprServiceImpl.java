@@ -70,4 +70,14 @@ public class SprServiceImpl implements SprService{
 //        SprBoard sprBoard = sprRepository.findById(bno).orElse(null);
         sprRepository.deleteById(bno);
     }
+
+    @Override
+    public SprBoardDTO upedateRecommend(Long bno) {
+        SprBoard sprBoard = sprRepository.findById(bno).orElse(null);
+        SprBoardDTO dto = entityToDTO(sprBoard);
+        sprBoard.updateRecommend();
+        sprRepository.save(sprBoard);
+        return dto;
+    }
+
 }

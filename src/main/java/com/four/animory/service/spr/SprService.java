@@ -13,6 +13,7 @@ public interface SprService {
     SprBoardDTO findBoardById(Long bno, int mode);
     void updateBoard(SprBoardDTO sprBoardDTO);
     void deleteBoardById(Long bno);
+    SprBoardDTO upedateRecommend(Long bno);
 
 
     default SprBoard dtoToEntity(SprBoardDTO sprBoardDTO) {

@@ -5,13 +5,13 @@
       xmlns:th="http://www.thymeleaf.org">
 
 <div layout:fragment="content">
-  <!-- /* view 화면 html 코드 작성 부분 */ -->
-  <div class="page_title mb-4">
-    <a class="d-inline-flex align-items-baseline" href="/spr/list">
-      <small class="text-danger">나눔/공구/신고 게시판 <i class="fa-solid fa-chevron-right fs-xs"></i></small>
-    </a>
-    <h3 class="memomentKkukkkuk fw-normal mt-2">게시글 작성</h3>
-  </div>
+    <!-- /* view 화면 html 코드 작성 부분 */ -->
+    <div class="page_title mb-4">
+        <a class="d-inline-flex align-items-baseline" href="/spr/list">
+            <small class="text-danger">나눔/공구/신고 게시판 <i class="fa-solid fa-chevron-right fs-xs"></i></small>
+        </a>
+        <h3 class="memomentKkukkkuk fw-normal mt-2">게시글 작성</h3>
+    </div>
     <div class="board_area">
         <form action="/spr/register" enctype="multipart/form-data" method="post" >
             <input type="hidden" th:value="${memberDTO.username}" name="author">
@@ -37,7 +37,7 @@
             <!-- 시도군구 표시 끝 -->
             <div class="mb-2">
                 <input class="form-control" name="title" placeholder="제목을 입력해주세요" required type="text">
-            </div>
+             </div>
             <div class="mb-2">
                 <textarea class="form-control" cols="30" id="content" name="content" placeholder="나눔/공구 게시글 작성 시 마감되면 수정을 통해 완료 체크해주세요! 신고 게시글 작성 시 관련 첨부 파일은 필수 입니다!(글자 수는 최대 1000자)"
                 required rows="10"></textarea>
