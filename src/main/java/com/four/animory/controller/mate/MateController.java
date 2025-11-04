@@ -1,11 +1,13 @@
 package com.four.animory.controller.mate;
 
+import com.four.animory.dto.mate.MateBoardDTO;
 import com.four.animory.service.mate.MateService;
 import com.four.animory.service.user.UserService;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 @Controller
@@ -22,4 +24,20 @@ public class MateController {
     @GetMapping("/list")
     public void list() {
     }
+
+    @GetMapping("/register")
+    public void registerGet(){
+
+    }
+
+    @PostMapping("/register")
+    public void registerPost(){
+
+    }
+
+
+
+
+
+
 }

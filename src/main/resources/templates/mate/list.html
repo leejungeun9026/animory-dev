@@ -1,13 +1,14 @@
 <!DOCTYPE html>
 <html lang="en" layout:decorate="~{include/user}"
+      xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      xmlns:th="http://www.thymeleaf.org">
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity6">
 
 <div layout:fragment="content">
 <!-- /* view 화면 html 코드 작성 부분 */ -->
   <div class="page_title mb-4 mb-md-5">
-    <h3 class="memomentKkukkkuk fw-normal mb-2">돌보미 게시판</h3>
-    <small class="text-secondary">돌보미 일해요는 시터 인증한 회원만 작성 가능합니다</small>
+    <h3 class="memomentKkukkkuk fw-normal mb-2">산책 게시판</h3>
+    <small class="text-secondary">반려동물 정보를 입력한 회원만 작성 가능합니다</small>
   </div>
   <div class="board_area">
     <div class="row g-4">
@@ -32,8 +33,8 @@
         <section class="search_result_area">
           <div class="d-flex align-items-end mb-2">
             <small>총 12개 (1/2페이지)</small>
-            <div class="ms-auto">
-              <a href="/sitter/register" class="btn btn-lg btn-main px-4"><i class="fa-solid fa-pencil"></i> 글쓰기</a>
+            <div sec:authorize="isAuthenticated()" class="ms-auto">
+              <a href="/mate/register" class="btn btn-lg btn-main px-4"><i class="fa-solid fa-pencil"></i> 글쓰기</a>
             </div>
           </div>
           <table class="table border-top align-middle">
@@ -53,8 +54,8 @@
               <td>
                 <div class="py-2">
                   <div class="d-flex gap-2 flex-nowrap mb-2">
-                    <p class="badge badge-success">구인완료!</p>
-                    <p class="badge badge-warning">&#x1F440; 돌봄 구해요</p>
+                    <p class="badge badge-success">모집완료</p>
+                    <p class="badge badge-warning">&#x1F43E; 같이가요</p>
                     <p class="badge badge-outline-secondary">강아지</p>
                   </div>
                   <a href="" class="d-block mb-1">
@@ -75,8 +76,8 @@
               <td>
                 <div class="py-2">
                   <div class="d-flex gap-2 flex-nowrap mb-2">
-                    <p class="badge badge-info">구직중</p>
-                    <p class="badge badge-danger">&#x1F525; 돌봄 일해요</p>
+                    <p class="badge badge-info">모집중</p>
+                    <p class="badge badge-warning">&#x1F43E; 같이가요</p>
                     <p class="badge badge-outline-secondary">강아지</p>
                   </div>
                   <a href="" class="tr_title d-block mb-1">
@@ -132,7 +133,6 @@
 
 
   </div>
-
 <!-- /* //view 화면 html 코드 작성 끝 */ -->
 </div>
 

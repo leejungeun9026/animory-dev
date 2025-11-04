@@ -4,6 +4,7 @@ import com.four.animory.domain.BaseEntity;
 import com.four.animory.domain.user.Member;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.BatchSize;
 import org.hibernate.annotations.ColumnDefault;
 
 import java.util.HashSet;
@@ -13,7 +14,7 @@ import java.util.Set;
 @Table(name = "tbl_mate_board")
 @Getter
 @Setter
-@ToString(exclude = {"member", "fileSet"})
+@ToString(exclude = {"member"})
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
@@ -44,7 +45,7 @@ public class MateBoard extends BaseEntity {
     @ColumnDefault(value="0")
     private int readCount;
 
-//    @OneToMany(mappedBy = "sitterBoard", fetch = FetchType.LAZY, cascae = CascadeType.ALL)
+//    @OneToMany(mappedBy = "mateBoard", fetch = FetchType.LAZY, cascae = CascadeType.ALL, orphanRemoval = true)
 //    private Set<MateFile> fileSet = new HashSet<>();
 
 }
