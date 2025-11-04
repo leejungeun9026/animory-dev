@@ -36,4 +36,8 @@ out/
 ### VS Code ###
 .vscode/
 
+<<<<<<< HEAD
+=======
+### properties ###
+>>>>>>> animory-dev/jyr
 /src/main/resources/application.properties

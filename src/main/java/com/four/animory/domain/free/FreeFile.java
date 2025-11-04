@@ -6,7 +6,7 @@ import lombok.*;
 @Entity
 @Getter
 @Setter
-@ToString
+@ToString(exclude = "freeBoard")
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
