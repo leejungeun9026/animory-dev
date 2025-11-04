@@ -24,7 +24,7 @@
           </tr>
           <tr>
             <td class="tb_title border-bottom py-3 px-0">
-              <h4 class="py-2">제목 최대 길이는 10자까지 입니다 두줄로 넘어갈 때 테스트 입니다.</h4>
+              <h4 class="py-2" th:text="${notice.title}">제목</h4>
               <div class="d-flex gap-2 flex-nowrap text-secondary">
                 <p>작성자</p>
                 <p>2025-10-10</p>
@@ -51,7 +51,7 @@
           <!-- 첨부파일이 있으면 노출 끝 -->
           <tr>
             <td class="px-0 py-3">
-              <div class="tb_content">내용 어쩌고저쩌고</div>
+              <div class="tb_content" th:text="${notice.content}">내용</div>
             </td>
           </tr>
           <tr>

@@ -11,7 +11,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -22,48 +21,40 @@ public class NoticeServiceImpl implements NoticeService {
     @Autowired
     private NoticeRepository noticeRepository;
 
-
     @Override
-    public void registerNoticeBoard(NoticeBoardDTO dto) {
-        NoticeBoard board = dtoToEntity(dto);
-        noticeRepository.save(board);
-    }
-
-    @Override
-    public Long insertNotice(NoticeBoardDTO noticeBoardDTO) {
+    public Long registerNotice(NoticeBoardDTO noticeBoardDTO) {
         NoticeBoard board = dtoToEntity(noticeBoardDTO);
         Long bno = noticeRepository.save(board).getBno();
         return bno;
-    }
-
-    @Override
-    public List<NoticeBoardDTO> findAllNotices() {
-        List<NoticeBoard> boards = noticeRepository.findAll();
-        List<NoticeBoardDTO> dtos = new ArrayList<>();
-        for (NoticeBoard board : boards) {
-            dtos.add(entityToDTO(board));
-        }
-        return dtos;
     }
 
 
     @Override
     public NoticeBoardDTO getNotice(Long bno) {
         NoticeBoard board = noticeRepository.findById(bno).orElse(null);
-        if (board != null) {
+        return board != null ? entityToDTO(board) : null;
+    }
 
-            board.setReadCount(board.getReadCount() + 1);
-            noticeRepository.save(board);
+    @Override
+    public NoticeBoardDTO findNoticeById(Long bno, int mode) {
+        NoticeBoard noticeBoard = noticeRepository.findById(bno).orElse(null);
+        if (noticeBoard == null) return null;
+
+        if (mode == 1) {
+            noticeBoard.updateReadCount();
+            noticeRepository.save(noticeBoard);
         }
-        return entityToDTO(board);
+        return entityToDTO(noticeBoard);
     }
 
     @Override
     public void updateNotice(NoticeBoardDTO noticeBoardDTO) {
-        NoticeBoard board = noticeRepository.findById(noticeBoardDTO.getBno()).orElse(null);
-        if (board != null) {
-            board.change(noticeBoardDTO.getTitle(), noticeBoardDTO.getContent());
-            noticeRepository.save(board);
+        NoticeBoard noticeBoard = noticeRepository.findById(noticeBoardDTO.getBno()).orElse(null);
+        if (noticeBoard == null) {
+            noticeBoard.change(noticeBoardDTO.getTitle(), noticeBoardDTO.getContent());
+            noticeBoard.setPinned(noticeBoardDTO.isPinned());
+
+            noticeRepository.save(noticeBoard);
         }
     }
 

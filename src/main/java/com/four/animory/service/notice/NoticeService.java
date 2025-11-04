@@ -1,36 +1,26 @@
 package com.four.animory.service.notice;
 
 import com.four.animory.domain.notice.NoticeBoard;
-import com.four.animory.domain.user.Member;
 import com.four.animory.dto.common.PageRequestDTO;
 import com.four.animory.dto.common.PageResponseDTO;
 import com.four.animory.dto.notice.NoticeBoardDTO;
 
-import java.util.List;
-
 public interface NoticeService {
 
-
-    void registerNoticeBoard(NoticeBoardDTO noticeBoardDTO);
-
-    Long insertNotice(NoticeBoardDTO noticeBoardDTO);
-    List<NoticeBoardDTO> findAllNotices();
+    Long registerNotice(NoticeBoardDTO noticeBoardDTO);
     NoticeBoardDTO getNotice(Long bno);
+    NoticeBoardDTO findNoticeById(Long bno, int mode);
     void updateNotice(NoticeBoardDTO dto);
     void removeNotice(Long bno);
+
     PageResponseDTO<NoticeBoardDTO> getList(PageRequestDTO pageRequestDTO);
 
-
-
     default NoticeBoard dtoToEntity(NoticeBoardDTO dto){
-
         return NoticeBoard.builder()
                 .title(dto.getTitle())
                 .content(dto.getContent())
                 .readCount(dto.getReadCount())
                 .isPinned(dto.isPinned())
-
-
                 .build();
     }
 

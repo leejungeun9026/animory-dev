@@ -57,19 +57,19 @@
             </tr>
             </thead>
             <tbody>
-            <tr>
-              <td>1</td>
-              <td>Y</td>
+            <tr th:each="notice : ${responseDTO.dtoList}">
+              <td th:text="${notice.bno}">1</td>
+              <td th:text="${notice.isPinned ? '📌' : ''}">📌</td>
               <td>
-                <a href="/admin/notice/view">
-                  <h6 class="text-overflew-line-2 py-3">글제목 들어가는 자리입니다. <span class="text-danger">[3]</span></h6>
+                <a th:href="@{/admin/notice/view(bno=${notice.bno},mode=1)}">
+                  <h6 class="text-overflew-line-2 py-3" th:text="${notice.title}">글제목 들어가는 자리입니다. <span class="text-danger">[3]</span></h6>
                 </a>
               </td>
               <td>관리자</td>
-              <td>2025-01-01 00:00</td>
-              <td>123</td>
+              <td th:text="${#temporals.format(notice.regDate, 'yyyy-MM-dd HH:mm')}">2025-01-01 00:00</td>
+              <td th:text="${notice.readCount}">123</td>
             </tr>
-            <tr>
+            <tr th:if="${#lists.isEmpty(responseDTO.dtoList)}">
               <td colspan="6">
                 <p class="py-3 text-center">게시글이 없어요</p>
               </td>
