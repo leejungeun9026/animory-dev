@@ -101,7 +101,7 @@
 .header .sign {
     position: absolute;
     right: calc(var(--bs-gutter-x)* 1);
-    top: 25px;
+    top: 26.5px;
     display: flex;
     gap: 8px;
     align-items: center;
