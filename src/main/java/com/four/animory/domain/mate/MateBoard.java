@@ -13,11 +13,7 @@ import java.util.Set;
 @Table(name = "tbl_mate_board")
 @Getter
 @Setter
-<<<<<<< HEAD
-@ToString(exclude = {"member"})
-=======
 @ToString(exclude = "member")
->>>>>>> 02ff85383b41069979313121ff3c23f498c80adb
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
