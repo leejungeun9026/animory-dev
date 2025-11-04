@@ -35,15 +35,14 @@ public class SitterController {
 
   @GetMapping("/register")
   public void registerGet(@AuthenticationPrincipal PrincipalDetails principal, Model model) {
-      MemberDTO memberDTO = null;
       if (principal != null) { // 로그인한 사용자가 있는 경우
           Member member = principal.getMember();
-          memberDTO = userService.getMemberByUsername(member.getUsername());
+          MemberDTO memberDTO = userService.getMemberByUsername(member.getUsername());
           log.info("로그인한 회원 정보: {}", memberDTO);
+          model.addAttribute("memberDTO", memberDTO);
       } else {
           log.info("비로그인 상태에서 글쓰기 페이지 접근");
       }
-      model.addAttribute("memberDTO", memberDTO);
   }
 
   @PostMapping("/register")
