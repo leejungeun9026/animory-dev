@@ -5,13 +5,13 @@
       xmlns:th="http://www.thymeleaf.org">
 
 <div layout:fragment="content">
-  <!-- /* view 화면 html 코드 작성 부분 */ -->
-  <div class="page_title mb-4">
-    <a class="d-inline-flex align-items-baseline" href="/spr/list">
-      <small class="text-danger">나눔/공구/신고 게시판 <i class="fa-solid fa-chevron-right fs-xs"></i></small>
-    </a>
-    <h3 class="memomentKkukkkuk fw-normal mt-2">게시글 수정</h3>
-  </div>
+<!-- /* view 화면 html 코드 작성 부분 */ -->
+    <div class="page_title mb-4">
+        <a class="d-inline-flex align-items-baseline" href="/spr/list">
+         <small class="text-danger">나눔/공구/신고 게시판 <i class="fa-solid fa-chevron-right fs-xs"></i></small>
+        </a>
+        <h3 class="memomentKkukkkuk fw-normal mt-2">게시글 수정</h3>
+    </div>
     <div class="board_area">
         <form action="/spr/modify" enctype="multipart/form-data" method="post" >
             <input type="hidden" th:value="${board.bno}" name="bno">
@@ -23,12 +23,12 @@
                 <textarea class="form-control" cols="30" id="content" name="content"
                 required rows="10">[[${board.content}]]</textarea>
             </div>
-            <!-- 나눔 / 공구 카테고리에서만 체크박스 표시 -->
+        <!-- 나눔 / 공구 카테고리에서만 체크박스 표시 -->
             <div class="mb-2" th:if="${board.category == '나눔'} or ${board.category == '공구'}">
                 <input class="form-check-input" name="complete" type="checkbox" id="complete" th:checked="${board.complete == true}">
                 <label class="form-check-label" for="complete">[[${board.category}]]완료</label>
             </div>
-            <!-- 체크박스 끝 -->
+        <!-- 체크박스 끝 -->
             <div class="mb-3">
                 <input class="form-control" multiple name="files" type="file">
             </div>

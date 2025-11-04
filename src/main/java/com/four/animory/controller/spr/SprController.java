@@ -62,12 +62,20 @@ public class SprController {
         return "redirect:/spr/list";
     }
 
+    @GetMapping("/like")
+    public String likePost(Long bno,RedirectAttributes redirectAttributes){
+        sprService.upedateRecommend(bno);
+        redirectAttributes.addAttribute("bno",bno);
+        redirectAttributes.addAttribute("mode",2);
+        return "redirect:/spr/view";
+    }
+
     @GetMapping({"/view","/modify"})
     public void view_modifyBoard(Long bno, int mode, PageRequestDTO pageRequestDTO, Model model){
         model.addAttribute("pageRequestDTO",pageRequestDTO);
         model.addAttribute("board",sprService.findBoardById(bno, mode));
     }
-    @PostMapping("modify")
+    @PostMapping("/modify")
     public String modifyPost(SprBoardDTO sprBoardDTO, RedirectAttributes redirectAttributes) {
         sprService.updateBoard(sprBoardDTO);
         redirectAttributes.addAttribute("bno",sprBoardDTO.getBno());
