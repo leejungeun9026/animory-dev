@@ -32,13 +32,25 @@ public class FreeServiceImpl implements FreeService{
         return freeBoardDTOS;
     }
 
-    @Override
+    @Override // bno로 게시글 1개 찾아오기
     public FreeBoardDTO findFreeBoardById(Long bno) {
         FreeBoard freeBoard = freeBoardRepository.findById(bno).orElse(null);
         FreeBoardDTO freeBoardDTO = entityToDTO(freeBoard);
         return freeBoardDTO;
     }
 
+    @Override // 게시글 업데이트
+    public void updateFreeBoard(FreeBoardDTO freeBoardDTO) {
+        FreeBoard freeBoard = freeBoardRepository.findById(freeBoardDTO.getBno()).orElse(null); // 기존의 board 데이터 가져오기
+        freeBoard.change(freeBoardDTO.getContent(), freeBoardDTO.getContent());
+        freeBoardRepository.save(freeBoard);
+    }
+
+
+    @Override // 게시글 번호 삭제
+    public void deleteFreeBoardById(Long bno) {
+        freeBoardRepository.deleteById(bno);
+    }
 
 
 }

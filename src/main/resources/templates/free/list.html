@@ -54,7 +54,11 @@
               <td>
                 <div class="py-2">
                   <div class="d-flex gap-2 flex-nowrap mb-2">
-                    <p class="badge badge-success" th:text="${board.btype}"></p>
+<!--                    <p class="badge badge-success" th:text="${board.btype}"></p>-->
+                    <p th:text="${board.btype}" class="badge"
+                       th:classappend="${board.btype == '자유'} ? ' badge-success' :
+                   (${board.btype == '정보'} ? ' badge-info' : ' badge-secondary')">
+                    </p>
                   </div>
                   <a th:href="@{/free/view/{bno}(bno=${board.bno})}" class="d-block mb-1">
                     <h5 class="text-overflew-line-2" >[[${board.title}]]</h5>

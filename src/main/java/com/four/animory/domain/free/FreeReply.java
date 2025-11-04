@@ -6,7 +6,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 @Entity
-@Table(name="tbl_free_reply")
+@Table(indexes = {@Index(name="idx_freeReply_bno", columnList = "bno")})
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
@@ -20,6 +20,7 @@ public class FreeReply extends BaseEntity {
 
     @Column(nullable=false, length = 500)
     private String content;
+
     @Column(nullable=false, length = 45)
     private String username;
 

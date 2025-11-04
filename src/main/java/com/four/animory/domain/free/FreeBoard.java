@@ -2,6 +2,7 @@ package com.four.animory.domain.free;
 
 import com.four.animory.domain.BaseEntity;
 import com.four.animory.domain.user.Member;
+import com.four.animory.dto.free.FreeBoardDTO;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.ColumnDefault;
@@ -45,5 +46,10 @@ public class FreeBoard extends BaseEntity {
     @Builder.Default
     @OneToMany(mappedBy = "freeBoard", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<FreeReply> replies = new ArrayList<>(); // 실제 댓글 목록을 담는 필드
+
+    public void change(String title, String content) {
+        this.title = title;
+        this.content = content;
+    }
 
 }

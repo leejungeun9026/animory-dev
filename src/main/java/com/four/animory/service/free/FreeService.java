@@ -10,6 +10,8 @@ public interface FreeService {
     void registerFreeBoard(FreeBoardDTO freeBoardDTO); // 글 등록
     List<FreeBoardDTO> findAllFreeBoards(); // 게시글 전부 가져오기
     FreeBoardDTO findFreeBoardById(Long bno);
+    void updateFreeBoard(FreeBoardDTO freeBoardDTO);
+    void deleteFreeBoardById(Long bno);
 
     // dto -> Entity
     default FreeBoard dtoToEntity(FreeBoardDTO freeBoardDTO) {
