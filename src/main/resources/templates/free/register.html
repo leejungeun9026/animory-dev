@@ -5,45 +5,46 @@
       xmlns:th="http://www.thymeleaf.org">
 
 <div layout:fragment="content">
-  <!-- /* view 화면 html 코드 작성 부분 */ -->
-  <div class="page_title mb-4">
-    <a class="d-inline-flex align-items-baseline" href="/free/list">
-      <small class="text-danger">커뮤니티<i class="fa-solid fa-chevron-right fs-xs"></i></small>
-    </a>
-    <h3 class="memomentKkukkkuk fw-normal mt-2">게시글 작성</h3>
-  </div>
-  <div class="board_area">
-    <form action="/free/register" enctype="multipart/form-data" method="post">
-      <div class="mb-2">
-        <select class="form-select w-auto" id="btype" name="btype" required>
-          <option value="">카테고리(필수)</option>
-          <option value="자유">자유</option>
-          <option value="정보">정보</option>
-        </select>
-      </div>
-      <div class="mb-2">
-        <input class="form-control" name="title" placeholder="제목을 입력해주세요" required type="text">
-      </div>
-      <div class="mb-2">
-        <input type="hidden" name="writer" value="닉네임">
-        <textarea class="form-control" cols="30" id="content" name="content" placeholder="내용을 입력해주세요." required rows="10"></textarea>
-      </div>
-      <div class="mb-3">
-        <input class="form-control" multiple name="files" type="file">
-      </div>
-      <div class="button_wrap">
-        <div class="row g-2">
-          <div class="col-6 col-md-auto ms-md-auto">
-            <a class="btn btn-lg btn-gray w-100" href="/free/list">취소</a>
-          </div>
-          <div class="col-6 col-md-auto">
-            <button type="submit" class="btn btn-lg btn-main w-100">저장</button>
-          </div>
-        </div>
-      </div>
-    </form>
-  </div>
-  <!-- /* //view 화면 html 코드 작성 끝 */ -->
+    <!-- /* view 화면 html 코드 작성 부분 */ -->
+    <div class="page_title mb-4">
+        <a class="d-inline-flex align-items-baseline" href="/free/list">
+            <small class="text-danger">커뮤니티<i class="fa-solid fa-chevron-right fs-xs"></i></small>
+        </a>
+        <h3 class="memomentKkukkkuk fw-normal mt-2">게시글 작성</h3>
+    </div>
+    <div class="board_area">
+        <form action="/free/register" enctype="multipart/form-data" method="post">
+            <div class="mb-2">
+                <select class="form-select w-auto" id="btype" name="btype" required>
+                    <option value="">카테고리(필수)</option>
+                    <option value="자유">자유</option>
+                    <option value="정보">정보</option>
+                </select>
+            </div>
+            <div class="mb-2">
+                <input class="form-control" name="title" placeholder="제목을 입력해주세요" required type="text">
+            </div>
+            <div class="mb-2">
+                <p class="form-control" cols="30" name="nickname">[[${member.nickname}]]</p>
+                <input type="hidden" name="username" th:value="${member.username}">
+                <textarea class="form-control" cols="30" id="content" name="content" placeholder="내용을 입력해주세요." required rows="10"></textarea>
+            </div>
+            <div class="mb-3">
+                <input class="form-control" multiple name="files" type="file">
+            </div>
+            <div class="button_wrap">
+                <div class="row g-2">
+                    <div class="col-6 col-md-auto ms-md-auto">
+                        <a class="btn btn-lg btn-gray w-100" href="/free/list">취소</a>
+                    </div>
+                    <div class="col-6 col-md-auto">
+                        <button type="submit" class="btn btn-lg btn-main w-100">저장</button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+    <!-- /* //view 화면 html 코드 작성 끝 */ -->
 </div>
 
 <script layout:fragment="pagescript" th:inline="javascript">

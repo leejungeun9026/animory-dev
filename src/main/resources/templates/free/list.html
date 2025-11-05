@@ -60,11 +60,11 @@
                    (${board.btype == '정보'} ? ' badge-info' : ' badge-secondary')">
                     </p>
                   </div>
-                  <a th:href="@{/free/view/{bno}(bno=${board.bno})}" class="d-block mb-1">
+                  <a th:href="@{/free/view(bno=${board.bno})}" class="d-block mb-1">
                     <h5 class="text-overflew-line-2" >[[${board.title}]]</h5>
                   </a>
                   <div class="d-flex gap-2 flex-nowrap text-secondary">
-                    <p th:text="${board.writer}">작성자</p>
+                    <p>[[${board.nickname}]]</p>
                     <p th:text="${#temporals.format(board.updateDate, 'yyyy.MM.dd HH:mm')}"></p>
                     <p class="ms-auto"><i class="fa-regular fa-eye me-1"></i>
                         <span th:text="${board.readcount}"></span>
@@ -110,9 +110,6 @@
         </section>
       </div>
     </div>
-
-
-
   </div>
 <!-- /* //view 화면 html 코드 작성 끝 */ -->
 </div>

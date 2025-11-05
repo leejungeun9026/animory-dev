@@ -18,8 +18,8 @@
       <div class="mb-2">
         <select class="form-select w-auto" id="btype" name="btype" required>
           <option value="">카테고리(필수)</option>
-          <option value="자유">자유</option>
-          <option value="정보">정보</option>
+          <option value="자유" th:selected="${freeBoard.btype != null and freeBoard.btype == '자유'}">자유</option>
+          <option value="정보" th:selected="${freeBoard.btype != null and freeBoard.btype == '정보'}">정보</option>
         </select>
       </div>
       <div class="mb-2">
@@ -27,7 +27,7 @@
         <input class="form-control" name="title" required type="text" th:value="${freeBoard.title}">
       </div>
       <div class="mb-2">
-        <input type="hidden" name="writer" value="닉네임">
+        <input type="hidden" name="nickname" value="닉네임">
         <label class="form-label">내용</label>
         <textarea class="form-control" cols="30" id="content" name="content" required rows="10">[[${freeBoard.content}]]
         </textarea>

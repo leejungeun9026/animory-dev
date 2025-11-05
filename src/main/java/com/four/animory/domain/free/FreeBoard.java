@@ -27,8 +27,7 @@ public class FreeBoard extends BaseEntity {
     private String title;
     @Column(nullable = false, length = 3000)
     private String content;
-    @Column(nullable = false, length = 45)
-    private String writer;
+
     @Column(nullable = false, length = 20)
     private String btype;
 
@@ -47,9 +46,13 @@ public class FreeBoard extends BaseEntity {
     @OneToMany(mappedBy = "freeBoard", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<FreeReply> replies = new ArrayList<>(); // 실제 댓글 목록을 담는 필드
 
-    public void change(String title, String content) {
+    public void change(String title, String content, String btype) {
         this.title = title;
         this.content = content;
+        this.btype = btype;
+    }
+    public void updateReadCount() {
+        this.readcount = readcount+1;
     }
 
 }

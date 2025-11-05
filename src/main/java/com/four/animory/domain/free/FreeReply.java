@@ -6,7 +6,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 @Entity
-@Table(indexes = {@Index(name="idx_freeReply_bno", columnList = "bno")})
+@Table(name="tbl_free_reply")
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
@@ -23,6 +23,9 @@ public class FreeReply extends BaseEntity {
 
     @Column(nullable=false, length = 45)
     private String username;
+
+    @Column(nullable=false, length = 45)
+    private String nickname;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "bno")

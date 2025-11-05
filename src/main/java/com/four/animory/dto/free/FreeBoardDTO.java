@@ -22,8 +22,11 @@ public class FreeBoardDTO {
     @NotEmpty
     private String content;
     @NotEmpty
-    private String writer;
+    private String username;
+    private String nickname;
+    @NotEmpty
     private String btype;
+
     private int readcount;
     private int likecount;
     private LocalDateTime regDate;
@@ -31,4 +34,5 @@ public class FreeBoardDTO {
     private List<FreeFile> fileDTOs;
     private int replycount;
     private Long mno; // 로그인 회원 ID용 필드
+
 }

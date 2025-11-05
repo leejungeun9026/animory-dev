@@ -1,15 +1,16 @@
 package com.four.animory.service.free;
 
 import com.four.animory.domain.free.FreeBoard;
+import com.four.animory.domain.user.Member;
 import com.four.animory.dto.free.FreeBoardDTO;
 
 import java.util.List;
 
 
 public interface FreeService {
-    void registerFreeBoard(FreeBoardDTO freeBoardDTO); // 글 등록
+    void registerFreeBoard(FreeBoardDTO freeBoardDTO, Member member); // 글 등록
     List<FreeBoardDTO> findAllFreeBoards(); // 게시글 전부 가져오기
-    FreeBoardDTO findFreeBoardById(Long bno);
+    FreeBoardDTO findFreeBoardById(Long bno,Integer mode);
     void updateFreeBoard(FreeBoardDTO freeBoardDTO);
     void deleteFreeBoardById(Long bno);
 
@@ -18,7 +19,6 @@ public interface FreeService {
         FreeBoard freeBoard = FreeBoard.builder()
                 .title(freeBoardDTO.getTitle())
                 .content(freeBoardDTO.getContent())
-                .writer(freeBoardDTO.getWriter())
                 .btype(freeBoardDTO.getBtype())
                 .likecount(freeBoardDTO.getLikecount())
                 .readcount(freeBoardDTO.getReadcount())
@@ -32,7 +32,8 @@ public interface FreeService {
                 .bno(freeBoard.getBno())
                 .title(freeBoard.getTitle())
                 .content(freeBoard.getContent())
-                .writer(freeBoard.getWriter())
+                .nickname(freeBoard.getMember().getNickname())
+                .username(freeBoard.getMember().getUsername())
                 .btype(freeBoard.getBtype())
                 .likecount(freeBoard.getLikecount())
                 .readcount(freeBoard.getReadcount())
