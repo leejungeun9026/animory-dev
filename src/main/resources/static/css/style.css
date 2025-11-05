@@ -284,9 +284,8 @@ ul, ol, li {
     --bs-pagination-disabled-border-color: var(--bs-gray-400);
 }
 
-.badge-primary {
-    color: var(--bs-primary);
-    background: rgba(var(--bs-primary-rgb), 0.175);
+.badge, .badge > * {
+   font-size: 12px;
 }
 .badge-outline-primary {
     color: var(--bs-primary);

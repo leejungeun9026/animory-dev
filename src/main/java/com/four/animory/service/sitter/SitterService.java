@@ -1,13 +1,20 @@
 package com.four.animory.service.sitter;
 
 import com.four.animory.domain.sitter.SitterBoard;
+import com.four.animory.domain.user.Member;
+import com.four.animory.dto.common.PageResponseDTO;
 import com.four.animory.dto.sitter.SitterBoardDTO;
+import com.four.animory.dto.sitter.SitterBoardListDTO;
+import com.four.animory.dto.sitter.SitterBoardPageRequestDTO;
+import com.four.animory.dto.sitter.SitterBoardPageResponseDTO;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 public interface SitterService {
-  void registerSitterBoard(SitterBoardDTO sitterBoardDTO);
+  void insertSitterBoard(SitterBoardDTO sitterBoardDTO, Member member);
+  List<SitterBoardDTO> getSitterBoardList();
+  SitterBoardDTO getSitterBoardById(Long bno);
+  SitterBoardPageResponseDTO<SitterBoardListDTO> getSitterBoardListSearchPage(SitterBoardPageRequestDTO sitterBoardPageRequestDTO);
 
   default SitterBoard dtoToEntity(SitterBoardDTO sitterBoardDTO){
     SitterBoard sitterBoard = SitterBoard.builder()
@@ -26,11 +33,14 @@ public interface SitterService {
     SitterBoardDTO sitterBoardDTO = SitterBoardDTO.builder()
         .bno(sitterBoard.getBno())
         .state(sitterBoard.getState())
+        .category(sitterBoard.getCategory())
         .petInfo(sitterBoard.getPetInfo())
         .sido(sitterBoard.getSido())
         .sigungu(sitterBoard.getSigungu())
         .title(sitterBoard.getTitle())
         .content(sitterBoard.getContent())
+        .username(sitterBoard.getMember().getUsername())
+        .nickname(sitterBoard.getMember().getNickname())
         .readCount(sitterBoard.getReadCount())
         .regDate(sitterBoard.getRegDate())
         .updateDate(sitterBoard.getUpdateDate())
