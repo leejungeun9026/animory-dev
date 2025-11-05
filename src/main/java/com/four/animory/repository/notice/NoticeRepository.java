@@ -14,9 +14,14 @@ import java.util.List;
 public interface NoticeRepository extends JpaRepository<NoticeBoard, Long> {
 
 
-    @Query(
-            "SELECT n FROM NoticeBoard n " +
-            "WHERE LOWER(n.title) LIKE LOWER(CONCAT('%', :keyword, '%')) " +
-            "   OR LOWER(n.content) LIKE LOWER(CONCAT('%', :keyword, '%'))")
-    Page<NoticeBoard> searchByKeyword(@Param("keyword") String keyword, Pageable pageable);
+    @Query("""
+  SELECT n FROM NoticeBoard n
+  WHERE (:kw IS NULL OR :kw = ''
+         OR LOWER(n.title)   LIKE LOWER(CONCAT('%', :kw, '%'))
+         OR LOWER(n.content) LIKE LOWER(CONCAT('%', :kw, '%')))
+  ORDER BY n.isPinned DESC, n.bno DESC
+""")
+    Page<NoticeBoard> search(@Param("kw") String keyword, Pageable pageable);
+
+
 }

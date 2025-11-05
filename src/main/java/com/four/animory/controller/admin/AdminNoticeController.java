@@ -38,11 +38,18 @@ public class AdminNoticeController {
         model.addAttribute("list", responseDTO.getDtoList());
     }
 
-    @GetMapping({"/view","/modify"})
-    public void viewOrModify(@RequestParam Long bno, int mode, PageRequestDTO pageRequestDTO, Model model){
-        model.addAttribute("notice", noticeService.findNoticeById(bno, mode));
-
+    @GetMapping("/view")
+    public String view(@RequestParam Long bno, Model model) {
+        model.addAttribute("notice", noticeService.findNoticeById(bno, 1)); // 조회수 +
+        return "admin/notice/view";
     }
+
+    @GetMapping("/modify")
+    public String modifyForm(@RequestParam Long bno, Model model) {
+        model.addAttribute("notice", noticeService.findNoticeById(bno, 0)); // 조회수 X
+        return "admin/notice/modify";
+    }
+
 
     @PostMapping("/modify")
     public String modifyPost(NoticeBoardDTO noticeBoardDTO, RedirectAttributes redirectAttributes){
@@ -52,9 +59,11 @@ public class AdminNoticeController {
         return "redirect:/admin/notice/view";
     }
 
-    @PostMapping("/remove")
-    public String removePost(@RequestParam Long bno){
+    @GetMapping("/remove")
+    public String removeGet(@RequestParam Long bno) {
         noticeService.removeNotice(bno);
         return "redirect:/admin/notice/list";
     }
+
+
 }
