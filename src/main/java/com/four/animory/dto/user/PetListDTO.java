@@ -12,6 +12,8 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class PetRequestDTO {
-  private List<PetDTO> pets = new ArrayList<>();
+public class PetListDTO {
+  private Long mid;
+  @Builder.Default
+  private List<PetDTO> petDTO = new ArrayList<>();
 }

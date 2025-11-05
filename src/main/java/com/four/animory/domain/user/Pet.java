@@ -25,4 +25,10 @@ public class Pet extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="mid")
     private Member member;
+
+  public void change(String name, int age, String type){
+    this.name = name;
+    this.age = age;
+    this.type = type;
+  }
 }

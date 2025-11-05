@@ -4,7 +4,7 @@ import com.four.animory.config.auth.PrincipalDetails;
 import com.four.animory.domain.user.Member;
 import com.four.animory.dto.user.MemberDTO;
 import com.four.animory.dto.user.PetDTO;
-import com.four.animory.dto.user.PetRequestDTO;
+import com.four.animory.dto.user.PetListDTO;
 import com.four.animory.dto.user.UserRegisterDTO;
 import com.four.animory.service.user.UserService;
 import lombok.extern.log4j.Log4j2;
@@ -57,14 +57,14 @@ public class UserController {
 
   @GetMapping("/modifyPet")
   public void modifyGet(@RequestParam("mid") Long mid, Model model) {
+    model.addAttribute("mid", mid);
     model.addAttribute("petDTOs", userService.getPetListByMemberId(mid));
   }
 
   @PostMapping("/modifyPet")
-  public String modifyPost(PetRequestDTO petRequestDTO, Model model, RedirectAttributes redirectAttributes) {
-    for (PetDTO petDTO : petRequestDTO.getPets()) {
-      log.info(petDTO);
-    }
+  public String modifyPost(PetListDTO petListDTO, Model model) {
+    log.info(petListDTO);
+    userService.updatePetList(petListDTO);
     return "redirect:/index";
   }
 }

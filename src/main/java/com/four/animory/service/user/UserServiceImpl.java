@@ -2,10 +2,7 @@ package com.four.animory.service.user;
 
 import com.four.animory.domain.user.Member;
 import com.four.animory.domain.user.Pet;
-import com.four.animory.dto.user.MemberDTO;
-import com.four.animory.dto.user.MemberListPetCountDTO;
-import com.four.animory.dto.user.PetDTO;
-import com.four.animory.dto.user.UserRegisterDTO;
+import com.four.animory.dto.user.*;
 import com.four.animory.repository.user.MemberRepository;
 import com.four.animory.repository.user.PetRepository;
 import lombok.extern.log4j.Log4j2;
@@ -91,5 +88,54 @@ public class UserServiceImpl implements UserService {
       petDTOs.add(entityToDTO(pet));
     }
     return petDTOs;
+  }
+
+  @Override
+  public void updatePetList(PetListDTO petListDTO) {
+    Long mid = petListDTO.getMid();
+    List<PetDTO> petDTOs = petListDTO.getPetDTO();
+    log.info("petListDTO"+petListDTO);
+    log.info("mid"+mid);
+    log.info("petDTOs"+petDTOs);
+
+    Member member = memberRepository.findById(mid).orElse(null);
+    List<Pet> petList = petRepository.findPetsByMemberId(mid);
+    log.info(member);
+    log.info(petList);
+
+    // DB에 있는 petList와 입력한 petDTOList 비교
+    for(Pet pet : petList){
+      log.info("for문 시작" + pet);
+      boolean isSame = false;
+
+      for(PetDTO petDTO : petDTOs){
+        log.info("이중for문 시작 DTO");
+        if(pet.getId().equals(petDTO.getPid())){
+          // 내가 입력한 petID와 DB에 있는 petID가 일치하면 업데이트
+          Pet updatePet = petRepository.findById(pet.getId()).orElse(null);
+          updatePet.change(petDTO.getName(), petDTO.getAge(), petDTO.getType());
+          log.info("수정");
+          petRepository.save(updatePet);
+          isSame = true;
+        }
+      }
+      if(isSame){
+        // 같으면 업데이트 수행하고 왔으므로 아무일도 일어나지 않음
+      } else {
+        // 다르면(DB에 없으면) 삭제
+        log.info("삭제");
+        petRepository.deleteById(pet.getId());
+      }
+    }
+
+    // 입력한 petDTO에 petID가 없으면
+    for(PetDTO petDTO : petDTOs){
+      if(petDTO.getPid() == null){
+        Pet insertPet = dtoToEntity(petDTO);
+        insertPet.setMember(member);
+        log.info("등록");
+        petRepository.save(insertPet);
+      }
+    }
   }
 }

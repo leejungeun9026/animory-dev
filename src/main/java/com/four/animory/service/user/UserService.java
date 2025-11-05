@@ -2,10 +2,7 @@ package com.four.animory.service.user;
 
 import com.four.animory.domain.user.Member;
 import com.four.animory.domain.user.Pet;
-import com.four.animory.dto.user.MemberDTO;
-import com.four.animory.dto.user.MemberListPetCountDTO;
-import com.four.animory.dto.user.PetDTO;
-import com.four.animory.dto.user.UserRegisterDTO;
+import com.four.animory.dto.user.*;
 
 import java.util.List;
 
@@ -18,7 +15,7 @@ public interface UserService {
   void modifySitter(MemberDTO memberDTO);
 
   List<PetDTO> getPetListByMemberId(Long mid);
-
+  void updatePetList(PetListDTO petListDTO);
 
   default Member dtoToEntity(MemberDTO memberDTO){
     return Member.builder()
