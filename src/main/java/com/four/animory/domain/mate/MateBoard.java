@@ -22,27 +22,31 @@ public class MateBoard extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long bno;
-    @Column(nullable = false, length = 45)
+    @Column(nullable = false)
     private String state;
-    @Column(nullable = false, length = 45)
+    @Column(nullable = false)
     private String category;
-    @Column(nullable = false, length = 45)
+    @Column(nullable = false)
     private String petInfo;
+
     @Column(nullable = false, length = 45)
     private String sido;
     @Column(nullable = false, length = 45)
     private String sigungu;
+
+
     @Column(nullable = false, length = 300)
     private String title;
     @Column(nullable = false, length = 3000)
     private String content;
-
-   @ManyToOne(fetch = FetchType.LAZY)
-//    @JoinColumn(name="mid") //fat info
-    private Member member;
-
     @ColumnDefault(value="0")
     private int readCount;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name="mid") //fat info
+    private Member member;
+
+    public void updateReadCount(){ this.readCount = this.readCount + 1; }
 
 //    @OneToMany(mappedBy = "sitterBoard", fetch = FetchType.LAZY, cascae = CascadeType.ALL)
 //    private Set<MateFile> fileSet = new HashSet<>();

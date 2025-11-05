@@ -21,6 +21,7 @@ public class MateBoardDTO {
     private String state;
     @NotEmpty
     private String category;
+    @NotEmpty
     private String perInfo;
     @NotEmpty
     private String sido;
@@ -36,6 +37,4 @@ public class MateBoardDTO {
     private LocalDateTime regDate;
     private LocalDateTime updateDate;
     private List<MateFile> fileDTOs;
-
-
 }

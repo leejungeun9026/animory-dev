@@ -20,11 +20,8 @@ public class MateFile implements Comparable<MateFile> {
     private boolean image;
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "bno")
     private MateBoard mateBoard;
-
-    public void changeBoard(MateBoard mateBoard) {
-        this.mateBoard = mateBoard;
-    }
 
     // OneToMany에서 순서에 맞게 정렬하기 위함
     @Override
