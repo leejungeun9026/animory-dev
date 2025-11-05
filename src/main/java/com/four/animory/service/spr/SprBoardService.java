@@ -2,12 +2,11 @@ package com.four.animory.service.spr;
 
 
 import com.four.animory.domain.spr.SprBoard;
-import com.four.animory.domain.user.Member;
 import com.four.animory.dto.common.PageRequestDTO;
 import com.four.animory.dto.common.PageResponseDTO;
 import com.four.animory.dto.spr.SprBoardDTO;
 
-public interface SprService {
+public interface SprBoardService {
     void registerSprBoard(SprBoardDTO sprBoardDTO);
     PageResponseDTO<SprBoardDTO> getList(PageRequestDTO pageRequestDTO);
     SprBoardDTO findBoardById(Long bno, int mode);
