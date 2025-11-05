@@ -1,32 +1,41 @@
 package com.four.animory.controller.spr;
 
 import com.four.animory.config.auth.PrincipalDetails;
+import com.four.animory.domain.spr.SprReply;
 import com.four.animory.domain.user.Member;
 import com.four.animory.dto.common.PageRequestDTO;
 import com.four.animory.dto.common.PageResponseDTO;
-import com.four.animory.dto.sitter.SitterBoardDTO;
 import com.four.animory.dto.spr.SprBoardDTO;
+import com.four.animory.dto.spr.SprReplyDTO;
 import com.four.animory.dto.user.MemberDTO;
-import com.four.animory.service.spr.SprService;
+import com.four.animory.service.spr.SprBoardService;
+import com.four.animory.service.spr.SprReplyService;
 import com.four.animory.service.user.UserService;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
+import java.util.List;
 
 @Controller
 @Log4j2
 @RequestMapping("/spr")
-public class SprController {
+public class SprBoardController {
     @Autowired
-    private SprService sprService;
+    private SprBoardService sprService;
     @Autowired
     private UserService userService;
+    @Autowired
+    private SprReplyService sprReplyService;
+
 
     @GetMapping("/list")
     public void list(PageRequestDTO pageRequestDTO, Model model){
@@ -57,17 +66,14 @@ public class SprController {
 
     @GetMapping("/remove")
     public String removePost(Long bno){
-        SprBoardDTO sprBoardDTO = sprService.findBoardById(bno,2 );
         sprService.deleteBoardById(bno);
         return "redirect:/spr/list";
     }
 
+    @ResponseBody
     @GetMapping("/like")
-    public String likePost(Long bno,RedirectAttributes redirectAttributes){
-        sprService.upedateRecommend(bno);
-        redirectAttributes.addAttribute("bno",bno);
-        redirectAttributes.addAttribute("mode",2);
-        return "redirect:/spr/view";
+    public SprBoardDTO likePost(Long bno){
+        return sprService.upedateRecommend(bno);
     }
 
     @GetMapping({"/view","/modify"})

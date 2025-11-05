@@ -20,8 +20,6 @@ public class SprReply extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long rno;
-    @Column(nullable = false, length = 300)
-    private String title;
     @Column(nullable = false, length = 3000)
     private String content;
     @ManyToOne(fetch = FetchType.LAZY)
@@ -30,6 +28,6 @@ public class SprReply extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="mid")
     private Member member;
-    private boolean secrete;
+    private boolean secret;
     private boolean deleted;
 }
