@@ -50,7 +50,7 @@ public class NoticeServiceImpl implements NoticeService {
     @Override
     public void updateNotice(NoticeBoardDTO noticeBoardDTO) {
         NoticeBoard noticeBoard = noticeRepository.findById(noticeBoardDTO.getBno()).orElse(null);
-        if (noticeBoard == null) {
+        if (noticeBoard != null) {
             noticeBoard.change(noticeBoardDTO.getTitle(), noticeBoardDTO.getContent());
             noticeBoard.setPinned(noticeBoardDTO.isPinned());
 
@@ -65,19 +65,22 @@ public class NoticeServiceImpl implements NoticeService {
 
     @Override
     public PageResponseDTO<NoticeBoardDTO> getList(PageRequestDTO pageRequestDTO) {
+
+        String kw = pageRequestDTO.getKeyword();
         Pageable pageable = pageRequestDTO.getPageable("bno");
-        Page<NoticeBoard> result = noticeRepository.findAll(pageable);
+        Page<NoticeBoard> result = noticeRepository.search(kw == null ? "" : kw.trim(), pageable);
 
-        List<NoticeBoardDTO> dtoList = result.getContent().stream()
+
+        var dtoList = result.getContent().stream()
                 .map(this::entityToDTO)
-                .collect(Collectors.toList());
-
-        int total = (int) result.getTotalElements();
+                .toList();
 
         return PageResponseDTO.<NoticeBoardDTO>withAll()
                 .pageRequestDTO(pageRequestDTO)
                 .dtoList(dtoList)
-                .total(total)
+                .total((int) result.getTotalElements())
                 .build();
     }
 }
+
+

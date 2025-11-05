@@ -55,8 +55,9 @@
                 <div class="py-2">
                   <a th:href="@{/notice/view(bno=${notice.bno})}" class="d-block mb-1">
                       <h5 class="text-overflew-line-2">
-                          <span th:if="${notice.isPinned}" class="me-1" aria-hidden="true">📌</span>
+                          <span th:if="${notice.pinned}" class="me-1" aria-hidden="true">📌</span>
                           <span th:text="${notice.title}">글 제목 자리</span>
+                          <span th:if="${notice.updateDate != null and notice.updateDate.isAfter(notice.regDate)}" class="text-muted">(수정됨)</span>
                       </h5>
 
                   </a>
