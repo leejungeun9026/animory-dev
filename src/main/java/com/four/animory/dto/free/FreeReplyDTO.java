@@ -20,6 +20,8 @@ public class FreeReplyDTO {
     private String content;
     @NotEmpty
     private String username;
+    @NotEmpty
+    private String nickname;
 
     private LocalDateTime regDate;
     private LocalDateTime updateDate;
