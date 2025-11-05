@@ -7,7 +7,10 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public interface MateService {
-    void regesiterMateBoard(MateBoardDTO mateBoardDTO);
+    List<MateBoardDTO> findAllMateBoards();
+    void registerMateBoard(MateBoardDTO mateBoardDTO);
+
+
 
     default MateBoard dtoToEntity(MateBoardDTO mateBoardDTO) {
         MateBoard mateBoard = MateBoard.builder()
