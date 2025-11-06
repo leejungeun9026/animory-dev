@@ -33,17 +33,12 @@ public class SprBoardServiceImpl implements SprBoardService {
     @Override
     public PageResponseDTO<SprBoardDTO> getList(PageRequestDTO pageRequestDTO) {
         Pageable pageable = pageRequestDTO.getPageable("bno");
-        Page<SprBoard> result =  sprRepository.searchAll(
+        Page<SprBoardDTO> result =  sprRepository.searchAll(
                 pageRequestDTO.getTypes(), pageRequestDTO.getKeyword(), pageable);
-
-        List<SprBoardDTO> dtoList = result.getContent().stream()
-                .map(sprBoard -> entityToDTO(sprBoard))
-                .collect(Collectors.toList());
-        int total = (int)result.getTotalElements();
         PageResponseDTO<SprBoardDTO> responseDTO = PageResponseDTO.<SprBoardDTO>withAll()
                 .pageRequestDTO(pageRequestDTO)
-                .dtoList(dtoList)
-                .total(total)
+                .dtoList(result.getContent())
+                .total((int)result.getTotalElements())
                 .build();
         return responseDTO;
     }

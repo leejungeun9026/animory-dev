@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en" layout:decorate="~{include/user}"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity6"
       xmlns:th="http://www.thymeleaf.org">
 
 <div layout:fragment="content">
@@ -40,7 +41,7 @@
                                     <p class="ms-auto"><i class="fa-regular fa-eye me-1"></i>[[${board.readcount}]]</p>
                                     <p th:if="${board.recommend >= 1}"><i class="fa-solid fa-heart me-1 text-danger" id="likeIcon"></i><span id="likeCount">[[${board.recommend}]]</span></p>
                                     <p th:if="${board.recommend == 0}"><i class="fa-regular fa-heart me-1 text-danger" id="likeIcon"></i><span id="likeCount">[[${board.recommend}]]</span></p>
-                                    <!--                  <p><i class="fa-regular fa-comment-dots me-1"></i>[[${board.replyCount}]]</p>-->
+                                    <p><i class="fa-regular fa-comment-dots me-1"></i>[[${board.replyCount}]]</p>
                                 </div>
                             </td>
                         </tr>
@@ -84,19 +85,33 @@
                                 <div>
                                     <ul class="pagination replyPaging"></ul>
                                 </div>
-                                <form id="replyForm">
-                                    <input type="hidden" id="bno" th:value="${board.bno}">
+                                <div class="replyModal">
                                     <div class="reply_write_area pt-3">
                                         <div class="mb-2">
-                                            <textarea name="replyText" id="replyText" class="form-control" placeholder="댓글 내용을 입력해주세요(최대 1000자)"></textarea>
+                                            <textarea name="replyText" class="replyText form-control" placeholder="댓글 내용을 입력해주세요(최대 1000자)"></textarea>
                                         </div>
                                         <div class="d-flex">
-                                            <input class="form-check-input" name="secret" type="checkbox" id="secret">
+                                            <input class="form-check-input secretCheck" name="secret" type="checkbox" id="secret">
                                             <label class="form-check-label" for="secret">비밀댓글</label>
-                                            <button type="submit" class="btnReplyRegister ms-auto btn btn-main">댓글 쓰기</button>
+                                            <button type="button" class="btnReplyRegister ms-auto btn btn-main">댓글 쓰기</button>
                                         </div>
                                     </div>
-                                </form>
+                                </div>
+                                <div class="modal modifyModal" tabindex="-1">
+                                    <div class="modal-dialog">
+                                        <div class="modal-content">
+                                            <div class="modal-body">
+                                                <div class="input-group mb-3">
+                                                    <input type="text" class="form-control modifyText">
+                                                </div>
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-dark modifyCloseBtn">닫기</button>
+                                                <button type="button" class="btn btn-primary modifyBtn2">수정</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
                             </td>
                         </tr>
                     </tbody>
@@ -108,6 +123,186 @@
 </div>
 
 <script layout:fragment="pagescript" th:inline="javascript">
+    const bno = [[${board.bno}]]
+    const replyList = document.querySelector(".replyList")
+    const replyPaging = document.querySelector(".replyPaging")
+    const boardAuthor = [[${board.author}]]
+    const loginUser = [[${#authentication.principal.username}]]
+
+    function printList(dtoList){
+        let str='';
+        if(dtoList && dtoList.length>0){
+            for(let dto of dtoList){
+                str += `<li class="reply_list border-bottom" data-rno="${dto.rno}">
+                                            <div class="d-flex justify-content-start align-items-start gap-2 py-2">
+                                                <div class="flex-grow-1">`
+                if(dto.deleted === true){
+                    str += `<div class="replyContent">삭제된 댓글입니다.</div>`
+                }else if(dto.secret === true){
+                    if(dto.author === loginUser || boardAuthor === loginUser){
+                        str += `<b>${dto.author}</b><div class="replyContent">${dto.content}</div>`
+                    }else{
+                        str += `<div class="replyContent">비밀 댓글입니다.</div>`
+                    }
+                } else if(dto.secret === false){
+                    str += `<b>${dto.author}</b><div class="replyContent">${dto.content}</div>`
+                }
+                str += `   </div>
+                        <div class="flex-shrink-1">
+                            <div class="btn-group">
+                                ${dto.deleted === false ? `
+                                <button type="button" class="btn btn-xs rounded-2 btn-outline-gray" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <i class="fa-solid fa-ellipsis"></i>
+                                </button>
+                                <ul class="dropdown-menu">
+                                    <li><a class="dropdown-item modifyBtn" href="">수정</a></li>
+                                    <li><a class="dropdown-item deleteBtn" href="">삭제</a></li>
+                                    <li><a class="btnReReplyWriteView dropdown-item">대댓글 달기</a></li>
+                                </ul>`: ''}
+                            </div>
+                        </div>
+                    </div>
+                </li>`;
+            }
+        }
+        replyList.innerHTML=str
+    }
+
+    function printPages(data){
+        let pageStr=''
+        if(data.prev){
+            pageStr += `<li class="page-item"><a class="page-link" data-page="${data.start -1}"><i class="fa-solid fa-chevron-left"></i></a></li>`
+        }
+        for(let i = data.start; i <= data.end; i++){
+            pageStr += `<li class="page-item ${Number(i) === Number(data.page)?"active":""}"><a class="page-link" data-page="${i}">${i}</a></li>`
+        }
+        if(data.next){
+            pageStr += `<li class="page-item"><a class="page-link" data-page="${data.end +1}"><i class="fa-solid fa-chevron-right"></i></a></li>`
+        }
+        replyPaging.innerHTML = pageStr
+    }
+
+    let page=1
+    let size=10
+
+    async function printReplies(bno, page, size, goLast){
+
+        const response = await axios.get(`/replies/list/${bno}`, {params:{page, size: Number(size)}})
+        let data = response.data;
+
+        if(goLast){
+            const total = response.data.total;
+            const lastPage = Math.ceil(total / size);
+            return printReplies(bno, lastPage, size, false);
+        }
+        printList(data.dtoList)
+        printPages(data);
+    }
+    printReplies(bno, page, size, false)
+
+    const registerModal = new bootstrap.Modal(document.querySelector(".replyModal"))
+    const registerBtn = document.querySelector(".btnReplyRegister")
+    const replyText = document.querySelector(".replyText")
+
+
+    replyPaging.addEventListener("click", function (e){
+        e.preventDefault()
+        e.stopPropagation()
+
+        const target = e.target.closest('a')
+        if(!target){
+            return
+        }
+        const pageNum = Number(target.getAttribute("data-page"));
+        page = pageNum
+        printReplies(bno, page, size, false)
+    },false)
+
+    registerBtn.addEventListener("click", async function (e){
+        const isSecret = document.querySelector(".secretCheck").checked
+
+        const replyObj = {
+            bno : bno,
+            content : replyText.value,
+            secret : isSecret ? 1:0,
+            deleted : false
+        }
+        try{
+            const response = await axios.post(`/replies/`, replyObj);
+            const result = response.data;
+
+            replyText.value = '';
+            document.querySelector(".secretCheck").checked = false;
+
+            printReplies(bno, 1, 10, false);
+        }catch (error){
+            alert("댓글 입력 오류");
+            console.error(error);
+        }
+    },false)
+
+    let CurrentModifyRno = null;;
+    const modifyModal = new bootstrap.Modal(document.querySelector(".modifyModal"))
+    const modifyText = document.querySelector(".modifyText")
+
+    const modifyCloseBtn = document.querySelector(".modifyCloseBtn")
+    async function modifyReply(replyObj){
+        const response = await axios.put(`/replies/${replyObj.rno}`, replyObj);
+        return response.data;
+    }
+    async function getReply(rno){
+        const response = await axios.get(`/replies/${rno}`)
+        return response.data;
+    }
+
+    replyList.addEventListener("click", async function (e) {
+        e.preventDefault()
+        e.stopPropagation()
+
+       const target = e.target.closest("a");
+        if(!target){
+            return
+        }
+        const li = target.closest("li.reply_list")
+        const rno = li.getAttribute("data-rno")
+        if(target.classList.contains("modifyBtn")) {
+            try {
+                const response = await axios.get(`/replies/${rno}`)
+                const reply = response.data
+                modifyText.value = reply.content
+                modifyModal.show()
+            } catch (err) {
+                console.error(err)
+            }
+        }
+
+        if(target.classList.contains("deleteBtn")){
+            try{
+                await axios.post(`/replies/delete/${rno}`)
+                printReplies(bno, page, size, false)
+            }catch (err){
+                console.error(err)
+            }
+        }
+
+
+        const modifyBtn2 = document.querySelector(".modifyBtn2")
+        modifyBtn2.onclick = async function () {
+            const updatedContent = modifyText.value
+
+            await axios.put(`/replies/${rno}`, {
+                rno: rno,
+                content: updatedContent
+            })
+
+            modifyModal.hide();
+
+            printReplies(bno, page, size, false);
+        }
+        modifyCloseBtn.onclick = function (){
+            modifyModal.hide();
+        }
+    })
 
 
 

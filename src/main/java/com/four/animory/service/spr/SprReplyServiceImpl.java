@@ -2,11 +2,14 @@ package com.four.animory.service.spr;
 
 import com.four.animory.domain.spr.SprBoard;
 import com.four.animory.domain.spr.SprReply;
+import com.four.animory.domain.user.Member;
 import com.four.animory.dto.common.PageRequestDTO;
 import com.four.animory.dto.common.PageResponseDTO;
 import com.four.animory.dto.spr.SprReplyDTO;
 import com.four.animory.repository.spr.SprBoardRepository;
 import com.four.animory.repository.spr.SprReplyRepository;
+import com.four.animory.repository.user.MemberRepository;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -18,17 +21,22 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
+@Log4j2
 public class SprReplyServiceImpl implements SprReplyService {
     @Autowired
     private SprReplyRepository sprReplyRepository;
     @Autowired
     private SprBoardRepository sprBoardRepository;
+    @Autowired
+    private MemberRepository memberRepository;
 
     @Override
-    public Long register(SprReplyDTO sprReplyDTO) {
+    public Long register(SprReplyDTO sprReplyDTO, String username) {
         SprReply sprReply = dtoToEntity(sprReplyDTO);
         SprBoard sprBoard = sprBoardRepository.findById(sprReplyDTO.getBno()).get();
+        Member member = memberRepository.findByUsername(username);
         sprReply.setSprBoard(sprBoard);
+        sprReply.setMember(member);
         Long rno = sprReplyRepository.save(sprReply).getRno();
         return rno;
     }
@@ -67,11 +75,9 @@ public class SprReplyServiceImpl implements SprReplyService {
     public PageResponseDTO<SprReplyDTO> getListOfBoard(Long bno, PageRequestDTO pageRequestDTO) {
         Pageable pageable = pageRequestDTO.getPageable("rno");
         Page<SprReply> result = sprReplyRepository.listOfBoard(bno, pageable);
-
         List<SprReplyDTO> dtoList = result.getContent().stream()
                 .map(sprReply -> entityToDTO(sprReply))
                 .collect(Collectors.toList());
-
         return PageResponseDTO.<SprReplyDTO>withAll()
                 .pageRequestDTO(pageRequestDTO)
                 .dtoList(dtoList)
