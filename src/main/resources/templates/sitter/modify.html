@@ -10,22 +10,23 @@
     <a class="d-inline-flex align-items-baseline" href="/sitter/list">
       <small class="text-danger">돌보미 게시판 <i class="fa-solid fa-chevron-right fs-xs"></i></small>
     </a>
-    <h3 class="memomentKkukkkuk fw-normal mt-2">게시글 작성</h3>
+    <h3 class="memomentKkukkkuk fw-normal mt-2">게시글 수정</h3>
   </div>
   <div class="board_area">
-    <form action="/sitter/register" enctype="multipart/form-data" method="post">
+    <form action="/sitter/modify" enctype="multipart/form-data" method="post">
+      <input type="text" name="bno" th:value="${board.bno}">
+      <input type="text" name="username" th:value="${board.username}">
       <div class="mb-2">
-        <select class="form-select w-auto" id="category" name="category" required>
-          <option value="">카테고리(필수)</option>
-          <option value="구해요">구하고 싶어요</option>
-          <option value="일해요">일하고 싶어요</option>
+        <select class="form-select w-auto" id="category" aria-label="구인구직" disabled>
+          <option value="구해요" th:selected="${board.category == '구해요'}">구하고 싶어요</option>
+          <option value="일해요" th:selected="${board.category == '일해요'}">일하고 싶어요</option>
         </select>
+        <input type="hidden" name="category" th:value="${board.category}">
       </div>
       <div class="mb-2">
         <select class="form-select" id="petInfo" name="petInfo">
-          <option value="">돌봄이 필요한 아이는</option>
-          <option value="dog">강아지</option>
-          <option value="cat">고양이</option>
+          <option value="dog" th:selected="${board.petInfo == 'dog'}">강아지</option>
+          <option value="cat" th:selected="${board.petInfo == 'cat'}">고양이</option>
         </select>
       </div>
       <div class="mb-2">
@@ -39,11 +40,11 @@
         </div>
       </div>
       <div class="mb-2">
-        <input class="form-control" name="title" placeholder="제목을 입력해주세요" required type="text">
+        <input aria-label="제목" class="form-control" name="title" placeholder="제목을 입력해주세요" required type="text" th:value="${board.title}">
       </div>
       <div class="mb-2">
-        <textarea class="form-control" cols="30" id="content" name="content" placeholder="시간과 장소 및 급여를 자세히 알려주세요!(최대 1000자)"
-                  required rows="10"></textarea>
+        <textarea aria-label="내용"  class="form-control" cols="30" id="content" name="content" placeholder="시간과 장소 및 급여를 자세히 알려주세요!(최대 1000자)"
+                  required rows="10">[[${board.content}]]</textarea>
       </div>
       <div class="mb-3">
         <input class="form-control" multiple name="files" type="file">
@@ -51,7 +52,7 @@
       <div class="button_wrap">
         <div class="row g-2">
           <div class="col-6 col-md-auto ms-md-auto">
-            <a class="btn btn-lg btn-gray w-100" href="/sitter/list">취소</a>
+            <a class="btn btn-lg btn-gray w-100" th:href="|@{/sitter/view(bno=${board.bno}, mode='0')}&${sitterBoardPageRequestDTO.link}|">취소</a>
           </div>
           <div class="col-6 col-md-auto">
             <button class="btn btn-lg btn-main w-100">저장</button>
@@ -64,34 +65,31 @@
 </div>
 
 <script layout:fragment="pagescript" th:inline="javascript">
-    /////// 카테고리 및 타입 설정 ///////
-    const cate = document.getElementById("category")
+    /////// 카테고리 및 타입 가져오기 ///////
+    const readCate = [[${board.category}]]
     const petInfo = document.getElementById("petInfo")
-    petInfo.classList.add("d-none")
-    cate.addEventListener("change", function (e) {
-        console.log(e.target.value)
-        let val = e.target.value
-        if (val === "일해요") {
-            petInfo.classList.remove("d-block")
-            petInfo.classList.add("d-none")
-            petInfo.value = ''
-        } else {
-            petInfo.classList.remove("d-none")
-            petInfo.classList.add("d-block")
-        }
-    })
+    console.log(readCate)
+    if(readCate==="구해요"){
+        petInfo.classList.remove("d-none")
+        petInfo.classList.add("d-block")
+    } else if(readCate==="일해요"){
+        petInfo.classList.remove("d-block")
+        petInfo.classList.add("d-none")
+    }
+
+
 
     /////// 사용자 정보 - 시도,시군구 정보 초기화 ///////
     const sido = document.querySelector("#sido")
     const sigungu = document.querySelector("#sigungu")
 
     async function loadSido() {
-        const memberSido = /*[[${memberDTO != null ? memberDTO.sido : null}]]*/ null;
-        const memberSiGungu = /*[[${memberDTO != null ? memberDTO.sigungu : null}]]*/ null;
+        const readSido = [[${board.sido}]]
+        const readSigungu = [[${board.sigungu}]]
         const {data: sidoList} = await axios.get('/api/regions/sido');
         sido.innerHTML = `<option value="">시/도</option>` +
             sidoList.map(s =>
-                `<option value="${s.name}" data-sido-id="${s.id}" ${s.name === memberSido ? 'selected' : ''}>${s.name}</option>`
+                `<option value="${s.name}" data-sido-id="${s.id}" ${s.name === readSido ? 'selected' : ''}>${s.name}</option>`
             ).join('');
         const selectedOption = sido.selectedOptions[0]; // 선택된 <option> 요소
         const sidoId = selectedOption.dataset.sidoId;       // data-sidoid 값 읽기
@@ -105,9 +103,8 @@
         }
         const {data: sigunguList} = await axios.get('/api/regions/sigungu', {params: {sidoId}});
         sigungu.innerHTML = '<option value="">시/군/구</option>' +
-            sigunguList.map(g => `<option value="${g.name}" ${g.name === memberSiGungu ? 'selected' : ''}>${g.name}</option>`).join('');
+            sigunguList.map(g => `<option value="${g.name}" ${g.name === readSigungu ? 'selected' : ''}>${g.name}</option>`).join('');
         sigungu.disabled = false;
-
     }
 
     async function loadSigungu(sidoId) {

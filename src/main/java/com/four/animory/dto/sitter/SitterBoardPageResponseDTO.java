@@ -1,14 +1,11 @@
 package com.four.animory.dto.sitter;
 
-import com.four.animory.dto.common.PageRequestDTO;
 import lombok.*;
 
 import java.util.List;
 
-@Data
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
+@Getter
+@ToString
 public class SitterBoardPageResponseDTO<E> {
   private int page;   // 현재 페이지 번호
   private int size;   // 한 페이지당 표시할 리스트 개수
@@ -24,11 +21,11 @@ public class SitterBoardPageResponseDTO<E> {
   private List<E> dtoList;  // 실제 데이터 목록
 
   @Builder(builderMethodName = "withAll")
-  public SitterBoardPageResponseDTO(SitterBoardPageRequestDTO pageRequestDTO, List<E> dtoList, int total) {
-    this.page = pageRequestDTO.getPage();
-    this.size = pageRequestDTO.getSize();
+  public SitterBoardPageResponseDTO(SitterBoardPageRequestDTO sitterBoardPageRequestDTO, List<E> dtoList, int total) {
+    this.page = sitterBoardPageRequestDTO.getPage();
+    this.size = sitterBoardPageRequestDTO.getSize();
     this.total = total;
-    this.pageBlockSize = 10;
+    this.pageBlockSize = 3;
     this.dtoList = dtoList;
 
     this.first = 1;

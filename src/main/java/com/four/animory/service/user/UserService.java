@@ -19,6 +19,7 @@ public interface UserService {
 
   default Member dtoToEntity(MemberDTO memberDTO){
     return Member.builder()
+        .id(memberDTO.getMid())
         .username(memberDTO.getUsername())
         .email(memberDTO.getEmail())
         .nickname(memberDTO.getNickname())

@@ -7,17 +7,21 @@ import com.four.animory.dto.sitter.SitterBoardDTO;
 import com.four.animory.dto.sitter.SitterBoardListDTO;
 import com.four.animory.dto.sitter.SitterBoardPageRequestDTO;
 import com.four.animory.dto.sitter.SitterBoardPageResponseDTO;
+import com.four.animory.dto.user.MemberDTO;
 
 import java.util.List;
 
 public interface SitterService {
-  void insertSitterBoard(SitterBoardDTO sitterBoardDTO, Member member);
+  void insertSitterBoard(SitterBoardDTO sitterBoardDTO, MemberDTO memberDTO);
   List<SitterBoardDTO> getSitterBoardList();
-  SitterBoardDTO getSitterBoardById(Long bno);
+  SitterBoardDTO getSitterBoardById(Long bno, String mode);
   SitterBoardPageResponseDTO<SitterBoardListDTO> getSitterBoardListSearchPage(SitterBoardPageRequestDTO sitterBoardPageRequestDTO);
+  void updateBoard(SitterBoardDTO sitterBoardDTO);
+  int deleteBoard(Long bno);
 
   default SitterBoard dtoToEntity(SitterBoardDTO sitterBoardDTO){
     SitterBoard sitterBoard = SitterBoard.builder()
+        .bno(sitterBoardDTO.getBno())
         .category(sitterBoardDTO.getCategory())
         .state(sitterBoardDTO.getState())
         .petInfo(sitterBoardDTO.getPetInfo())
@@ -32,8 +36,8 @@ public interface SitterService {
   default SitterBoardDTO entityToDTO(SitterBoard sitterBoard){
     SitterBoardDTO sitterBoardDTO = SitterBoardDTO.builder()
         .bno(sitterBoard.getBno())
-        .state(sitterBoard.getState())
         .category(sitterBoard.getCategory())
+        .state(sitterBoard.getState())
         .petInfo(sitterBoard.getPetInfo())
         .sido(sitterBoard.getSido())
         .sigungu(sitterBoard.getSigungu())

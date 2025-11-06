@@ -32,7 +32,8 @@ public class SitterBoardPageRequestDTO {
   private String sido;
   private String sigungu;
   private String category;
-  private String state;
+  @Builder.Default
+  private String state = "n";
   private String petInfo;
   private String field;
   private String keyword;
@@ -53,23 +54,38 @@ public class SitterBoardPageRequestDTO {
   public String getLink(){
     if (link == null){
       StringBuilder builder = new StringBuilder();
-      builder.append("page="+this.page);
-      builder.append("&size="+this.size);
-      builder.append("&sido="+this.sido);
-      builder.append("&sigungu="+this.sigungu);
-      builder.append("&category="+this.category);
-      builder.append("&status="+this.state);
-      builder.append("&petInfo="+this.petInfo);
-      if(field!=null && !field.isEmpty() && keyword!= null) {
-        builder.append("&field="+this.field);
+      builder.append("page=").append(this.page);
+      builder.append("&size=").append(this.size);
+
+      // null 또는 빈 문자열은 제외
+      if (this.sido != null && !this.sido.isEmpty()) {
+        builder.append("&sido=").append(this.sido);
       }
-      if(keyword!=null) {
+      if (this.sigungu != null && !this.sigungu.isEmpty()) {
+        builder.append("&sigungu=").append(this.sigungu);
+      }
+      if (this.category != null && !this.category.isEmpty()) {
+        builder.append("&category=").append(this.category);
+      }
+      if (this.state != null && !this.state.isEmpty()) {
+        builder.append("&status=").append(this.state);
+      }
+      if (this.petInfo != null && !this.petInfo.isEmpty()) {
+        builder.append("&petInfo=").append(this.petInfo);
+      }
+
+      // 검색 필드와 키워드가 있을 경우만 추가
+      if (this.field != null && !this.field.isEmpty() && this.keyword != null && !this.keyword.isEmpty()) {
+        builder.append("&field=").append(this.field);
+      }
+      if (this.keyword != null && !this.keyword.isEmpty()) {
         try {
-          builder.append("&keyword="+ URLEncoder.encode(this.keyword, "UTF-8"));
+          builder.append("&keyword=").append(URLEncoder.encode(this.keyword, "UTF-8"));
         } catch (Exception e) {
           e.printStackTrace();
         }
       }
+
       link = builder.toString();
     }
     return link;

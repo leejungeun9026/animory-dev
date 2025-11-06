@@ -2,6 +2,7 @@ package com.four.animory.domain.sitter;
 
 import com.four.animory.domain.BaseEntity;
 import com.four.animory.domain.user.Member;
+import com.four.animory.dto.sitter.SitterBoardDTO;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.BatchSize;
@@ -45,4 +46,16 @@ public class SitterBoard extends BaseEntity {
   @Builder.Default
   @BatchSize(size = 20)
   private Set<SitterFile> fileSet = new HashSet<>();
+
+  public void updateReadCount(){
+    readCount = readCount + 1;
+  }
+
+  public void changeBoard(SitterBoardDTO sitterBoardDTO){
+    this.petInfo = sitterBoardDTO.getPetInfo();
+    this.sido = sitterBoardDTO.getSido();
+    this.sigungu = sitterBoardDTO.getSigungu();
+    this.title = sitterBoardDTO.getTitle();
+    this.content = sitterBoardDTO.getContent();
+  }
 }

@@ -80,7 +80,8 @@ public class SitterSearchImpl extends QuerydslRepositorySupport implements Sitte
             q.sigungu,
             q.title,
             q.member.nickname.as("nickname"),
-            q.regDate
+            q.regDate,
+            q.readCount
         ))
         .orderBy(q.regDate.desc());
 

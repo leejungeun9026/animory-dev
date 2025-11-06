@@ -15,6 +15,7 @@
       <div class="col-12 col-sm-10 col-md-8 col-lg-6 mx-auto">
         <section class="search_area">
           <form action="/sitter/list" method="get">
+            <input type="hidden" id="responsePage" name="page" th:value="${sitterBoardPageRequestDTO.page}">
             <input type="hidden" name="size" th:value="${sitterBoardPageRequestDTO.size}">
             <div class="row g-2 mb-2">
               <div class="col-6 col-lg">
@@ -57,7 +58,7 @@
               </select>
               <input name="keyword" id="keyword" type="text" class="form-control form-control-sm" placeholder="검색어를 입력하세요" th:value="${sitterBoardPageRequestDTO.keyword}" aria-label="검색어">
               <button type="submit" class="btn btn-sm btn-secondary text-nowrap"><i class="fa-solid fa-magnifying-glass me-1"></i>검색</button>
-              <button type="button" th:onclick="" class="btn btn-sm btn-gray text-nowrap">초기화</button>
+              <button type="button" th:onclick="|location.href='@{/sitter/list}'|" class="btn btn-sm btn-gray text-nowrap">초기화</button>
             </div>
           </form>
         </section>
@@ -65,9 +66,9 @@
       <div class="col-12">
         <section class="search_result_area">
           <div class="d-flex align-items-end mb-2">
-            <small>총 12개 (1/2페이지)</small>
+            <small>총 [[${pageResponseDTO.total}]]개 ([[${pageResponseDTO.page}]]/[[${pageResponseDTO.last}]])</small>
             <div sec:authorize="isAuthenticated()" class="ms-auto">
-              <a href="/free/register" class="btn btn-lg btn-main px-4"><i class="fa-solid fa-pencil"></i> 글쓰기</a>
+              <a href="/sitter/register" class="btn btn-lg btn-main px-4"><i class="fa-solid fa-pencil"></i> 글쓰기</a>
             </div>
           </div>
           <table class="table border-top align-middle">
@@ -100,7 +101,7 @@
                     <p th:class="${board.state == '구인중' or board.state == '구직중' ? 'badge badge-info':'badge badge-success'}">[[${board.state}]]</p>
                     <p th:text="${board.petInfo == 'dog' ? '강아지' : '고양이'}" class="badge badge-outline-secondary"></p>
                   </div>
-                  <a th:href="@{/sitter/view(bno=${board.bno})}" class="d-block mb-1">
+                  <a th:href="|@{/sitter/view(bno=${board.bno}, mode='1')}&${sitterBoardPageRequestDTO.link}|" class="d-block mb-1">
                     <h5 class="text-overflew-line-2">[[${board.title}]]</h5>
                   </a>
                   <div class="d-flex gap-2 flex-nowrap text-secondary">
@@ -120,7 +121,7 @@
       <div class="col-12 col-sm-10 col-md-8 col-lg-6 mx-auto">
         <section class="paging_area">
           <nav aria-label="Page navigation">
-            <ul th:if="${pageResponseDTO.last > 1}" class="pagination pagination-sm justify-content-center mb-0">
+            <ul class="pagination pagination-sm justify-content-center mb-0">
               <li th:class="${pageResponseDTO.page == pageResponseDTO.first ? 'page-item disabled' : 'page-item'}">
                 <a class="page-link" th:data-num="${pageResponseDTO.first}"><i class="fa-solid fa-angles-left"></i></a>
               </li>
@@ -129,14 +130,14 @@
               </li>
               <th:block th:each="i:${#numbers.sequence(pageResponseDTO.start, pageResponseDTO.end)}">
                 <li th:class="${pageResponseDTO.page == i} ? 'page-item active' : 'page-item'">
-                  <a class="page-link" th:data-num="${i}">1</a>
+                  <a class="page-link" th:data-num="${i}">[[${i}]]</a>
                 </li>
               </th:block>
               <li th:class="${!pageResponseDTO.next ? 'page-item disabled' : 'page-item'}">
                 <a class="page-link" th:data-num="${pageResponseDTO.end + 1}"><i class="fa-solid fa-chevron-right"></i></a>
               </li>
-              <li  th:class="${pageResponseDTO.page == pageResponseDTO.last ? 'page-item disabled' : 'page-item'}">
-                <a class="page-link"><i class="fa-solid fa-angles-right"></i></a>
+              <li th:class="${pageResponseDTO.page == pageResponseDTO.last ? 'page-item disabled' : 'page-item'}">
+                <a class="page-link" th:data-num="${pageResponseDTO.last}"><i class="fa-solid fa-angles-right"></i></a>
               </li>
             </ul>
           </nav>
@@ -144,35 +145,100 @@
       </div>
     </div>
   </div>
+
+  <div id="resultModal" class="modal modal-w-380" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered modal-sm">
+      <div class="modal-content">
+        <div class="modal-header border-bottom-0">
+          <h5 class="modal-title"></h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body py-0">
+          <p></p>
+        </div>
+        <div class="modal-footer border-top-0">
+          <button type="button" class="btn btn-lg btn-success w-100" data-bs-dismiss="modal">확인</button>
+        </div>
+      </div>
+    </div>
+  </div>
 <!-- /* //view 화면 html 코드 작성 끝 */ -->
 </div>
 
 <script layout:fragment="pagescript" th:inline="javascript">
-/////// 사용자 정보 - 시도,시군구 정보 초기화 ///////
-const sido = document.querySelector("#sido")
-const sigungu = document.querySelector("#sigungu")
+    /////// 삭제 결과 모달 ///////
+  const deleteResult = [[${deleteResult != null ? deleteResult: null}]]
+  if(deleteResult !== null){
+    const modal = new bootstrap.Modal(document.getElementById('resultModal'))
+    const modalTitle = document.querySelector(".modal-title")
+    const modalBody = document.querySelector(".modal-body")
+    if(deleteResult === "success"){
+      modalTitle.innerHTML = "삭제 성공"
+      modalBody.innerHTML = `<p>삭제가 완료됐어요</p>`
 
-async function loadSido(){
-    const {data} = await axios.get('/api/regions/sido');
-    sido.innerHTML = `<option value="">지역 전체</option>` +
-        data.map(s=>`<option value="${s.name}" data-sido-id="${s.id}">${s.name}</option>`).join('');
-}
-
-async function loadSigungu(sidoId) {
-    if (!sidoId) {
-        sigungu.innerHTML = '<option value="">시/군/구</option>';
-        return;
+    } else {
+      modalTitle.innerHTML = "삭제 실패"
+      modalBody.innerHTML = `<p>삭제가 정상적으로 완료되지 않았어요</p>`
     }
-    const { data } = await axios.get('/api/regions/sigungu', { params: { sidoId } });
-    sigungu.innerHTML = '<option value="">전체</option>' +
-        data.map(g => `<option value="${g.name}">${g.name}</option>`).join('');
-}
+    modal.show();
+  }
 
-sido.addEventListener('change', (e) => {
-    const selectedOption = e.target.selectedOptions[0]; // 선택된 <option> 요소
-    const sidoId = selectedOption.dataset.sidoId;       // data-sidoid 값 읽기
-    loadSigungu(sidoId);
-});
 
-loadSido()
+  /////// 사용자 정보 - 시도,시군구 정보 초기화 ///////
+  const searchSido = /*[[${sitterBoardPageRequestDTO.sido != null ? sitterBoardPageRequestDTO.sido : null}]]*/ null;
+  const searchSigungu = /*[[${sitterBoardPageRequestDTO.sigungu != null ? sitterBoardPageRequestDTO.sigungu : null}]]*/ null;
+
+  const sido = document.querySelector("#sido")
+  const sigungu = document.querySelector("#sigungu")
+
+  async function loadSido(){
+      const { data:sidoList } = await axios.get('/api/regions/sido');
+      sido.innerHTML = `<option value="">지역 전체</option>` +
+          sidoList.map(s=>`<option value="${s.name}" data-sido-id="${s.id}" ${searchSido===s.name?'selected':''}>${s.name}</option>`).join('');
+
+      const selectedOption = sido.selectedOptions[0]; // 선택된 <option> 요소
+      const sidoId = selectedOption.dataset.sidoId;       // data-sidoid 값 읽기
+      loadSigungu(sidoId)
+  }
+
+  async function loadSigungu(sidoId) {
+      if (!sidoId) {
+          sigungu.innerHTML = '<option value="">시/군/구</option>';
+          return;
+      }
+      const { data } = await axios.get('/api/regions/sigungu', { params: { sidoId } });
+      sigungu.innerHTML = '<option value="">전체</option>' +
+          data.map(g => `<option value="${g.name}" ${searchSigungu===g.name?'selected':''}>${g.name}</option>`).join('');
+  }
+
+  sido.addEventListener('change', (e) => {
+      const selectedOption = e.target.selectedOptions[0]; // 선택된 <option> 요소
+      const sidoId = selectedOption.dataset.sidoId;       // data-sidoid 값 읽기
+      loadSigungu(sidoId);
+  });
+
+  loadSido()
+
+
+
+  /////// 페이징 ///////
+  document.querySelector(".pagination").addEventListener("click", function(e){
+      e.preventDefault()
+
+      const a = e.target.closest('a.page-link');
+      if (!a) return;
+
+      // 비활성/현재 페이지는 동작 막기
+      const li = a.closest('li');
+      if (li && (li.classList.contains('disabled') || li.classList.contains('active'))) return;
+
+      const num = a.dataset.num;
+      if (!num) return;
+
+      const formObj = document.querySelector("form")
+      const page = formObj.page
+      console.log(page.value)
+      page.value = num
+      formObj.submit()
+  })
 </script>
