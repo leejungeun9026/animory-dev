@@ -1,6 +1,7 @@
 package com.four.animory.dto.mate;
 
 import com.four.animory.domain.mate.MateFile;
+import jakarta.validation.constraints.Future;
 import jakarta.validation.constraints.NotEmpty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -18,11 +19,7 @@ import java.util.List;
 public class MateBoardDTO {
     private Long bno;
     @NotEmpty
-    private String state;
-    @NotEmpty
     private String category;
-    @NotEmpty
-    private String perInfo;
     @NotEmpty
     private String sido;
     @NotEmpty
@@ -33,8 +30,17 @@ public class MateBoardDTO {
     private String content;
     @NotEmpty
     private String nickname;
+    private String username;
     private int readCount;
     private LocalDateTime regDate;
     private LocalDateTime updateDate;
     private List<MateFile> fileDTOs;
+    private boolean complete;
+
+
 }
+
+
+
+
+
