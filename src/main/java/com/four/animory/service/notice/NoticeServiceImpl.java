@@ -1,7 +1,11 @@
 package com.four.animory.service.notice;
 
+import com.four.animory.domain.spr.SprBoard;
+import com.four.animory.domain.user.Member;
 import com.four.animory.dto.common.PageRequestDTO;
 import com.four.animory.dto.common.PageResponseDTO;
+import com.four.animory.dto.spr.SprBoardDTO;
+import com.four.animory.repository.user.MemberRepository;
 import lombok.extern.log4j.Log4j2;
 import com.four.animory.domain.notice.NoticeBoard;
 import com.four.animory.dto.notice.NoticeBoardDTO;
@@ -21,12 +25,17 @@ public class NoticeServiceImpl implements NoticeService {
     @Autowired
     private NoticeRepository noticeRepository;
 
+    @Autowired
+    private MemberRepository memberRepository; // 추가
+
     @Override
-    public Long registerNotice(NoticeBoardDTO noticeBoardDTO) {
-        NoticeBoard board = dtoToEntity(noticeBoardDTO);
-        Long bno = noticeRepository.save(board).getBno();
-        return bno;
+    public void registerNotice(NoticeBoardDTO noticeBoardDTO) {
+        NoticeBoard noticeBoard = dtoToEntity(noticeBoardDTO);
+        Member member = memberRepository.findByUsername(noticeBoardDTO.getNickname());
+        noticeBoard.setMember(member);
+        noticeRepository.save(noticeBoard);
     }
+
 
 
     @Override
@@ -65,15 +74,17 @@ public class NoticeServiceImpl implements NoticeService {
 
     @Override
     public PageResponseDTO<NoticeBoardDTO> getList(PageRequestDTO pageRequestDTO) {
-
-        String kw = pageRequestDTO.getKeyword();
         Pageable pageable = pageRequestDTO.getPageable("bno");
-        Page<NoticeBoard> result = noticeRepository.search(kw == null ? "" : kw.trim(), pageable);
 
+        Page<NoticeBoard> result = noticeRepository.searchAll(
+                pageRequestDTO.getTypes(),
+                pageRequestDTO.getKeyword(),
+                pageable
+        );
 
         var dtoList = result.getContent().stream()
                 .map(this::entityToDTO)
-                .toList();
+                .collect(Collectors.toList());
 
         return PageResponseDTO.<NoticeBoardDTO>withAll()
                 .pageRequestDTO(pageRequestDTO)
@@ -81,6 +92,8 @@ public class NoticeServiceImpl implements NoticeService {
                 .total((int) result.getTotalElements())
                 .build();
     }
+
+
 }
 
 

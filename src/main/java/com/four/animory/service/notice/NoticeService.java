@@ -8,12 +8,11 @@ import org.springframework.data.domain.Page;
 
 public interface NoticeService {
 
-    Long registerNotice(NoticeBoardDTO noticeBoardDTO);
+    void registerNotice(NoticeBoardDTO noticeBoardDTO);
     NoticeBoardDTO getNotice(Long bno);
     NoticeBoardDTO findNoticeById(Long bno, int mode);
     void updateNotice(NoticeBoardDTO dto);
     void removeNotice(Long bno);
-
 
 
     PageResponseDTO<NoticeBoardDTO> getList(PageRequestDTO pageRequestDTO);
@@ -33,6 +32,7 @@ public interface NoticeService {
                 .title(entity.getTitle())
                 .content(entity.getContent())
                 .readCount(entity.getReadCount())
+                .nickname(entity.getMember() != null ? entity.getMember().getNickname() : "admin")
                 .isPinned(entity.isPinned())
                 .regDate(entity.getRegDate())
                 .updateDate(entity.getUpdateDate())
