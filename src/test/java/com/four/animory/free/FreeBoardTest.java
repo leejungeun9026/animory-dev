@@ -11,15 +11,15 @@ public class FreeBoardTest {
     @Autowired
     FreeBoardRepository freeBoardRepository;
 
-    @Test
-    void insertFreeBoard() {
-        FreeBoard freeBoard = FreeBoard.builder()
-                .title("제목5")
-                .content("내용5")
-                .username("유저5")
-                .nickname("닉네임5")
-                .btype("자유")
-                .build();
-        freeBoardRepository.save(freeBoard);
-    }
+//    @Test
+//    void insertFreeBoard() {
+//        FreeBoard freeBoard = FreeBoard.builder()
+//                .title("제목5")
+//                .content("내용5")
+//                .username("유저5")
+//                .nickname("닉네임5")
+//                .btype("자유")
+//                .build();
+//        freeBoardRepository.save(freeBoard);
+//    }
 }

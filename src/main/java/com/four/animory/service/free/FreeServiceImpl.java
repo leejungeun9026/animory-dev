@@ -2,8 +2,10 @@ package com.four.animory.service.free;
 
 import com.four.animory.domain.free.FreeBoard;
 import com.four.animory.domain.free.FreeFile;
+import com.four.animory.domain.spr.SprBoard;
 import com.four.animory.domain.user.Member;
 import com.four.animory.dto.free.FreeBoardDTO;
+import com.four.animory.dto.spr.SprBoardDTO;
 import com.four.animory.repository.free.FreeBoardRepository;
 import com.four.animory.repository.user.MemberRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,7 +42,8 @@ public class FreeServiceImpl implements FreeService{
 
     @Override // bno로 게시글 1개 찾아오기
     public FreeBoardDTO findFreeBoardById(Long bno, Integer mode) {
-        FreeBoard freeBoard = freeBoardRepository.findById(bno).orElse(null);
+//        FreeBoard freeBoard = freeBoardRepository.findById(bno).orElse(null);
+        FreeBoard freeBoard = freeBoardRepository.findByIdWithImages(bno).orElse(null);
         if(mode == 1){
             freeBoard.updateReadCount();
             freeBoardRepository.save(freeBoard);
@@ -63,5 +66,13 @@ public class FreeServiceImpl implements FreeService{
         freeBoardRepository.deleteById(bno);
     }
 
+    @Override // 게시판 좋아요 버튼
+    public FreeBoardDTO updateLikecount(Long bno) {
+        FreeBoard freeBoard = freeBoardRepository.findById(bno).orElse(null);
+        freeBoard.updateLikecount();
+        freeBoardRepository.save(freeBoard);
+        FreeBoardDTO dto = entityToDTO(freeBoard);
+        return dto;
+    }
 
 }
