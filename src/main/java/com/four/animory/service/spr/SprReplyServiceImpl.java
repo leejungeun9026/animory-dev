@@ -6,7 +6,7 @@ import com.four.animory.domain.user.Member;
 import com.four.animory.dto.common.PageRequestDTO;
 import com.four.animory.dto.common.PageResponseDTO;
 import com.four.animory.dto.spr.SprReplyDTO;
-import com.four.animory.repository.spr.SprBoardRepository;
+import com.four.animory.repository.spr.SprSprBoardRepository;
 import com.four.animory.repository.spr.SprReplyRepository;
 import com.four.animory.repository.user.MemberRepository;
 import lombok.extern.log4j.Log4j2;
@@ -15,6 +15,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 
 import java.util.List;
@@ -22,11 +23,12 @@ import java.util.stream.Collectors;
 
 @Service
 @Log4j2
+@Transactional
 public class SprReplyServiceImpl implements SprReplyService {
     @Autowired
     private SprReplyRepository sprReplyRepository;
     @Autowired
-    private SprBoardRepository sprBoardRepository;
+    private SprSprBoardRepository sprBoardRepository;
     @Autowired
     private MemberRepository memberRepository;
 

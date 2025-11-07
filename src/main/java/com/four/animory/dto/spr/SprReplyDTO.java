@@ -23,4 +23,5 @@ public class SprReplyDTO {
     private boolean secret;
     private boolean deleted;
     private Long mid;
+    private String username;
 }

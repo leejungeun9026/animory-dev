@@ -14,8 +14,8 @@ import org.springframework.data.jpa.repository.support.QuerydslRepositorySupport
 
 import java.util.List;
 
-public class BoardSearchImpl extends QuerydslRepositorySupport implements BoardSearch {
-    public BoardSearchImpl() {
+public class SprBoardSearchImpl extends QuerydslRepositorySupport implements SprBoardSearch {
+    public SprBoardSearchImpl() {
         super(SprBoard.class);
     }
 
@@ -82,7 +82,8 @@ public class BoardSearchImpl extends QuerydslRepositorySupport implements BoardS
                         qsprboard.recommend,
                         qsprboard.complete,
                         qsprreply.rno.count().as("replyCount"),
-                        qsprboard.member.nickname.as("author")
+                        qsprboard.member.nickname.as("author"),
+                        qsprboard.member.username.as("username")
                         ))
                 .groupBy(qsprboard);
         this.getQuerydsl().applyPagination(pageable, query);

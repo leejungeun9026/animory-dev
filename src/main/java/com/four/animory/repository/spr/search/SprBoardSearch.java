@@ -5,7 +5,7 @@ import com.four.animory.dto.spr.SprBoardDTO;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
-public interface BoardSearch {
+public interface SprBoardSearch {
     Page<SprBoard> search1(Pageable pageable);
     Page<SprBoardDTO> searchAll(String[] types, String keyword, Pageable pageable);
 }

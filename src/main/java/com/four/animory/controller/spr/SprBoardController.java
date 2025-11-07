@@ -6,13 +6,19 @@ import com.four.animory.domain.user.Member;
 import com.four.animory.dto.common.PageRequestDTO;
 import com.four.animory.dto.common.PageResponseDTO;
 import com.four.animory.dto.spr.SprBoardDTO;
+import com.four.animory.dto.spr.SprFileDTO;
 import com.four.animory.dto.spr.SprReplyDTO;
+import com.four.animory.dto.spr.upload.SprUploadFileDTO;
 import com.four.animory.dto.user.MemberDTO;
 import com.four.animory.service.spr.SprBoardService;
 import com.four.animory.service.spr.SprReplyService;
 import com.four.animory.service.user.UserService;
 import lombok.extern.log4j.Log4j2;
+import net.coobird.thumbnailator.Thumbnailator;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.FileSystemResource;
+import org.springframework.core.io.Resource;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.User;
@@ -24,18 +30,26 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 @Controller
 @Log4j2
 @RequestMapping("/spr")
 public class SprBoardController {
+    @Value("${com.four.animory.upload.path}")
+    private String uploadPath;
     @Autowired
     private SprBoardService sprService;
     @Autowired
     private UserService userService;
     @Autowired
-    private SprReplyService sprReplyService;
+    private SprBoardService sprBoardService;
 
 
     @GetMapping("/list")
@@ -59,7 +73,12 @@ public class SprBoardController {
     }
 
     @PostMapping("/register")
-    public String registerPost(SprBoardDTO sprBoardDTO) {
+    public String registerPost(SprBoardDTO sprBoardDTO, SprUploadFileDTO sprUploadFileDTO, RedirectAttributes redirectAttributes) {
+        List<SprFileDTO> sprFileDTOS = null;
+        if(sprUploadFileDTO.getFiles() != null && !sprUploadFileDTO.getFiles().get(0).getOriginalFilename().equals("")){
+            sprFileDTOS = fileUpload(sprUploadFileDTO);
+        }
+        sprBoardDTO.setSprFileDTOs(sprFileDTOS);
         sprService.registerSprBoard(sprBoardDTO);
         return "redirect:/spr/list";
     }
@@ -67,6 +86,11 @@ public class SprBoardController {
 
     @GetMapping("/remove")
     public String removePost(Long bno){
+        SprBoardDTO sprBoardDTO = sprBoardService.findBoardById(bno, 2);
+        List<SprFileDTO> sprFileDTOS = sprBoardDTO.getSprFileDTOs();
+        if(sprFileDTOS != null && !sprFileDTOS.isEmpty()){
+            removeFile(sprFileDTOS);
+        }
         sprService.deleteBoardById(bno);
         return "redirect:/spr/list";
     }
@@ -74,7 +98,7 @@ public class SprBoardController {
     @ResponseBody
     @GetMapping("/like")
     public SprBoardDTO likePost(Long bno){
-        return sprService.upedateRecommend(bno);
+        return sprService.updateRecommend(bno);
     }
 
     @GetMapping({"/view","/modify"})
@@ -83,10 +107,76 @@ public class SprBoardController {
         model.addAttribute("board",sprService.findBoardById(bno, mode));
     }
     @PostMapping("/modify")
-    public String modifyPost(SprBoardDTO sprBoardDTO, RedirectAttributes redirectAttributes) {
+    public String modifyPost(SprBoardDTO sprBoardDTO, RedirectAttributes redirectAttributes, SprUploadFileDTO sprUploadFileDTO) {
+        List<SprFileDTO> sprFileDTOS = null;
+        if(sprUploadFileDTO.getFiles() != null && !sprUploadFileDTO.getFiles().get(0).getOriginalFilename().equals("")){
+            SprBoardDTO sprBoardDTO1 = sprBoardService.findBoardById(sprBoardDTO.getBno(), 2);
+            List<SprFileDTO> sprFileDTOS1 = sprBoardDTO1.getSprFileDTOs();
+            if(sprFileDTOS1 != null && !sprFileDTOS1.isEmpty()){
+                removeFile(sprFileDTOS1);
+            }
+            sprFileDTOS = fileUpload(sprUploadFileDTO);
+        }
+        sprBoardDTO.setSprFileDTOs(sprFileDTOS);
         sprService.updateBoard(sprBoardDTO);
         redirectAttributes.addAttribute("bno",sprBoardDTO.getBno());
         redirectAttributes.addAttribute("mode",2);
         return "redirect:/spr/view";
     }
+
+    private List<SprFileDTO> fileUpload(SprUploadFileDTO sprUploadFileDTO){
+        String sprPath = Paths.get(uploadPath, "spr").toString();
+        log.info("sprPath:"+sprPath);
+        List<SprFileDTO> list = new ArrayList<>();
+        if(sprUploadFileDTO.getFiles() != null){
+            sprUploadFileDTO.getFiles().forEach(multiFile -> {
+                String originalFileName = multiFile.getOriginalFilename();
+                log.info("originalFileName:"+originalFileName);
+                String uuid = UUID.randomUUID().toString();
+                Path savePath = Paths.get(sprPath,uuid+"_"+originalFileName);
+                boolean image = false;
+                try{
+                    multiFile.transferTo(savePath);
+                    if(Files.probeContentType(savePath).startsWith("image")){
+                        image = true;
+                        File thumbnail = new File(sprPath, "s_"+uuid+"_"+originalFileName);
+                        Thumbnailator.createThumbnail(savePath.toFile(), thumbnail, 200, 200);
+                    }
+                }catch (Exception e){
+                    e.printStackTrace();
+                }
+                SprFileDTO sprFileDTO = SprFileDTO.builder()
+                        .uuid(uuid)
+                        .fileName(originalFileName)
+                        .image(image)
+                        .build();
+                list.add(sprFileDTO);
+            });
+        }
+        return list;
+    }
+
+    private void removeFile(List<SprFileDTO> sprFileDTOS){
+        String sprPath = Paths.get(uploadPath, "spr").toString();
+        for(SprFileDTO sprFileDTO : sprFileDTOS){
+            String fileName = sprFileDTO.getUuid()+"_"+sprFileDTO.getFileName();
+            Resource resource = new FileSystemResource(
+                    sprPath+File.separator+fileName);
+            String resourceName = resource.getFilename();
+            boolean removed = false;
+            try{
+                String contentType = Files.probeContentType(resource.getFile().toPath());
+                removed = resource.getFile().delete();
+                if(contentType.startsWith("image")){
+                    String fileName1 = "s_"+fileName;
+                    File originalFile = new File(sprPath+File.separator+fileName1);
+                    originalFile.delete();
+                }
+            }catch (Exception e){
+                e.printStackTrace();
+            }
+        }
+    }
+
+
 }

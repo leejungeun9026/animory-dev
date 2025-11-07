@@ -21,10 +21,14 @@ public class SprFile implements Comparable<SprFile> {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="bno")
-    private SprBoard sprboard;
+    private SprBoard sprBoard;
 
     @Override
     public int compareTo(SprFile other) {
         return this.ord - other.ord;
+    }
+
+    public void changeSprBoard(SprBoard sprboard) {
+        this.sprBoard = sprboard;
     }
 }

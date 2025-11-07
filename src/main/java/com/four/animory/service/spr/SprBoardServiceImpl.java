@@ -5,22 +5,25 @@ import com.four.animory.domain.user.Member;
 import com.four.animory.dto.common.PageRequestDTO;
 import com.four.animory.dto.common.PageResponseDTO;
 import com.four.animory.dto.spr.SprBoardDTO;
-import com.four.animory.repository.spr.SprBoardRepository;
+import com.four.animory.dto.spr.SprFileDTO;
+import com.four.animory.repository.spr.SprReplyRepository;
+import com.four.animory.repository.spr.SprSprBoardRepository;
 import com.four.animory.repository.user.MemberRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
-import java.util.stream.Collectors;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
+@Transactional
 public class SprBoardServiceImpl implements SprBoardService {
     @Autowired
-    private SprBoardRepository sprRepository;
+    private SprSprBoardRepository sprRepository;
     @Autowired
     private MemberRepository memberRepository;
+    @Autowired
+    private SprReplyRepository sprReplyRepository;
 
     @Override
     public void registerSprBoard(SprBoardDTO sprBoardDTO) {
@@ -58,17 +61,25 @@ public class SprBoardServiceImpl implements SprBoardService {
     public void updateBoard(SprBoardDTO sprBoardDTO) {
         SprBoard sprBoard = sprRepository.findById(sprBoardDTO.getBno()).orElse(null);
         sprBoard.change(sprBoardDTO.getTitle(), sprBoardDTO.getContent(), sprBoardDTO.isComplete());
+        if(sprBoardDTO.getSprFileDTOs() != null){
+            sprBoard.removeFile();
+            for(SprFileDTO fileDTO : sprBoardDTO.getSprFileDTOs()){
+                sprBoard.addFile(fileDTO.getUuid(), fileDTO.getFileName(), fileDTO.isImage());
+            }
+        }
         sprRepository.save(sprBoard);
     }
 
     @Override
     public void deleteBoardById(Long bno) {
-//        SprBoard sprBoard = sprRepository.findById(bno).orElse(null);
+        SprBoard sprBoard = sprRepository.findById(bno).orElse(null);
+        sprBoard.removeFile();
+        sprReplyRepository.deleteBySprBoardId(bno);
         sprRepository.deleteById(bno);
     }
 
     @Override
-    public SprBoardDTO upedateRecommend(Long bno) {
+    public SprBoardDTO updateRecommend(Long bno) {
         SprBoard sprBoard = sprRepository.findById(bno).orElse(null);
         sprBoard.updateRecommend();
         sprRepository.save(sprBoard);

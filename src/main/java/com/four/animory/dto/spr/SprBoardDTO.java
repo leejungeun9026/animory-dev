@@ -31,11 +31,12 @@ public class SprBoardDTO {
     private int readcount;
     private LocalDateTime regDate;
     private LocalDateTime updateDate;
-//    private List<SitterFile> fileDTOs;
+    private List<SprFileDTO> sprFileDTOs;
     @Future
     private String dueDate;
     private int recommend;
     private boolean complete;
     private Long replyCount;
     private String author;
+    private String username;
 }
