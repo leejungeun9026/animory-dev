@@ -69,8 +69,9 @@
                     <p class="ms-auto"><i class="fa-regular fa-eye me-1"></i>
                         <span th:text="${board.readcount}"></span>
                     </p>
-                    <p><i class="fa-regular fa-heart me-1 text-danger"></i>
-                        <span th:text="${board.likecount}"></span>
+                    <p>
+                        <i th:class="${board.likecount >= 1} ? 'fa-solid fa-heart me-1 text-danger' : 'fa-regular fa-heart me-1 text-danger'"></i>
+                        <span>[[${board.likecount}]]</span>
                     </p>
                     <p><i class="fa-regular fa-comment-dots me-1"></i>
                         <span th:text="${board.replycount}"></span>

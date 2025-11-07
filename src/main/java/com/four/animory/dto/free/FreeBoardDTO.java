@@ -26,13 +26,15 @@ public class FreeBoardDTO {
     private String nickname;
     @NotEmpty
     private String btype;
-
     private int readcount;
     private int likecount;
     private LocalDateTime regDate;
     private LocalDateTime updateDate;
-    private List<FreeFile> fileDTOs;
+
     private int replycount;
     private Long mno; // 로그인 회원 ID용 필드
+
+    private List<FreeFileDTO> freeFileDTOS;
+//    private List<FreeFile> fileDTOs;
 
 }

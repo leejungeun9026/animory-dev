@@ -1,10 +1,13 @@
 package com.four.animory.service.free;
 
 import com.four.animory.domain.free.FreeBoard;
+import com.four.animory.domain.free.FreeFile;
 import com.four.animory.domain.user.Member;
 import com.four.animory.dto.free.FreeBoardDTO;
+import com.four.animory.dto.free.FreeFileDTO;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 
 public interface FreeService {
@@ -13,6 +16,7 @@ public interface FreeService {
     FreeBoardDTO findFreeBoardById(Long bno,Integer mode);
     void updateFreeBoard(FreeBoardDTO freeBoardDTO);
     void deleteFreeBoardById(Long bno);
+    FreeBoardDTO updateLikecount(Long bno);
 
     // dto -> Entity
     default FreeBoard dtoToEntity(FreeBoardDTO freeBoardDTO) {
@@ -23,6 +27,13 @@ public interface FreeService {
                 .likecount(freeBoardDTO.getLikecount())
                 .readcount(freeBoardDTO.getReadcount())
                 .build();
+
+        if(freeBoardDTO.getFreeFileDTOS() !=null){
+            freeBoardDTO.getFreeFileDTOS().forEach(filename -> {
+//                String[] arr = filename.split("_");
+                freeBoard.addFile(filename.getUuid(), filename.getFilename(), filename.isImage());
+            });
+        }
         return freeBoard;
     }
 
@@ -41,6 +52,24 @@ public interface FreeService {
                 .regDate(freeBoard.getRegDate())
                 .updateDate(freeBoard.getUpdateDate())
                 .build();
+
+        List<FreeFileDTO> freeFileDTO = freeBoard.getFileSet()
+                .stream()
+                .sorted()
+                .map(img->fileEntityToDTO(img))
+                .collect(Collectors.toList());
+        freeBoardDTO.setFreeFileDTOS(freeFileDTO);
         return freeBoardDTO;
     }
+
+    default FreeFileDTO fileEntityToDTO(FreeFile freeFile) {
+        FreeFileDTO dto = FreeFileDTO.builder()
+                .uuid(freeFile.getUuid())
+                .filename(freeFile.getFilename())
+                .image(freeFile.isImage())
+                .ord(freeFile.getOrd())
+                .build();
+        return dto;
+    }
+
 }

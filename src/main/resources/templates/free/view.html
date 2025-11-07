@@ -31,16 +31,21 @@
 <!--                                <span sec:authorize="isAuthenticated()"-->
 <!--                                          th:if="${#authentication.principal.username == freeBoard.username}">-->
                                     <a th:href="|@{/free/modify(bno=${freeBoard.bno},mode=2)}|" class="btn btn-info">수정</a>
-                                    <a th:href="@{/free/remove(bno=${freeBoard.bno})}" class="btn btn-danger">삭제</a>
+                                    <a th:href="@{/free/remove(bno=${freeBoard.bno},mode=2)}" class="btn btn-danger">삭제</a>
 <!--                                </span>-->
                                 </div>
                                 <!-- // 로그인 사용자 == 글작성자 같을 경우만 노출 끝 -->
+
                             </div>
                             <h4 class="py-2" th:text="${freeBoard.title}"></h4>
                             <div class="d-flex gap-2 flex-nowrap text-secondary">
                                 <p>[[${#temporals.format(freeBoard.updateDate, 'yyyy.MM.dd HH:mm')}]]</p>
                                 <p class="ms-auto"><i class="fa-regular fa-eye me-1"></i>[[${freeBoard.readcount}]]</p>
-                                <p><i class="fa-regular fa-heart me-1 text-danger"></i>56</p>
+                                <p id="likeBtn">
+                                    <i id="likeIcon"
+                                       th:class="${freeBoard.likecount >= 1} ? 'fa-solid fa-heart me-1 text-danger' : 'fa-regular fa-heart me-1 text-danger'"></i>
+                                    <span id="likeCount">[[${freeBoard.likecount}]]</span>
+                                </p>
                                 <p><i class="fa-regular fa-comment-dots me-1"></i>8</p>
                             </div>
                         </td>
@@ -49,142 +54,20 @@
                 </table>
                     <tbody>
                     <!-- 첨부파일이 있으면 노출 -->
-                    <tr>
-                        <td class="px-0 py-3">
-                            <ul>
-                                <li>
-                                    <div class="img_wrap">
-                                        <img src="/images/hellokitty.jpg" alt="">
-                                    </div>
-                                </li>
-                            </ul>
+                    <tr class="mb-3">
+                        <td>
+                            <span class="input-group-text">첨부 이미지</span>
+                            <div class="col" th:if="${freeBoard.freeFileDTOS !=null && freeBoard.freeFileDTOS.size()>0}">
+                                <div class="container-fluid d-flex uploadResult" style="flex-wrap: wrap">
+                                    <img class="mb-3" th:each="file:${freeBoard.freeFileDTOS}" th:src="|/uploads/free/s_${file.uuid}_${file.filename}|">
+                                </div>
+                            </div>
                         </td>
-                    </tr>
-                    <!-- 첨부파일이 있으면 노출 끝 -->
                     <tr>
                         <td class="px-0 py-3">
                             <div class="tb_content">[[${freeBoard.content}]]</div>
                         </td>
                     </tr>
-<!--                    <tr>-->
-<!--                        <td class="px-0 pt-3">-->
-<!--                            <p><i class="fa-regular fa-comment-dots me-1"></i>댓글 <b class="text-danger">8</b></p>-->
-<!--                            <div class="reply_list_area">-->
-<!--                                <ul>-->
-<!--                                    <li class="reply_list border-bottom">-->
-<!--                                        <div class="d-flex justify-content-start align-items-start gap-2 py-2">-->
-<!--                                            <div class="flex-grow-1">-->
-<!--                                                <b>댓작성자</b>-->
-<!--                                                <div class="replyContent">어쩌고저쩌고</div>-->
-<!--                                            </div>-->
-<!--                                            <div class="flex-shrink-1">-->
-<!--                                                <div class="btn-group">-->
-<!--                                                    <button type="button" class="btn btn-xs rounded-2 btn-outline-gray" data-bs-toggle="dropdown" aria-expanded="false">-->
-<!--                                                        <i class="fa-solid fa-ellipsis"></i>-->
-<!--                                                    </button>-->
-<!--                                                    <ul class="dropdown-menu">-->
-<!--                                                        <li><a class="dropdown-item" href="">수정</a></li>-->
-<!--                                                        <li><a class="dropdown-item" href="">삭제</a></li>-->
-<!--                                                        <li><a class="btnReReplyWriteView dropdown-item">대댓글 달기</a></li>-->
-<!--                                                    </ul>-->
-<!--                                                </div>-->
-<!--                                            </div>-->
-<!--                                        </div>-->
-<!--                                        <div class="reply_depth2 ps-4">-->
-<!--                                            <ul>-->
-<!--                                                <li class="rerpley_list border-top">-->
-<!--                                                    <div class="d-flex justify-content-start align-items-start gap-2 py-2">-->
-<!--                                                        <div class="flex-grow-1">-->
-<!--                                                            <b>대댓작성자</b>-->
-<!--                                                            <div class="replyContent">어쩌고저쩌고</div>-->
-<!--                                                        </div>-->
-<!--                                                        <div class="flex-shrink-1">-->
-<!--                                                            <div class="btn-group">-->
-<!--                                                                <button type="button" class="btn btn-xs rounded-2 btn-outline-gray" data-bs-toggle="dropdown" aria-expanded="false">-->
-<!--                                                                    <i class="fa-solid fa-ellipsis"></i>-->
-<!--                                                                </button>-->
-<!--                                                                <ul class="dropdown-menu">-->
-<!--                                                                    <li><a class="dropdown-item" href="">수정</a></li>-->
-<!--                                                                    <li><a class="dropdown-item" href="">삭제</a></li>-->
-<!--                                                                </ul>-->
-<!--                                                            </div>-->
-<!--                                                        </div>-->
-<!--                                                    </div>-->
-<!--                                                </li>-->
-<!--                                                <li class="border-top">-->
-<!--                                                    <div class="d-flex justify-content-start align-items-start gap-2 py-2">-->
-<!--                                                        <div class="flex-grow-1">-->
-<!--                                                            <b>댓작성자</b>-->
-<!--                                                            <div class="replyContent">어쩌고저쩌고</div>-->
-<!--                                                        </div>-->
-<!--                                                        <div class="flex-shrink-1">-->
-<!--                                                            <div class="btn-group">-->
-<!--                                                                <button type="button" class="btn btn-xs rounded-2 btn-outline-gray" data-bs-toggle="dropdown" aria-expanded="false">-->
-<!--                                                                    <i class="fa-solid fa-ellipsis"></i>-->
-<!--                                                                </button>-->
-<!--                                                                <ul class="dropdown-menu">-->
-<!--                                                                    <li><a class="dropdown-item" href="">수정</a></li>-->
-<!--                                                                    <li><a class="dropdown-item" href="">삭제</a></li>-->
-<!--                                                                </ul>-->
-<!--                                                            </div>-->
-<!--                                                        </div>-->
-<!--                                                    </div>-->
-<!--                                                </li>-->
-<!--                                            </ul>-->
-<!--                                        </div>-->
-<!--                                    </li>-->
-<!--                                    <li class="reply_list border-bottom">-->
-<!--                                        <div class="d-flex justify-content-start align-items-start gap-2 py-2">-->
-<!--                                            <div class="flex-grow-1">-->
-<!--                                                <b>댓작성자</b>-->
-<!--                                                <div class="replyContent">어쩌고저쩌고</div>-->
-<!--                                            </div>-->
-<!--                                            <div class="flex-shrink-1">-->
-<!--                                                <div class="btn-group">-->
-<!--                                                    <button type="button" class="btn btn-xs rounded-2 btn-outline-gray" data-bs-toggle="dropdown" aria-expanded="false">-->
-<!--                                                        <i class="fa-solid fa-ellipsis"></i>-->
-<!--                                                    </button>-->
-<!--                                                    <ul class="dropdown-menu">-->
-<!--                                                        <li><a class="dropdown-item" href="">수정</a></li>-->
-<!--                                                        <li><a class="dropdown-item" href="">삭제</a></li>-->
-<!--                                                        <li><a class="btnReReplyWriteView dropdown-item">대댓글 달기</a></li>-->
-<!--                                                    </ul>-->
-<!--                                                </div>-->
-<!--                                            </div>-->
-<!--                                        </div>-->
-<!--                                    </li>-->
-<!--                                    <li class="reply_list border-bottom">-->
-<!--                                        <div class="d-flex justify-content-start align-items-start gap-2 py-2">-->
-<!--                                            <div class="flex-grow-1">-->
-<!--                                                <b>댓작성자</b>-->
-<!--                                                <div class="replyContent">어쩌고저쩌고</div>-->
-<!--                                            </div>-->
-<!--                                            <div class="flex-shrink-1">-->
-<!--                                                <div class="btn-group">-->
-<!--                                                    <button type="button" class="btn btn-xs rounded-2 btn-outline-gray" data-bs-toggle="dropdown" aria-expanded="false">-->
-<!--                                                        <i class="fa-solid fa-ellipsis"></i>-->
-<!--                                                    </button>-->
-<!--                                                    <ul class="dropdown-menu">-->
-<!--                                                        <li><a class="dropdown-item" href="">수정</a></li>-->
-<!--                                                        <li><a class="dropdown-item" href="">삭제</a></li>-->
-<!--                                                        <li><a class="btnReReplyWriteView dropdown-item">대댓글 달기</a></li>-->
-<!--                                                    </ul>-->
-<!--                                                </div>-->
-<!--                                            </div>-->
-<!--                                        </div>-->
-<!--                                    </li>-->
-<!--                                </ul>-->
-<!--                            </div>-->
-<!--                            <div class="reply_write_area pt-3">-->
-<!--                                <div class="mb-2">-->
-<!--                                    <textarea name="replyText" id="replyText" class="form-control" placeholder="댓글 내용을 입력해주세요(최대 1000자)"></textarea>-->
-<!--                                </div>-->
-<!--                                <div class="d-flex">-->
-<!--                                    <button class="btnReplyRegister ms-auto btn btn-main">댓글 쓰기</button>-->
-<!--                                </div>-->
-<!--                            </div>-->
-<!--                        </td>-->
-<!--                    </tr>-->
                     </tbody>
                 </table>
             </div>
@@ -240,6 +123,33 @@
         })
     })
 
+    //좋아요 버튼 누르면 recommend 수 증가
+    $(document).ready(function(){
+        // likeBtn을 누르면 함수
+        $('#likeBtn').on('click', function (){
+            const bno = [[${freeBoard.bno}]]
+
+            $.ajax({
+                url : "/free/like",
+                type : "GET",
+                data : { bno : bno},
+                success : function(response){
+                    console.log(response);
+                    // 업데이트 된 레코맨드 수 가져오기
+                    var likecount = response.likecount;
+                    $('#likeCount').text(likecount);
+
+                    //추천 수가 0에서 1이 되면 하트 아이콘이 빈하트 -> 꽉 찬 하트로 변화
+                    if(likecount > 0){
+                        $('#likeIcon').removeClass('fa-regular').addClass('fa-solid');
+                    } else {
+                        $('#likeIcon').removeClass('fa-solid').addClass('fa-regular');
+                    }
+                }
+            })
+
+        })
+    })
 
 
 </script>
