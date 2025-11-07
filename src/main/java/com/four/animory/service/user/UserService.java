@@ -10,7 +10,7 @@ public interface UserService {
   int register(UserRegisterDTO userRegisterDTO);
   MemberDTO getMemberById(Long mid);
   MemberDTO getMemberByUsername(String username);
-  List<MemberListPetCountDTO>  getMemberListPetCount();
+  List<MemberWithPetCountDTO>  getMemberListPetCount();
   boolean getSitterById(Long mid);
   void modifySitter(MemberDTO memberDTO);
 

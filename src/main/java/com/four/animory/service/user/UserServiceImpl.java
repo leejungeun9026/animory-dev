@@ -63,7 +63,7 @@ public class UserServiceImpl implements UserService {
 
 
   @Override
-  public List<MemberListPetCountDTO> getMemberListPetCount() {
+  public List<MemberWithPetCountDTO> getMemberListPetCount() {
     return memberRepository.findAllWithPetCount();
   }
 
