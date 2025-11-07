@@ -2,6 +2,8 @@ package com.four.animory.service.mate;
 
 import com.four.animory.domain.mate.MateBoard;
 import com.four.animory.domain.user.Member;
+import com.four.animory.dto.common.PageRequestDTO;
+import com.four.animory.dto.common.PageResponseDTO;
 import com.four.animory.dto.mate.MateBoardDTO;
 
 import java.util.List;
@@ -12,6 +14,8 @@ public interface MateService {
     MateBoardDTO findMateBoardById(Long bno, Integer mode);
     void updateMateBoard(MateBoardDTO mateBoardDTO);
     void deleteMateBoardById(Long bno);
+    PageResponseDTO<MateBoardDTO> getList(PageRequestDTO pageRequestDTO);
+//    PageResponseDTO<BoardListReplyCountDTO> getListReplyCount(PageRequestDTO pageRequestDTO);
 
 
     default MateBoard dtoToEntity(MateBoardDTO mateBoardDTO) {
@@ -21,6 +25,7 @@ public interface MateService {
                 .sigungu(mateBoardDTO.getSigungu())
                 .title(mateBoardDTO.getTitle())
                 .content(mateBoardDTO.getContent())
+                .dueDate(mateBoardDTO.getDueDate())
                 .build();
         return mateBoard;
     }
@@ -30,7 +35,7 @@ public interface MateService {
                 .bno(mateBoard.getBno())
 
                 .category(mateBoard.getCategory())
-
+                .dueDate(mateBoard.getDueDate())
                 .sido(mateBoard.getSido())
                 .sigungu(mateBoard.getSigungu())
                 .title(mateBoard.getTitle())

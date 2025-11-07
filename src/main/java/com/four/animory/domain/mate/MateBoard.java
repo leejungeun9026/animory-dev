@@ -6,6 +6,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.ColumnDefault;
 
+import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -36,7 +37,8 @@ public class MateBoard extends BaseEntity {
     private boolean complete;
     @ColumnDefault(value="0")
     private int readCount;
-
+    @Column(name="duedate", nullable = true, length = 300)
+    private String dueDate;
 
     @ManyToOne(fetch = FetchType.LAZY)
 //    @JoinColumn(name="mid") //fat info

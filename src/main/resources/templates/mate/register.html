@@ -21,37 +21,41 @@
                     <option value="그룹 모집">그룹 모집</option>
                 </select>
             </div>
-                <div class="mb-2">
-                    <div class="d-flex align-items-center gap-1">
-                        <select class="form-select" id="sido" name="sido" required>
-                            <option data-sido-id="" value="">시/도</option>
-                        </select>
-                        <select class="form-select" disabled id="sigungu" name="sigungu" required>
-                            <option value="">시/군/구</option>
-                        </select>
-                    </div>
+            <div class="mb-2">
+                <div class="d-flex align-items-center gap-1">
+                    <select class="form-select" id="sido" name="sido" required>
+                        <option data-sido-id="" value="">시/도</option>
+                    </select>
+                    <select class="form-select" disabled id="sigungu" name="sigungu" required>
+                        <option value="">시/군/구</option>
+                    </select>
                 </div>
-                <div class="mb-2">
-                    <input class="form-control" name="title" placeholder="제목을 입력해주세요" required type="text">
-                </div>
-                <div class="mb-2">
+            </div>
+            <div class="mb-2">
+                <input class="form-control" name="title" placeholder="제목을 입력해주세요" required type="text">
+            </div>
+            <div class="mb-2">
         <textarea class="form-control" cols="30" id="content" name="content"
                   placeholder=" 시간과 장소, 희망하는 산책 친구의 성격 등 자세히 알려주세요!(최대 1000자)"
                   required rows="10"></textarea>
-                </div>
-                <div class="mb-3">
-                    <input class="form-control" multiple name="files" type="file">
-                </div>
-                <div class="button_wrap">
-                    <div class="row g-2">
-                        <div class="col-6 col-md-auto ms-md-auto">
-                            <a class="btn btn-lg btn-gray w-100" href="/mate/list">취소</a>
-                        </div>
-                        <div class="col-6 col-md-auto">
-                            <button class="btn btn-lg btn-main w-100">저장</button>
-                        </div>
+            </div>
+            <div class="mb-2">
+                <span class="form-control" id="due">마감일</span>
+                <input class="form-control" type="datetime-local" name="dueDate" id="dueDate">
+            </div>
+            <div class="mb-3">
+                <input class="form-control" multiple name="files" type="file">
+            </div>
+            <div class="button_wrap">
+                <div class="row g-2">
+                    <div class="col-6 col-md-auto ms-md-auto">
+                        <a class="btn btn-lg btn-gray w-100" href="/mate/list">취소</a>
+                    </div>
+                    <div class="col-6 col-md-auto">
+                        <button class="btn btn-lg btn-main w-100">저장</button>
                     </div>
                 </div>
+            </div>
         </form>
     </div>
     <!-- /* //view 화면 html 코드 작성 끝 */ -->
