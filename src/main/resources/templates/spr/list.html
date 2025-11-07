@@ -63,9 +63,12 @@
                                             <p class="badge badge-info" th:if="${board.category == '나눔' || board.category == '공구'} and ${board.complete == true}">[[${board.category}]]완료</p>
                                             <!-- 표시 뱃지 끝 -->
                                         </div>
-                                        <a th:href="@{/spr/view(bno=${board.bno}, mode=1)}" class="d-block mb-1">
-                                            <h5 class="text-overflew-line-2">[[${board.title}]]</h5>
-                                        </a>
+                                        <h5 class="text-overflew-line-2">
+                                            <a th:href="@{/spr/view(bno=${board.bno}, mode=1)}" class="d-block mb-1" sec:authorize="isAuthenticated()">
+                                                [[${board.title}]]
+                                            </a>
+                                            <span sec:authorize="!isAuthenticated()">[[${board.title}]]</span>
+                                        </h5>
                                         <div class="d-flex gap-2 flex-nowrap text-secondary">
                                             <p>[[${board.author}]]</p>
                                             <p>[[${#temporals.format(board.regDate, 'yyyy-MM-dd')}]]</p>
@@ -73,7 +76,7 @@
                                             <p class="ms-auto"><i class="fa-regular fa-eye me-1"></i>[[${board.readcount}]]</p>
                                             <p th:if="${board.recommend >= 1}"><i class="fa-solid fa-heart me-1 text-danger"></i>[[${board.recommend}]]</p>
                                             <p th:if="${board.recommend == 0}"><i class="fa-regular fa-heart me-1 text-danger"></i>[[${board.recommend}]]</p>
-                                            <!--                            <p><i class="fa-regular fa-comment-dots me-1"></i>[[${board.replyCount}]]</p>-->
+                                            <p><i class="fa-regular fa-comment-dots me-1"></i>[[${board.replyCount}]]</p>
                                         </div>
                                     </div>
                                 </td>

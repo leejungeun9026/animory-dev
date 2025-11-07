@@ -22,4 +22,5 @@ public class SprReplyDTO {
     private LocalDateTime updateDate;
     private boolean secret;
     private boolean deleted;
+    private Long mid;
 }

@@ -8,12 +8,11 @@ import com.four.animory.dto.spr.SprReplyDTO;
 import java.util.List;
 
 public interface SprReplyService {
-    Long register(SprReplyDTO sprReplyDTO);
+    Long register(SprReplyDTO sprReplyDTO, String username);
     SprReplyDTO read(Long rno);
     void modify(SprReplyDTO sprReplyDTO);
     void remove(Long rno, String currentUser);
     List<SprReply> getReplies(Long bno);
-
     PageResponseDTO<SprReplyDTO> getListOfBoard(Long bno, PageRequestDTO pageRequestDTO);
 
     default com.four.animory.domain.spr.SprReply dtoToEntity(SprReplyDTO sprReplyDTO) {
@@ -36,8 +35,9 @@ public interface SprReplyService {
                 .updateDate(sprReply.getUpdateDate())
                 .regDate(sprReply.getRegDate())
                 .bno(sprReply.getSprBoard().getBno())
+                .mid(sprReply.getMember().getId())
                 .build();
-        return null;
+        return sprReplyDTO;
 
     }
 }

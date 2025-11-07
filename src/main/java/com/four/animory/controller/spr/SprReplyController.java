@@ -3,11 +3,13 @@ package com.four.animory.controller.spr;
 import com.four.animory.dto.common.PageRequestDTO;
 import com.four.animory.dto.common.PageResponseDTO;
 import com.four.animory.dto.spr.SprReplyDTO;
+import com.four.animory.dto.user.MemberDTO;
 import com.four.animory.service.spr.SprReplyService;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
@@ -17,16 +19,18 @@ import java.util.Map;
 
 @RestController
 @Log4j2
-@RequestMapping("/replies")
+@RequestMapping("/sprreplies")
 public class SprReplyController {
     @Autowired
     private SprReplyService sprReplyService;
 
+
     @PostMapping(value = "/", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public Map<String, Long> register(@RequestBody SprReplyDTO sprReplyDTO){
+    public Map<String, Long> register(@RequestBody SprReplyDTO sprReplyDTO, Authentication authentication) {
         log.info(sprReplyDTO);
+        String username = authentication.getName();
         Map<String,Long> map = new HashMap<>();
-        Long rno = sprReplyService.register( sprReplyDTO );
+        Long rno = sprReplyService.register(sprReplyDTO, username);
         map.put("rno",rno);
         return map;
     }

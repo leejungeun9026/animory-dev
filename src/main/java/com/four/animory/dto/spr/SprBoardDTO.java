@@ -28,12 +28,10 @@ public class SprBoardDTO {
     private String sigungu;
     @NotEmpty
     private String content;
-    @NotEmpty
-    private String nickname;
     private int readcount;
     private LocalDateTime regDate;
     private LocalDateTime updateDate;
-    private List<SitterFile> fileDTOs;
+//    private List<SitterFile> fileDTOs;
     @Future
     private String dueDate;
     private int recommend;

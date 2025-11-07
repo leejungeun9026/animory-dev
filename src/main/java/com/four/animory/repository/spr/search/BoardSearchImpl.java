@@ -1,8 +1,11 @@
 package com.four.animory.repository.spr.search;
 
 import com.four.animory.domain.spr.QSprBoard;
+import com.four.animory.domain.spr.QSprReply;
 import com.four.animory.domain.spr.SprBoard;
+import com.four.animory.dto.spr.SprBoardDTO;
 import com.querydsl.core.BooleanBuilder;
+import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.JPQLQuery;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -36,9 +39,12 @@ public class BoardSearchImpl extends QuerydslRepositorySupport implements BoardS
     }
 
     @Override
-    public Page<SprBoard> searchAll(String[] types, String keyword, Pageable pageable) {
+    public Page<SprBoardDTO> searchAll(String[] types, String keyword, Pageable pageable) {
         QSprBoard qsprboard = QSprBoard.sprBoard;
+        QSprReply qsprreply = QSprReply.sprReply;
         JPQLQuery<SprBoard> query = from(qsprboard);
+        query.leftJoin(qsprreply).on(qsprreply.sprBoard.eq(qsprboard));
+        query.groupBy(qsprboard);
         if (types != null && types.length > 0 && keyword != null) {
             BooleanBuilder builder = new BooleanBuilder();
             for (String type : types) {
@@ -61,8 +67,26 @@ public class BoardSearchImpl extends QuerydslRepositorySupport implements BoardS
             query.where(builder);
         }
         query.where(qsprboard.bno.gt(0));
+        JPQLQuery<SprBoardDTO> dtoQuery = query.select(
+                Projections.bean(SprBoardDTO.class,
+                        qsprboard.bno,
+                        qsprboard.title,
+                        qsprboard.category,
+                        qsprboard.sido,
+                        qsprboard.sigungu,
+                        qsprboard.content,
+                        qsprboard.readcount,
+                        qsprboard.regDate,
+                        qsprboard.updateDate,
+                        qsprboard.dueDate,
+                        qsprboard.recommend,
+                        qsprboard.complete,
+                        qsprreply.rno.count().as("replyCount"),
+                        qsprboard.member.nickname.as("author")
+                        ))
+                .groupBy(qsprboard);
         this.getQuerydsl().applyPagination(pageable, query);
-        List<SprBoard> list = query.fetch();
+        List<SprBoardDTO> list = dtoQuery.fetch();
         long count = query.fetchCount();
         return new PageImpl<>(list, pageable, count);
     }
