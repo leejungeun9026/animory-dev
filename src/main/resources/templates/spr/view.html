@@ -52,8 +52,12 @@
                             <td class="px-0 py-3">
                                 <ul>
                                     <li>
-                                        <div class="img_wrap">
-                                            <img src="" alt="">
+                                        <div class="img_wrap" th:if="${board.sprFileDTOs != null && board.sprFileDTOs.size() >0}">
+                                            <div th:each="fileDTO:${board.sprFileDTOs}">
+                                                <div th:if="${fileDTO.image}">
+                                                    <img th:src="|/uploads/spr/s_${fileDTO.uuid}_${fileDTO.fileName}|">
+                                                </div>
+                                            </div>
                                         </div>
                                     </li>
                                 </ul>
@@ -91,8 +95,8 @@
                                             <textarea name="replyText" class="replyText form-control" placeholder="댓글 내용을 입력해주세요(최대 1000자)"></textarea>
                                         </div>
                                         <div class="d-flex">
-                                            <input class="form-check-input secretCheck" name="secret" type="checkbox" id="secret">
                                             <label class="form-check-label" for="secret">비밀댓글</label>
+                                            <input class="form-check-input secretCheck" name="secret" type="checkbox" id="secret">
                                             <button type="button" class="btnReplyRegister ms-auto btn btn-main">댓글 쓰기</button>
                                         </div>
                                     </div>
@@ -126,7 +130,7 @@
     const bno = [[${board.bno}]]
     const replyList = document.querySelector(".replyList")
     const replyPaging = document.querySelector(".replyPaging")
-    const boardAuthor = [[${board.author}]]
+    const boardUsername = [[${board.username}]]
     const loginUser = [[${#authentication.principal.username}]]
 
     function printList(dtoList){
@@ -139,7 +143,7 @@
                 if(dto.deleted === true){
                     str += `<div class="replyContent">삭제된 댓글입니다.</div>`
                 }else if(dto.secret === true){
-                    if(dto.author === loginUser || boardAuthor === loginUser){
+                    if(dto.username === loginUser || boardUsername === loginUser){
                         str += `<b>${dto.author}</b><div class="replyContent">${dto.content}</div>`
                     }else{
                         str += `<div class="replyContent">비밀 댓글입니다.</div>`
@@ -169,6 +173,10 @@
     }
 
     function printPages(data){
+        if(!data.dtoList || data.dtoList.length === 0){
+            replyPaging.innerHTML = ''
+            return
+        }
         let pageStr=''
         if(data.prev){
             pageStr += `<li class="page-item"><a class="page-link" data-page="${data.start -1}"><i class="fa-solid fa-chevron-left"></i></a></li>`
@@ -237,51 +245,42 @@
             printReplies(bno, 1, 10, false);
         }catch (error){
             alert("댓글 입력 오류");
-            console.error(error);
+            console.log(error);
         }
     },false)
 
-    let CurrentModifyRno = null;;
     const modifyModal = new bootstrap.Modal(document.querySelector(".modifyModal"))
     const modifyText = document.querySelector(".modifyText")
 
     const modifyCloseBtn = document.querySelector(".modifyCloseBtn")
-    async function modifyReply(replyObj){
-        const response = await axios.put(`/sprreplies/${replyObj.rno}`, replyObj);
-        return response.data;
-    }
-    async function getReply(rno){
-        const response = await axios.get(`/sprreplies/${rno}`)
-        return response.data;
-    }
 
     replyList.addEventListener("click", async function (e) {
         e.preventDefault()
         e.stopPropagation()
 
-       const target = e.target.closest("a");
-        if(!target){
+        const target = e.target.closest("a");
+        if (!target) {
             return
         }
         const li = target.closest("li.reply_list")
         const rno = li.getAttribute("data-rno")
-        if(target.classList.contains("modifyBtn")) {
+        if (target.classList.contains("modifyBtn")) {
             try {
                 const response = await axios.get(`/sprreplies/${rno}`)
                 const reply = response.data
                 modifyText.value = reply.content
                 modifyModal.show()
             } catch (err) {
-                console.error(err)
+                console.log(err)
             }
         }
 
-        if(target.classList.contains("deleteBtn")){
-            try{
+        if (target.classList.contains("deleteBtn")) {
+            try {
                 await axios.post(`/sprreplies/delete/${rno}`)
                 printReplies(bno, page, size, false)
-            }catch (err){
-                console.error(err)
+            } catch (err) {
+                console.log(err)
             }
         }
 
@@ -299,20 +298,17 @@
 
             printReplies(bno, page, size, false);
         }
-        modifyCloseBtn.onclick = function (){
+        modifyCloseBtn.onclick = function () {
             modifyModal.hide();
         }
+
     })
 
 
 
 
 
-
-
-
   /////// 대댓글 textarea toggle ///////
-  const btnReReplyWriteViews = document.querySelectorAll(".btnReReplyWriteView")
   function reReplyStr() {
       return `<div class="reReplyWriteArea">
                 <div class="d-flex justify-content-start align-items-start gap-2 py-2">
@@ -321,6 +317,8 @@
                       <textarea name="reReplyText" id="reReplyText" class="form-control" placeholder="대댓글 내용을 입력해주세요(최대 1000자)"></textarea>
                     </div>
                     <div class="d-flex">
+                      <label class="form-check-label" for="secret1">비밀대댓글</label>
+                      <input class="form-check-input secretCheck" name="secret" type="checkbox" id="secret1">
                       <button class="btnReReplyRegister ms-auto btn btn-main">대댓글 쓰기</button>
                     </div>
                   </div>
@@ -333,29 +331,6 @@
               </div>`
   }
 
-  btnReReplyWriteViews.forEach(btn => {
-      btn.addEventListener("click", function(e){
-          e.preventDefault()
-          const li = e.target.closest("li.reply_list")
-          console.log(li)
-          // 대댓글 영역이 없으면 만들고 변수 초기화
-          if (li.querySelector(".reply_depth2") == null) {
-              li.insertAdjacentHTML("beforeend", `<div class="reply_depth2 ps-4"></div>`)
-          }
-          const depth2 = li.querySelector(".reply_depth2")
-
-          // 대댓글창이 이미 열려있으면 return, 아니면 추가하기
-          if (depth2.querySelector(".reReplyWriteArea") != null) {
-              return
-          }
-          depth2.insertAdjacentHTML("beforeend", reReplyStr())
-
-          const btnReReplyWriteClose = depth2.querySelector(".btnReReplyWriteClose")
-          btnReReplyWriteClose.addEventListener("click", () => {
-              btnReReplyWriteClose.closest(".reReplyWriteArea").remove()
-          })
-      })
-  })
 
 
   // 좋아요 버튼 누르면 recommend 수 증가

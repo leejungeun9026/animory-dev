@@ -19,7 +19,7 @@ import java.util.Set;
 @Table(name = "tbl_spr_board")
 @Getter
 @Setter
-@ToString(exclude = "member")
+@ToString(exclude = {"member","fileSet"})
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
@@ -45,10 +45,10 @@ public class SprBoard extends BaseEntity {
     private String sido;
     @Column(nullable = false)
     private String sigungu;
-//    @OneToMany(mappedBy = "sprBoard", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
-//    @Builder.Default
-//    @BatchSize(size = 20)
-//    private Set<SprFile> fileSet = new HashSet<>();
+    @OneToMany(mappedBy = "sprBoard", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    @BatchSize(size = 20)
+    private Set<SprFile> fileSet = new HashSet<>();
 
     public void change(String title, String content, Boolean complete){
         this.title = title;
@@ -60,4 +60,21 @@ public class SprBoard extends BaseEntity {
     }
 
     public void updateRecommend(){this.recommend = this.recommend + 1;}
+
+    public void addFile(String uuid, String fileName, boolean image){
+        SprFile sprFile = SprFile.builder()
+                .uuid(uuid)
+                .fileName(fileName)
+                .sprBoard(this)
+                .ord(fileSet.size())
+                .image(image)
+                .build();
+        fileSet.add(sprFile);
+    }
+
+    public void removeFile(){
+        fileSet.forEach(sprFile ->
+                sprFile.changeSprBoard(null));
+        this.fileSet.clear();
+    }
 }

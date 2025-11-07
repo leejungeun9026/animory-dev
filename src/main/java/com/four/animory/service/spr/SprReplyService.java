@@ -36,6 +36,7 @@ public interface SprReplyService {
                 .regDate(sprReply.getRegDate())
                 .bno(sprReply.getSprBoard().getBno())
                 .mid(sprReply.getMember().getId())
+                .username(sprReply.getMember().getUsername())
                 .build();
         return sprReplyDTO;
 
