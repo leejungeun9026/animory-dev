@@ -1,13 +1,13 @@
 <!DOCTYPE html>
 <html lang="en" layout:decorate="~{include/user}"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      xmlns:th="http://www.thymeleaf.org"
-      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity6">
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity6"
+      xmlns:th="http://www.thymeleaf.org">
 
 <div layout:fragment="content">
-<!-- /* view 화면 html 코드 작성 부분 */ -->
+  <!-- /* view 화면 html 코드 작성 부분 */ -->
   <div class="page_title mb-4">
-    <a th:href="|@{/sitter/list}?${sitterBoardPageRequestDTO.link}|" class="d-inline-flex align-items-baseline">
+    <a class="d-inline-flex align-items-baseline" th:href="|@{/sitter/list}?${sitterBoardPageRequestDTO.link}|">
       <small class="text-danger">돌보미 게시판 <i class="fa-solid fa-chevron-right fs-xs"></i></small>
     </a>
     <h3 class="memomentKkukkkuk fw-normal mt-2">게시글 보기</h3>
@@ -17,204 +17,220 @@
       <div class="card-body">
         <table class="table table-borderless">
           <thead>
-            <tr>
-              <td class="tb_title border-bottom pb-3 px-0">
-                <div class="d-flex gap-2 flex-nowrap align-items-end mb-2">
-                  <div class="d-flex gap-2 flex-nowrap align-items-center">
-                    <p th:class="${board.state == '구인중' or board.state == '구직중' ? 'badge badge-info':'badge badge-success'}">[[${board.state}]]</p>
-                    <p th:if="${board.category == '구해요'}" class="badge badge-warning">&#x1F440; 돌봄 구해요</p>
-                    <p th:if="${board.category == '일해요'}" class="badge badge-danger">&#x1F525; 돌봄 일해요</p>
-                    <p th:text="${board.petInfo == 'dog' ? '강아지' : '고양이'}" class="badge badge-outline-secondary"></p>
-                  </div>
-                  <!-- 로그인 사용자 == 글작성자 같을 경우만 노출 -->
-                  <div  sec:authorize="isAuthenticated()" th:if="${#authentication.principal.username == board.username}" class="d-flex gap-1 flex-nowrap ms-auto">
-                    <button class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteConfirmModal">삭제</button>
-                    <a th:href="@{/sitter/modify(bno=${board.bno}, mode='2')}" class="btn btn-gray">수정</a>
-                  </div>
-                  <!-- // 로그인 사용자 == 글작성자 같을 경우만 노출 끝 -->
+          <tr>
+            <td class="tb_title border-bottom pb-3 px-0">
+              <div class="d-flex gap-2 flex-nowrap align-items-end mb-2">
+                <div class="d-flex gap-2 flex-nowrap align-items-center">
+                  <p th:class="${board.state == '구인중' or board.state == '구직중' ? 'badge badge-info':'badge badge-success'}">
+                    [[${board.state}]]</p>
+                  <p class="badge badge-warning" th:if="${board.category == '구해요'}">&#x1F440; 돌봄 구해요</p>
+                  <p class="badge badge-danger" th:if="${board.category == '일해요'}">&#x1F525; 돌봄 일해요</p>
+                  <p class="badge badge-outline-secondary" th:text="${board.petInfo == 'dog' ? '강아지' : '고양이'}"></p>
                 </div>
-                <h4 class="py-2">[[${board.title}]]</h4>
-                <div class="d-flex gap-2 flex-nowrap text-secondary">
-                  <p>[[${board.nickname}]]</p>
-                  <p>[[${#temporals.format(board.regDate, 'yyyy-MM-dd')}]]</p>
-                  <p class="ms-auto"><i class="fa-regular fa-eye me-1"></i>[[${board.readCount}]]</p>
-                  <p><i class="fa-regular fa-heart me-1 text-danger"></i>56</p>
-                  <p><i class="fa-regular fa-comment-dots me-1"></i>8</p>
+                <!-- 로그인 사용자 == 글작성자 같을 경우만 노출 -->
+                <div class="d-flex gap-1 flex-nowrap ms-auto" sec:authorize="isAuthenticated()"
+                     th:if="${#authentication.principal.username == board.username}">
+                  <button class="btn btn-danger" data-bs-target="#deleteConfirmModal" data-bs-toggle="modal">삭제</button>
+                  <a class="btn btn-gray" th:href="@{/sitter/modify(bno=${board.bno}, mode='2')}">수정</a>
                 </div>
-              </td>
-            </tr>
+                <!-- // 로그인 사용자 == 글작성자 같을 경우만 노출 끝 -->
+              </div>
+              <h4 class="py-2">[[${board.title}]]</h4>
+              <div class="d-flex gap-2 flex-nowrap text-secondary">
+                <p>[[${board.nickname}]]</p>
+                <p>[[${#temporals.format(board.regDate, 'yyyy-MM-dd')}]]</p>
+                <p class="ms-auto"><i class="fa-regular fa-eye me-1"></i>[[${board.readCount}]]</p>
+                <p><i class="fa-regular fa-heart me-1 text-danger"></i>56</p>
+                <p><i class="fa-regular fa-comment-dots me-1"></i><span class="countReplies"></span></p>
+              </div>
+            </td>
+          </tr>
           </thead>
           <tbody>
-            <!-- 첨부파일이 있으면 노출 -->
-            <tr>
-              <td class="px-0 py-3">
-                <ul>
-                  <li>
-                    <div class="img_wrap">
-                      <img src="/images/hellokitty.jpg" alt="">
-                    </div>
-                  </li>
+          <!-- 첨부파일이 있으면 노출 -->
+          <tr>
+            <td class="px-0 py-3">
+              <ul>
+                <li>
+                  <div class="img_wrap">
+                    <img alt="" src="/images/hellokitty.jpg">
+                  </div>
+                </li>
+              </ul>
+            </td>
+          </tr>
+          <!-- 첨부파일이 있으면 노출 끝 -->
+          <tr>
+            <td class="px-0 py-3">
+              <div class="tb_content">[[${board.content}]]</div>
+            </td>
+          </tr>
+          <tr>
+            <td class="px-0 pt-3">
+              <p><i class="fa-regular fa-comment-dots me-1"></i>신청 <b class="countReplies text-danger"></b></p>
+              <div class="reply_list_area">
+                <ul class="" id="replyList">
                 </ul>
-              </td>
-            </tr>
-            <!-- 첨부파일이 있으면 노출 끝 -->
-            <tr>
-              <td class="px-0 py-3">
-                <div class="tb_content">[[${board.content}]]</div>
-              </td>
-            </tr>
-            <tr>
-              <td class="px-0 pt-3">
-                <p><i class="fa-regular fa-comment-dots me-1"></i>댓글 <b class="text-danger">8</b></p>
-                <div class="reply_list_area">
-                  <ul>
-                    <li class="reply_list border-bottom">
-                      <div class="d-flex justify-content-start align-items-start gap-2 py-2">
-                        <div class="flex-grow-1">
-                          <b>댓작성자</b>
-                          <div class="replyContent">어쩌고저쩌고</div>
-                        </div>
-                        <div class="flex-shrink-1">
-                          <div class="btn-group">
-                            <button type="button" class="btn btn-xs rounded-2 btn-outline-gray" data-bs-toggle="dropdown" aria-expanded="false">
-                              <i class="fa-solid fa-ellipsis"></i>
-                            </button>
-                            <ul class="dropdown-menu">
-                              <li><a class="dropdown-item" href="">수정</a></li>
-                              <li><a class="dropdown-item" href="">삭제</a></li>
-                              <li><a class="btnReReplyWriteView dropdown-item">대댓글 달기</a></li>
-                            </ul>
-                          </div>
-                        </div>
-                      </div>
-                      <div class="reply_depth2 ps-4">
-                        <ul>
-                          <li class="rerpley_list border-top">
-                            <div class="d-flex justify-content-start align-items-start gap-2 py-2">
-                              <div class="flex-grow-1">
-                                <b>대댓작성자</b>
-                                <div class="replyContent">어쩌고저쩌고</div>
-                              </div>
-                              <div class="flex-shrink-1">
-                                <div class="btn-group">
-                                  <button type="button" class="btn btn-xs rounded-2 btn-outline-gray" data-bs-toggle="dropdown" aria-expanded="false">
-                                    <i class="fa-solid fa-ellipsis"></i>
-                                  </button>
-                                  <ul class="dropdown-menu">
-                                    <li><a class="dropdown-item" href="">수정</a></li>
-                                    <li><a class="dropdown-item" href="">삭제</a></li>
-                                  </ul>
-                                </div>
-                              </div>
-                            </div>
-                          </li>
-                          <li class="border-top">
-                            <div class="d-flex justify-content-start align-items-start gap-2 py-2">
-                              <div class="flex-grow-1">
-                                <b>댓작성자</b>
-                                <div class="replyContent">어쩌고저쩌고</div>
-                              </div>
-                              <div class="flex-shrink-1">
-                                <div class="btn-group">
-                                  <button type="button" class="btn btn-xs rounded-2 btn-outline-gray" data-bs-toggle="dropdown" aria-expanded="false">
-                                    <i class="fa-solid fa-ellipsis"></i>
-                                  </button>
-                                  <ul class="dropdown-menu">
-                                    <li><a class="dropdown-item" href="">수정</a></li>
-                                    <li><a class="dropdown-item" href="">삭제</a></li>
-                                  </ul>
-                                </div>
-                              </div>
-                            </div>
-                          </li>
-                        </ul>
-                      </div>
-                    </li>
-                    <li class="reply_list border-bottom">
-                      <div class="d-flex justify-content-start align-items-start gap-2 py-2">
-                        <div class="flex-grow-1">
-                          <b>댓작성자</b>
-                          <div class="replyContent">어쩌고저쩌고</div>
-                        </div>
-                        <div class="flex-shrink-1">
-                          <div class="btn-group">
-                            <button type="button" class="btn btn-xs rounded-2 btn-outline-gray" data-bs-toggle="dropdown" aria-expanded="false">
-                              <i class="fa-solid fa-ellipsis"></i>
-                            </button>
-                            <ul class="dropdown-menu">
-                              <li><a class="dropdown-item" href="">수정</a></li>
-                              <li><a class="dropdown-item" href="">삭제</a></li>
-                              <li><a class="btnReReplyWriteView dropdown-item">대댓글 달기</a></li>
-                            </ul>
-                          </div>
-                        </div>
-                      </div>
-                    </li>
-                    <li class="reply_list border-bottom">
-                      <div class="d-flex justify-content-start align-items-start gap-2 py-2">
-                        <div class="flex-grow-1">
-                          <b>댓작성자</b>
-                          <div class="replyContent">어쩌고저쩌고</div>
-                        </div>
-                        <div class="flex-shrink-1">
-                          <div class="btn-group">
-                            <button type="button" class="btn btn-xs rounded-2 btn-outline-gray" data-bs-toggle="dropdown" aria-expanded="false">
-                              <i class="fa-solid fa-ellipsis"></i>
-                            </button>
-                            <ul class="dropdown-menu">
-                              <li><a class="dropdown-item" href="">수정</a></li>
-                              <li><a class="dropdown-item" href="">삭제</a></li>
-                              <li><a class="btnReReplyWriteView dropdown-item">대댓글 달기</a></li>
-                            </ul>
-                          </div>
-                        </div>
-                      </div>
-                    </li>
-                  </ul>
+              </div>
+              <div class="reply_write_area pt-3">
+                <input id="replyMember" name="replyMember" th:value="${loginUser != null ? loginUser.username : null}"
+                       type="hidden">
+                <div class="mb-1">
+                  <small class="text-secondary"><i class="fa-solid fa-circle-exclamation text-danger"></i> 신청하면 현재 게시글
+                    작성자에게만 내 연락처가 공개됩니다.</small>
                 </div>
-                <div class="reply_write_area pt-3">
-                  <div class="mb-2">
-                    <textarea name="replyText" id="replyText" class="form-control" placeholder="댓글 내용을 입력해주세요(최대 1000자)"></textarea>
-                  </div>
-                  <div class="d-flex">
-                    <button class="btnReplyRegister ms-auto btn btn-main">댓글 쓰기</button>
+                <div class="mb-2">
+                  <textarea class="form-control" id="replyText" name="replyText"
+                            placeholder="신청 한마디를 입력해 주세요(최대 1000자)" required></textarea>
+                </div>
+                <div class="row">
+                  <div class="col-12 col-sm-4 col-md-2 ms-auto">
+                    <button class="btn btn-main w-100" id="btnRegisterReply">신청하기</button>
                   </div>
                 </div>
-              </td>
-            </tr>
+              </div>
+            </td>
+          </tr>
           </tbody>
         </table>
       </div>
     </div>
   </div>
 
-  <div id="deleteConfirmModal" class="modal modal-w-380" tabindex="-1">
+  <div class="modal" id="deleteConfirmModal" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered modal-sm">
       <div class="modal-content">
         <div class="modal-header border-bottom-0">
           <h5 class="modal-title">정말로 삭제하시겠어요?</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          <button aria-label="Close" class="btn-close" data-bs-dismiss="modal" type="button"></button>
         </div>
         <div class="modal-body py-0">
           <p>삭제한 게시글과 댓글은 복구할 수 없어요. <br>그래도 삭제하시겠어요?</p>
         </div>
         <div class="modal-footer border-top-0">
           <div class="d-flex justify-content-center gap-2 flex-nowrap w-100">
-            <button type="button" class="btn btn-lg btn-gray w-100" data-bs-dismiss="modal">그만두기</button>
-            <a th:href="@{/sitter/remove(bno=${board.bno})}" type="button" class="btn btn-lg btn-danger w-100">삭제하기</a>
+            <button class="btn btn-lg btn-gray w-100" data-bs-dismiss="modal" type="button">그만두기</button>
+            <a class="btn btn-lg btn-danger w-100" th:href="@{/sitter/remove(bno=${board.bno})}" type="button">삭제하기</a>
           </div>
         </div>
       </div>
     </div>
   </div>
-<!-- /* //view 화면 html 코드 작성 끝 */ -->
+
+  <div class="modal" id="alertModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered modal-sm modal-360">
+      <div class="modal-content">
+        <div class="modal-header border-bottom-0">
+          <h5 class="modal-title"></h5>
+          <button aria-label="Close" class="btn-close" data-bs-dismiss="modal" type="button"></button>
+        </div>
+        <div class="modal-body py-0">
+          <p></p>
+        </div>
+        <div class="modal-footer border-top-0">
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- /* //view 화면 html 코드 작성 끝 */ -->
 </div>
 
 <script layout:fragment="pagescript" th:inline="javascript">
-  /////// 대댓글 textarea toggle ///////
-  const btnReReplyWriteViews = document.querySelectorAll(".btnReReplyWriteView")
-  function reReplyStr() {
-      return `<div class="reReplyWriteArea">
+    const bno = [[${board.bno}]]
+    const boardNickname = [[${board.nickname}]]
+    const category = [[${board.category}]]
+    const isLogin = [[${loginUser}]]
+    const loginNickname = [[${loginUser != null ? loginUser.nickname : null
+    }]]
+    const isSitter = [[${loginUser != null ? loginUser.isSitter : null
+    }]]
+    const hasPet = [[${loginUser != null ? loginUser.petCount : null
+    }]]
+    console.log(boardNickname)
+    console.log(loginNickname)
+
+    const alertModal = new bootstrap.Modal(document.getElementById('alertModal'))
+    const alertModalTitle = document.querySelector("#alertModal .modal-title")
+    const alertModalBody = document.querySelector("#alertModal .modal-body")
+    const alertModalFooter = document.querySelector("#alertModal .modal-footer")
+
+    const countReplies = document.querySelectorAll(".countReplies")
+    const replyList = document.getElementById("replyList")
+    const btnReReplyWriteViews = document.querySelectorAll(".btnReReplyWriteView")
+
+    const replyMember = document.getElementById("replyMember")
+    const replyText = document.getElementById("replyText")
+    const btnRegisterReply = document.getElementById("btnRegisterReply")
+
+
+    async function getReplyList(bno) {
+        let response = await axios.get(`/sitter/replies/list/${bno}`)
+        return response.data
+    }
+
+    async function postReply(replyObj) {
+        let response = await axios.post(`/sitter/replies/`, replyObj)
+        return response.data
+    }
+
+    function printReplyList(responseResult) {
+        for (let cnt of countReplies) {
+            cnt.innerText = responseResult.length
+        }
+        let str = '';
+        if (responseResult && responseResult.length > 0) {
+            for (let reply of responseResult) {
+                str += `<li class="reply_list border-bottom">
+                          <div class="row g-2 py-2">`
+                if (loginNickname === boardNickname || loginNickname === reply.nickname) {
+                    str += `
+                        <div class="col">
+                          <p><b>${reply.nickname}</b>(${reply.userTel})</p>
+                          <div class="replyContent">${reply.content}</div>
+                          <small class="text-secondary">${reply.regDate}</small>
+                        </div>`
+                } else {
+                    str += `<div class="p-2 bg-light rounded-3">
+                              <small class="text-secondary">게시글 작성자와 신청자 본인만 확인가능해요</small>
+                            </div>`
+                }
+                if (loginNickname === boardNickname) {
+                    str += `<div class="col-12 col-sm-4 ms-sm-auto">
+                            <div class="d-flex flex-nowrap gap-2">
+                              <a href="/sitter/${reply.rno}" class="btn btn-gray w-100 text-nowrap">프로필 보기</a>
+                              <button class="btn btn-success w-100 text-nowrap">구인하기</button>
+                            </div>
+                          </div>`
+                } else if (loginNickname === reply.nickname) {
+                    str += `<div class="col-auto">
+                              <div class="btn-group">
+                                <button type="button" class="btn btn-xs rounded-2 btn-outline-gray" data-bs-toggle="dropdown" aria-expanded="false">
+                                  <i class="fa-solid fa-ellipsis"></i>
+                                </button>
+                                <ul class="dropdown-menu">
+                                  <li><button type="button" id="btnModifyReply" class="dropdown-item">수정</button></li>
+                                  <li><button type="button" id="btnDeleteReply" class="dropdown-item">삭제</button></li>
+                                </ul>
+                              </div>
+                            </div>`
+                }
+                str += `  </div>
+                        </li>`
+            }
+        }
+        replyList.innerHTML = str
+    }
+
+    function loadReplyList() {
+        getReplyList(bno)
+            .then(result => {
+                printReplyList(result)
+            }).catch(err => console.error(err))
+    }
+
+    /////// 대댓글 textarea toggle ///////
+    function reReplyStr() {
+        return `<div class="reReplyWriteArea">
                 <div class="d-flex justify-content-start align-items-start gap-2 py-2">
                   <div class="flex-grow-1">
                     <div class="mb-2">
@@ -231,32 +247,108 @@
                   </div>
                 </div>
               </div>`
-  }
+    }
 
-  btnReReplyWriteViews.forEach(btn => {
-      btn.addEventListener("click", function(e){
-          e.preventDefault()
-          const li = e.target.closest("li.reply_list")
-          console.log(li)
-          // 대댓글 영역이 없으면 만들고 변수 초기화
-          if (li.querySelector(".reply_depth2") == null) {
-              li.insertAdjacentHTML("beforeend", `<div class="reply_depth2 ps-4"></div>`)
-          }
-          const depth2 = li.querySelector(".reply_depth2")
 
-          // 대댓글창이 이미 열려있으면 return, 아니면 추가하기
-          if (depth2.querySelector(".reReplyWriteArea") != null) {
-              return
-          }
-          depth2.insertAdjacentHTML("beforeend", reReplyStr())
+    loadReplyList()
 
-          const btnReReplyWriteClose = depth2.querySelector(".btnReReplyWriteClose")
-          btnReReplyWriteClose.addEventListener("click", () => {
-              btnReReplyWriteClose.closest(".reReplyWriteArea").remove()
-          })
-      })
-  })
+    btnRegisterReply.addEventListener("click", function (e) {
+        let replyObj = {
+            bno: bno,
+            content: replyText.value,
+            username: replyMember.value
+        }
+        postReply(replyObj)
+            .then(() => {
+                replyText.value = ''
+                loadReplyList()
+            })
+            .catch((e) => {
+                alert("댓글 등록 오류")
+            })
+    }, false)
 
+    replyText.addEventListener("input", function () {
+        if (isLogin == null) {
+            alertModalTitle.innerHTML = "회원 서비스"
+            alertModalBody.innerHTML = `<p>로그인해야 이용할 수 있어요</p>`
+            alertModalFooter.innerHTML = `<div class="d-flex w-100 gap-2 flex-nowrap">
+                                          <a href="/member/member" class="btn btn-lg btn-outline-main text-nowrap w-100">회원가입</a>
+                                          <a href="/member/login" class="btn btn-lg btn-main text-nowrap w-100">로그인</a>
+                                        </div>`
+            alertModal.show()
+            this.value = ''
+        } else {
+            if (boardNickname === loginNickname) {
+                alertModalTitle.innerHTML = "회원 서비스"
+                alertModalBody.innerHTML = `<p>글 작성자는 신청할 수 없어요</p>`
+                alertModalFooter.innerHTML = `<div class="d-flex w-100 gap-2 flex-nowrap">
+                                          <button class="btn btn-lg btn-main text-nowrap w-100" data-bs-dismiss="modal" >닫기</button>
+                                        </div>`
+                alertModal.show()
+                this.value = ''
+            }
+            if (category === "구해요" && isSitter !== true) {
+                alertModalTitle.innerHTML = "회원 서비스"
+                alertModalBody.innerHTML = `<p>시터 인증을 완료한 회원만 신청 가능해요</p>`
+                alertModalFooter.innerHTML = `<div class="d-flex w-100 gap-2 flex-nowrap">
+                                          <a href="/member/mypage" class="btn btn-lg btn-main text-nowrap w-100">시터 인증 방법 보러가기</a>
+                                        </div>`
+                alertModal.show()
+                this.value = ''
+            }
+            if (category === "일해요" && hasPet === 0) {
+                alertModalTitle.innerHTML = "회원 서비스"
+                alertModalBody.innerHTML = `<p>반려동물 정보를 등록한 회원만 신청 가능해요</p>`
+                alertModalFooter.innerHTML = `<div class="d-flex w-100 gap-2 flex-nowrap">
+                                          <a href="/member/modifyPet?mid=${isLogin.mid}" class="btn btn-lg btn-main text-nowrap w-100">반려동물 정보 등록하기</a>
+                                        </div>`
+                alertModal.show()
+                this.value = ''
+            }
+        }
+    })
+    //
+    // document.addEventListener("DOMContentLoaded", () => {
+    //     let replyListLi = document.querySelectorAll("#replyList li");
+    //     console.log(replyListLi.length);
+    //     const btnModifyReply = document.getElementById("btnModifyReply")
+    //     const btnRemoveReply = document.getElementById("btnRemoveReply")
+    //
+    //     if(btnModifyReply != null) {
+    //         btnModifyReply.addEventListener("click", function(e){
+    //             e.preventDefault()
+    //             let result = e.target
+    //             console.log(result)
+    //         })
+    //     }
+    // });
+
+
+
+    // 대댓글 작성창 표시
+    btnReReplyWriteViews.forEach(btn => {
+        btn.addEventListener("click", function (e) {
+            e.preventDefault()
+            const li = e.target.closest("li.reply_list")
+            // 대댓글 영역이 없으면 만들고 변수 초기화
+            if (li.querySelector(".reply_depth2") == null) {
+                li.insertAdjacentHTML("beforeend", `<div class="reply_depth2 ps-4"></div>`)
+            }
+            const depth2 = li.querySelector(".reply_depth2")
+
+            // 대댓글창이 이미 열려있으면 return, 아니면 추가하기
+            if (depth2.querySelector(".reReplyWriteArea") != null) {
+                return
+            }
+            depth2.insertAdjacentHTML("beforeend", reReplyStr())
+
+            const btnReReplyWriteClose = depth2.querySelector(".btnReReplyWriteClose")
+            btnReReplyWriteClose.addEventListener("click", () => {
+                btnReReplyWriteClose.closest(".reReplyWriteArea").remove()
+            })
+        })
+    })
 
 
 </script>

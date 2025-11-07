@@ -21,6 +21,6 @@ public class SitterBoardListDTO {
   private String title;
   private String nickname;
   private int readCount;
-//  private int replyCount;
+  private Long replyCount;
   private LocalDateTime regDate;
 }

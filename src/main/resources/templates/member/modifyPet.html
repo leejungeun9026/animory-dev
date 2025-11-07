@@ -20,7 +20,6 @@
             </h4>
             <div id="petInfo">
               <ul id="petList">
-                <li th:if="${#lists.isEmpty(petDTOs)}"></li>
                 <li class="mb-3" th:each="pet, stat :${petDTOs}" th:unless="${#lists.isEmpty(petDTOs)}">
                   <div class="card bg-light border-0 rounded-3 py-4 px-3">
                     <input type="hidden"  th:name="'petDTO[' + ${stat.index} + '].pid'" th:value="${pet.pid}">
@@ -75,6 +74,7 @@
     const btnAddPet = document.getElementById("btnAddPet");
     const petInfo = document.getElementById("petInfo");
     const petList = document.getElementById("petList");
+    let idx = 0;
 
     function Li(idx){
         return `<li class="mb-3">
@@ -133,6 +133,8 @@
     btnAddPet.addEventListener("click", function(e){
         e.preventDefault()
         const liCnt = petList.querySelectorAll("li").length
+        console.log(petList)
+        console.log(liCnt)
         if (liCnt >= 10){
             alert ("반려동물은 10마리까지만 등록가능합니다")
             return

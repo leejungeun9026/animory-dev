@@ -1,8 +1,6 @@
 package com.four.animory.service.sitter;
 
 import com.four.animory.domain.sitter.SitterBoard;
-import com.four.animory.domain.user.Member;
-import com.four.animory.dto.common.PageResponseDTO;
 import com.four.animory.dto.sitter.SitterBoardDTO;
 import com.four.animory.dto.sitter.SitterBoardListDTO;
 import com.four.animory.dto.sitter.SitterBoardPageRequestDTO;
@@ -11,7 +9,7 @@ import com.four.animory.dto.user.MemberDTO;
 
 import java.util.List;
 
-public interface SitterService {
+public interface SitterBoardService {
   void insertSitterBoard(SitterBoardDTO sitterBoardDTO, MemberDTO memberDTO);
   List<SitterBoardDTO> getSitterBoardList();
   SitterBoardDTO getSitterBoardById(Long bno, String mode);

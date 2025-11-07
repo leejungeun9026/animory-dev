@@ -109,7 +109,7 @@
                     <p>[[${#temporals.format(board.regDate, 'yyyy-MM-dd')}]]</p>
                     <p class="ms-auto"><i class="fa-regular fa-eye me-1"></i>[[${board.readCount}]]</p>
                     <p><i class="fa-regular fa-heart me-1 text-danger"></i>56</p>
-                    <p><i class="fa-regular fa-comment-dots me-1"></i>00</p>
+                    <p><i class="fa-regular fa-comment-dots me-1"></i>[[${board.replyCount}]]</p>
                   </div>
                 </div>
               </td>
@@ -146,7 +146,7 @@
     </div>
   </div>
 
-  <div id="resultModal" class="modal modal-w-380" tabindex="-1">
+  <div id="resultModal" class="modal" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered modal-sm">
       <div class="modal-content">
         <div class="modal-header border-bottom-0">

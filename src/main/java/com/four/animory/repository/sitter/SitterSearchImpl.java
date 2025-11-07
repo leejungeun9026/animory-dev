@@ -1,6 +1,7 @@
 package com.four.animory.repository.sitter;
 
 import com.four.animory.domain.sitter.QSitterBoard;
+import com.four.animory.domain.sitter.QSitterReply;
 import com.four.animory.domain.sitter.SitterBoard;
 import com.four.animory.dto.sitter.SitterBoardListDTO;
 import com.querydsl.core.BooleanBuilder;
@@ -24,30 +25,31 @@ public class SitterSearchImpl extends QuerydslRepositorySupport implements Sitte
       String sido, String sigungu, String category, String state,
       String petInfo, String[] field, String keyword, Pageable pageable) {
 
-    QSitterBoard q = QSitterBoard.sitterBoard;
+    QSitterBoard qBoard = QSitterBoard.sitterBoard;
+    QSitterReply qReply = QSitterReply.sitterReply;
 
     // 1) 공통 조건 빌드
     BooleanBuilder where = new BooleanBuilder();
-    where.and(q.bno.gt(0L));
+    where.and(qBoard.bno.gt(0L));
 
     if (sido != null && !sido.isBlank()) {
-      where.and(q.sido.eq(sido));
+      where.and(qBoard.sido.eq(sido));
       if (sigungu != null && !sigungu.isBlank()) {
-        where.and(q.sigungu.eq(sigungu));
+        where.and(qBoard.sigungu.eq(sigungu));
       }
     }
 
     if (category != null && !category.isBlank()) {
-      where.and(q.category.eq(category));
+      where.and(qBoard.category.eq(category));
     }
 
     // state=n 이면 "완료" 포함 게시글 제외
     if ("n".equals(state)) {
-      where.and(q.state.isNull().or(q.state.notLike("%완료%")));
+      where.and(qBoard.state.isNull().or(qBoard.state.notLike("%완료%")));
     }
 
     if (petInfo != null && !petInfo.isBlank()) {
-      where.and(q.petInfo.eq(petInfo));
+      where.and(qBoard.petInfo.eq(petInfo));
     }
 
     if (field != null && field.length > 0 && keyword != null && !keyword.isBlank()) {
@@ -55,13 +57,13 @@ public class SitterSearchImpl extends QuerydslRepositorySupport implements Sitte
       for (String f : field) {
         switch (f) {
           case "t":
-            kw.or(q.title.containsIgnoreCase(keyword));
+            kw.or(qBoard.title.containsIgnoreCase(keyword));
             break;
           case "c":
-            kw.or(q.content.containsIgnoreCase(keyword));
-            break; // ★ 빠져있던 break 추가
+            kw.or(qBoard.content.containsIgnoreCase(keyword));
+            break;
           case "w":
-            kw.or(q.member.nickname.containsIgnoreCase(keyword)); // username이 아니라 nickname이면 여기 수정
+            kw.or(qBoard.member.nickname.containsIgnoreCase(keyword));
             break;
         }
       }
@@ -69,30 +71,34 @@ public class SitterSearchImpl extends QuerydslRepositorySupport implements Sitte
     }
 
     // 2) DTO 쿼리 (조건/정렬/페이징 모두 dtoQuery에 적용)
-    JPQLQuery<SitterBoardListDTO> dtoQuery = from(q)
+    JPQLQuery<SitterBoardListDTO> dtoQuery = from(qBoard)
+        .leftJoin(qReply).on(qReply.sitterBoard.eq(qBoard))
         .where(where)
+        .groupBy(
+            qBoard.bno, qBoard.state, qBoard.category, qBoard.petInfo,
+            qBoard.sido, qBoard.sigungu, qBoard.title, qBoard.member.nickname,
+            qBoard.regDate, qBoard.readCount
+        )
         .select(Projections.bean(SitterBoardListDTO.class,
-            q.bno,
-            q.state,
-            q.category,
-            q.petInfo,
-            q.sido,
-            q.sigungu,
-            q.title,
-            q.member.nickname.as("nickname"),
-            q.regDate,
-            q.readCount
-        ))
-        .orderBy(q.regDate.desc());
+            qBoard.bno,
+            qBoard.state,
+            qBoard.category,
+            qBoard.petInfo,
+            qBoard.sido,
+            qBoard.sigungu,
+            qBoard.title,
+            qBoard.member.nickname.as("nickname"),
+            qBoard.regDate,
+            qBoard.readCount,
+            qReply.count().as("replyCount")
+        ));
 
-    getQuerydsl().applyPagination(pageable, dtoQuery);
+    this.getQuerydsl().applyPagination(pageable, dtoQuery);
 
     List<SitterBoardListDTO> dtoList = dtoQuery.fetch();
-
-    // 3) 카운트 쿼리 분리
-    long total = from(q).where(where).select(q.count()).fetchOne();
+    Long total = dtoQuery.fetchCount();
+    if (total == null ) { total = 0L; };
 
     return new PageImpl<>(dtoList, pageable, total);
   }
-
 }
