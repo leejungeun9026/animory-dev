@@ -5,6 +5,7 @@ import com.four.animory.domain.free.FreeFile;
 import com.four.animory.domain.spr.SprBoard;
 import com.four.animory.domain.user.Member;
 import com.four.animory.dto.free.FreeBoardDTO;
+import com.four.animory.dto.free.FreeFileDTO;
 import com.four.animory.dto.spr.SprBoardDTO;
 import com.four.animory.repository.free.FreeBoardRepository;
 import com.four.animory.repository.user.MemberRepository;
@@ -32,7 +33,7 @@ public class FreeServiceImpl implements FreeService{
 
     @Override // 게시글 db에서 가져와서 출력하기.
     public List<FreeBoardDTO> findAllFreeBoards() {
-        List<FreeBoard> freeBoards = freeBoardRepository.findAll(Sort.by(Sort.Direction.DESC, "updateDate"));
+        List<FreeBoard> freeBoards = freeBoardRepository.findAll(Sort.by(Sort.Direction.DESC, "bno"));
         List<FreeBoardDTO> freeBoardDTOS = new ArrayList<>();
         for (FreeBoard freeBoard : freeBoards) {
             freeBoardDTOS.add(entityToDTO(freeBoard));
@@ -58,11 +59,20 @@ public class FreeServiceImpl implements FreeService{
     public void updateFreeBoard(FreeBoardDTO freeBoardDTO) {
         FreeBoard freeBoard = freeBoardRepository.findById(freeBoardDTO.getBno()).orElse(null); // 기존의 board 데이터 가져오기
         freeBoard.change(freeBoardDTO.getContent(), freeBoardDTO.getContent(), freeBoardDTO.getBtype());
+
+        if(freeBoardDTO.getFreeFileDTOS() != null){
+            freeBoard.removeFile();
+            for(FreeFileDTO freeFileDTO : freeBoardDTO.getFreeFileDTOS()){
+                freeBoard.addFile(freeFileDTO.getUuid(), freeFileDTO.getFilename(), freeFileDTO.isImage());
+            }
+        }
         freeBoardRepository.save(freeBoard);
     }
 
     @Override // 게시글 번호 삭제
     public void deleteFreeBoardById(Long bno) {
+        FreeBoard freeBoard = freeBoardRepository.findByIdWithImages(bno).orElse(null);
+        freeBoard.removeFile();
         freeBoardRepository.deleteById(bno);
     }
 
