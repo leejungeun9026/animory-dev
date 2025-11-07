@@ -2,6 +2,8 @@ package com.four.animory.controller.mate;
 
 import com.four.animory.config.auth.PrincipalDetails;
 import com.four.animory.domain.user.Member;
+import com.four.animory.dto.common.PageRequestDTO;
+import com.four.animory.dto.common.PageResponseDTO;
 import com.four.animory.dto.free.FreeBoardDTO;
 import com.four.animory.dto.mate.MateBoardDTO;
 import com.four.animory.service.mate.MateService;
@@ -28,12 +30,20 @@ public class MateController {
     @Autowired
     private UserService userService;
 
-     //list
+     //1차 list
+//    @GetMapping("/list")
+//    public String list(Model model) {
+//        List<MateBoardDTO> mateboardList = mateService.findAllMateBoards();
+//        log.info("LIST SIZE = {}", mateboardList.size());
+//        model.addAttribute("mateboardList", mateboardList);
+//        return "mate/list";
+//    }
+
     @GetMapping("/list")
-    public String list(Model model) {
-        List<MateBoardDTO> mateboardList = mateService.findAllMateBoards();
-        log.info("LIST SIZE = {}", mateboardList.size());
-        model.addAttribute("mateboardList", mateboardList);
+    public String list(PageRequestDTO pageRequestDTO, Model model) {
+        PageResponseDTO<MateBoardDTO> responseDTO = mateService.getList(pageRequestDTO);
+
+        model.addAttribute("responseDTO", responseDTO);
         return "mate/list";
     }
 
@@ -69,7 +79,13 @@ public class MateController {
     @PostMapping("/modify")
     public String modify(MateBoardDTO mateBoardDTO) {
         mateService.updateMateBoard(mateBoardDTO);
-        return "redirect:/free/view?bno=" + mateBoardDTO.getBno();
+        return "redirect:/mate/view?bno=" + mateBoardDTO.getBno();
+    }
+
+    @GetMapping("remove")
+    public String removeMateBoard(Long bno) {
+        mateService.deleteMateBoardById(bno);
+        return "redirect:/mate/list";
     }
 
 

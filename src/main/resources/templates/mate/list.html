@@ -2,8 +2,7 @@
 <html lang="en" layout:decorate="~{include/user}"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity6"
-      xmlns:th="http://www.thymeleaf.org"
->
+      xmlns:th="http://www.thymeleaf.org">
 
 <div layout:fragment="content">
     <!-- /* view 화면 html 코드 작성 부분 */ -->
@@ -18,16 +17,12 @@
                 <section class="search_area">
                     <form action="">
                         <div class="d-flex gap-2">
-                            <select class="form-select form-select-sm w-auto flex-shrink-1" id="" name="">
+                            <select class="form-select form-select-sm w-auto flex-shrink-1" id="" name="type">
                                 <option value="">-----</option>
-                                <option value="tc">제목+내용</option>
-                                <option value="t">제목</option>
-                                <option value="c">내용</option>
-                                <option value="w">작성자</option>
-                                <!--                                <option th:selected="${pageRequestDTO.type=='tc'}" value="tc">제목+내용</option>-->
-                                <!--                                <option th:selected="${pageRequestDTO.type=='t'}" value="t">제목</option>-->
-                                <!--                                <option th:selected="${pageRequestDTO.type=='c'}" value="c">내용</option>-->
-                                <!--                                <option th:selected="${pageRequestDTO.type=='w'}" value="w">작성자</option>-->
+                                <option th:selected="${pageRequestDTO.type=='tc'}" value="tc">제목+내용</option>
+                                <option th:selected="${pageRequestDTO.type=='t'}" value="t">제목</option>
+                                <option th:selected="${pageRequestDTO.type=='c'}" value="c">내용</option>
+                                <option th:selected="${pageRequestDTO.type=='w'}" value="w">작성자</option>
                             </select>
                             <!--                            <input type="text" name="keyword" class="input-control" th:value="${pageRequestDTO.keyword}">-->
                             <input class="form-control form-control-sm" name="keyword" placeholder="검색어를 입력하세요"
@@ -40,7 +35,6 @@
                     </form>
                 </section>
             </div>
-
             <!-- 리스트 목록보기 -->
             <div class="col-12">
                 <section class="search_result_area">
@@ -63,18 +57,16 @@
                         </tr>
                         </thead>
                         <tbody>
-                        <tr th:each="board:${mateboardList}">
+                        <tr th:each="board:${responseDTO.dtoList}">
                             <td th:text="${board.bno}"></td>
                             <td>
-
-
                                 <div class="py-2">
                                     <div class="d-flex gap-2 flex-nowrap mb-2">
                                         <div class="badge badge-gray mb-2">
                                             <span>[[${board.sido}]]</span> / <span>[[${board.sigungu}]]</span>
                                         </div>
                                         <!-- 표시 뱃지 -->
-                                        <p class="badge badge-info"
+                                        <p class="badge badge-info mb-2"
                                            th:if="${board != null and (board.category == '1:1 모집' or board.category == '그룹 모집')}"
                                            th:text="${board.category}">
                                         </p>
@@ -84,26 +76,25 @@
                                     <a class="d-block mb-1" th:href="@{/mate/view(bno=${board.bno})}">
                                         <h5 class="text-overflew-line-2">[[${board.title}]]</h5>
                                     </a>
-
-
                                 </div>
-
-
-                                <a class="d-block mb-1" th:href="@{/mate/view/{bno}(bno=${board.bno})}">
-                                    <h5 class="text-overflew-line-2">[[${board.title}]]</h5>
-                                </a>
-                                <div class="d-flex gap-2 flex-nowrap text-secondary">
-                                    <p th:text="${board.nickname}">작성자</p>
-                                    <p th:text="${#temporals.format(board.updateDate, 'yyyy.MM.dd')}"></p>
-                                    <p class="ms-auto"><i class="fa-regular fa-eye me-1">[[${board.readCount}]]</i>
-                                        <span th:text="${board.readCount}"></span>
-                                    </p>
-                                    <!--                                        <p><i class="fa-regular fa-heart me-1 text-danger"></i>-->
-                                    <!--                                            <span th:text="${board.likecount}"></span>-->
-                                    <!--                                        </p>-->
-                                    <!--                                        <p><i class="fa-regular fa-comment-dots me-1"></i>-->
-                                    <!--                                            <span th:text="${board.replycount}"></span>-->
-                                    <!--                                        </p>-->
+                                <div class="d-flex text-secondary small">
+                                    <!-- 왼쪽: 두 줄(윗줄: 작성자/작성일, 아랫줄: 마감일) -->
+                                    <div class="d-flex flex-column">
+                                        <div class="d-flex gap-2 flex-wrap">
+                                            <span th:text="${board.nickname}">작성자</span>
+                                            <span th:text="${#temporals.format(board.regDate, 'yyyy.MM.dd')}">작성일</span>
+                                        </div>
+                                        <div class="mt-1 text-danger"
+                                             th:if="${board.dueDate != null}">
+                                            신청마감일 :
+                                            <span th:text="${#strings.replace(board.dueDate, 'T', ' ')}"></span>
+                                        </div>
+                                    </div>
+                                    <!-- 오른쪽: 조회수 -->
+                                    <div class="ms-auto d-flex align-items-start">
+                                        <i class="fa-regular fa-eye me-1"></i>
+                                        <span>[[${board.readCount}]]</span>
+                                    </div>
                                 </div>
                             </td>
                         </tr>
@@ -115,24 +106,42 @@
                 <section class="paging_area">
                     <nav aria-label="Page navigation">
                         <ul class="pagination pagination-sm justify-content-center mb-0">
-                            <li class="page-item disabled">
-                                <a class="page-link"><i class="fa-solid fa-angles-left"></i></a>
+                            <li class="page-item">
+                                <a class="page-link" th:data-num="${responseDTO.start}"><i class="fa-solid fa-angles-left"></i></a>
+                            </li>
+                            <li class="page-item" th:if="${responseDTO.prev}">
+                                <a class="page-link" th:data-num="${responseDTO.start -1}"><i class="fa-solid fa-chevron-left"></i></a>
+                            </li>
+                            <th:block th:each="i:${#numbers.sequence(responseDTO.start, responseDTO.end)}">
+                                <li th:class="${responseDTO.page==i}?'page-item active':'page-item'">
+                                    <a class="page-link" th:data-num="${i}">[[${i}]]</a>
+                                </li>
+                            </th:block>
+                            <li class="page-item" th:if="${responseDTO.next}">
+                                <a class="page-link" th:data-num="${responseDTO.end +1}"><i class="fa-solid fa-chevron-right"></i></a>
                             </li>
                             <li class="page-item">
-                                <a class="page-link"><i class="fa-solid fa-chevron-left"></i></a>
+                                <a class="page-link" th:data-num="${responseDTO.end}"><i class="fa-solid fa-angles-right"></i></a>
                             </li>
-                            <li class="page-item active">
-                                <a class="page-link">1</a>
-                            </li>
-                            <li class="page-item">
-                                <a class="page-link">2</a>
-                            </li>
-                            <li class="page-item">
-                                <a class="page-link"><i class="fa-solid fa-chevron-right"></i></a>
-                            </li>
-                            <li class="page-item">
-                                <a class="page-link"><i class="fa-solid fa-angles-right"></i></a>
-                            </li>
+
+
+<!--/*                                <a class="page-link"><i class="fa-solid fa-angles-left"></i></a>-->
+<!--                            </li>-->
+<!--                            <li class="page-item">-->
+<!--                                <a class="page-link"><i class="fa-solid fa-chevron-left"></i></a>-->
+<!--                            </li>-->
+<!--                            <li class="page-item active">-->
+<!--                                <a class="page-link">1</a>-->
+<!--                            </li>-->
+<!--                            <li class="page-item">-->
+<!--                                <a class="page-link">2</a>-->
+<!--                            </li>-->
+<!--                            <li class="page-item">-->
+<!--                                <a class="page-link"><i class="fa-solid fa-chevron-right"></i></a>-->
+<!--                            </li>-->
+<!--                            <li class="page-item">-->
+<!--                                <a class="page-link"><i class="fa-solid fa-angles-right"></i></a>-->
+<!--                            </li>*/-->
                         </ul>
                     </nav>
                 </section>

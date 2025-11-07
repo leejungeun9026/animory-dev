@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en" layout:decorate="~{include/user}"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity6"
+      xmlns:th="http://www.thymeleaf.org">
+
+<div layout:fragment="content">
+    <!-- /* view 화면 html 코드 작성 부분 */ -->
+    <div class="page_title mb-4">
+        <a class="d-inline-flex align-items-baseline" href="/mate/list">
+            <small class="text-danger">산책 게시판<i class="fa-solid fa-chevron-right fs-xs"></i></small>
+        </a>
+        <h3 class="memomentKkukkkuk fw-normal mt-2">게시글 수정</h3>
+    </div>
+    <div class="board_area">
+        <form action="/mate/modify" enctype="multipart/form-data" method="post">
+            <div class="mb-2">
+                <div class="d-flex align-items-center gap-1">
+                    <input class="form-control w-auto bg-body-secondary text-muted" name="bno" readonly
+                           th:value="${mateBoard.bno}" type="text">
+                    <input class="form-control w-auto bg-body-secondary text-muted" name="username" readonly
+                           th:value="${mateBoard.username}"
+                           type="text">
+                </div>
+            </div>
+
+            <div class="mb-2">
+                <select class="form-select w-auto" id="category" name="category" th:value="${mateBoard.category}" required>
+                    <option value="">카테고리(필수)</option>
+                    <option value="1:1 모집">1:1 모집</option>
+                    <option value="그룹 모집">그룹 모집</option>
+                </select>
+            </div>
+
+            <div class="mb-2">
+                <div class="d-flex align-items-center gap-1">
+                    <select class="form-select" id="sido" name="sido" required
+                            th:data-current-sido="${mateBoard.sido}">
+                        <option data-sido-id="" value="">시/도</option>
+                    </select>
+                    <select class="form-select" disabled id="sigungu" name="sigungu" required
+                            th:data-current-sigungu="${mateBoard.sigungu}">
+                        <option value="">시/군/구</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="mb-2">
+                <input class="form-control" name="title" placeholder="제목을 입력해주세요" required th:value="${mateBoard.title}"
+                       type="text">
+            </div>
+            <div class="mb-2">
+        <textarea class="form-control" cols="30" id="content" name="content"
+                  placeholder=" 시간과 장소, 희망하는 산책 친구의 성격 등 자세히 알려주세요!(최대 1000자)"
+                  required rows="10">[[${mateBoard.content}]]</textarea>
+            </div>
+
+            <div class="mb-2">
+                <span class="form-control" id="due">마감일</span>
+                <input class="form-control" type="datetime-local" name="dueDate" id="dueDate"
+                       th:value="${mateBoard != null and mateBoard.dueDate != null
+             ? (#strings.contains(mateBoard.dueDate,'T')
+                  ? mateBoard.dueDate
+                  : #strings.replace(mateBoard.dueDate,' ','T'))
+             : ''}">
+            </div>
+
+
+            <div class="mb-3">
+                <input class="form-control" multiple name="files" type="file">
+            </div>
+            <div class="button_wrap">
+                <div class="row g-2">
+                    <div class="col-6 col-md-auto ms-md-auto">
+                        <a class="btn btn-lg btn-gray w-100" href="/mate/list">목록</a>
+                    </div>
+                    <div class="col-6 col-md-auto">
+                        <button class="btn btn-lg btn-main w-100" type="submit">저장</button>
+                        <!--                        <a class="btn btn-gray" th:href="@{/mate/view/{bno}(bno=${mateBoard.bno})}">취소</a>-->
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+    <!-- /* //view 화면 html 코드 작성 끝 */ -->
+</div>
+
+<script layout:fragment="pagescript" th:inline="javascript">
+    // /////// 카테고리 및 타입 설정 ///////
+    // const cate = document.getElementById("category")
+    // const sido1 = document.getElementById("sido")
+    // const sigungu1 = document.getElementById("sigungu")
+    // cate.addEventListener("change", function (e) {
+    //     console.log(e.target.value)
+    //     let val = e.target.value
+    //     if (val === "1:1") {
+    //         sido1.classList.remove("d-none")
+    //         sido1.classList.add("d-block")
+    //         sigungu1.classList.remove("d-none")
+    //         sigungu1.classList.add("d-block")
+    //     } else { (val === "그룹")
+    //         sido1.classList.remove("d-block")
+    //         sido1.classList.add("d-none")
+    //         sigungu1.classList.remove("d-block")
+    //         sigungu1.classList.add("d-none")
+    //     }
+    // })
+
+
+
+
+
+    //
+    //
+    // /////// 사용자 정보 - 시도,시군구 정보 초기화 ///////
+    // const sido = document.querySelector("#sido")
+    // const sigungu = document.querySelector("#sigungu")
+    //
+    // async function loadSido() {
+    //     const memberSido = /*[[${memberDTO != null ? memberDTO.sido : null}]]*/ null;
+    //     const memberSiGungu = /*[[${memberDTO != null ? memberDTO.sigungu : null}]]*/ null;
+    //     const {data: sidoList} = await axios.get('/api/regions/sido');
+    //     sido.innerHTML = `<option value="">시/도</option>` +
+    //         sidoList.map(s =>
+    //             `<option value="${s.name}" data-sido-id="${s.id}" ${s.name === memberSido ? 'selected' : ''}>${s.name}</option>`
+    //         ).join('');
+    //     const selectedOption = sido.selectedOptions[0]; // 선택된 <option> 요소
+    //     const sidoId = selectedOption.dataset.sidoId;       // data-sidoid 값 읽기
+    //
+    //     // loadSigungu랑 거의 같음
+    //     // memberSiGungu 를 가지고 selected 하는 부분만 다름
+    //     if (!sidoId) {
+    //         sigungu.innerHTML = '<option value="">시/군/구</option>';
+    //         sigungu.disabled = true;
+    //         return;
+    //     }
+    //     const {data: sigunguList} = await axios.get('/api/regions/sigungu', {params: {sidoId}});
+    //     sigungu.innerHTML = '<option value="">시/군/구</option>' +
+    //         sigunguList.map(g => `<option value="${g.name}" ${g.name === memberSiGungu ? 'selected' : ''}>${g.name}</option>`).join('');
+    //     sigungu.disabled = false;
+    //
+    // }
+    //
+    // async function loadSigungu(sidoId) {
+    //     if (!sidoId) {
+    //         sigungu.innerHTML = '<option value="">시/군/구</option>';
+    //         sigungu.disabled = true;
+    //         return;
+    //     }
+    //     const {data} = await axios.get('/api/regions/sigungu', {params: {sidoId}});
+    //     sigungu.innerHTML = '<option value="">시/군/구</option>' +
+    //         data.map(g => `<option value="${g.name}">${g.name}</option>`).join('');
+    //     sigungu.disabled = false;
+    // }
+    //
+    // sido.addEventListener('change', (e) => {
+    //     const selectedOption = e.target.selectedOptions[0]; // 선택된 <option> 요소
+    //     const sidoId = selectedOption.dataset.sidoId;       // data-sidoid 값 읽기
+    //     loadSigungu(sidoId);
+    // });
+    //
+    // loadSido()
+
+// 시군구 수정 - 이전 값 미리보기
+        const sido    = document.getElementById('sido');
+        const sigungu = document.getElementById('sigungu');
+
+        async function initRegion() {
+        // 1) 시/도 옵션 로드
+        const { data: sidoList } = await axios.get('/api/regions/sido');
+        sido.innerHTML = '<option value="">시/도</option>' +
+        sidoList.map(s => `<option value="${s.name}" data-sido-id="${s.id}">${s.name}</option>`).join('');
+
+        // 2) 등록 당시 값 읽기
+        const currentSido    = sido.dataset.currentSido || '';
+        const currentSigungu = sigungu.dataset.currentSigungu || '';
+
+        // 3) 시/도가 있으면 선택 후 해당 시군구 로드
+        if (currentSido) {
+        // 시/도 선택
+        const sidoOption = Array.from(sido.options).find(o => o.value === currentSido);
+        if (sidoOption) {
+        sido.value = currentSido;
+
+        // 3-1) 시군구 로드
+        const sidoId = sidoOption.dataset.sidoId;
+        const { data: sigunguList } = await axios.get('/api/regions/sigungu', { params: { sidoId } });
+        sigungu.innerHTML = '<option value="">시/군/구</option>' +
+        sigunguList.map(g => `<option value="${g.name}">${g.name}</option>`).join('');
+        sigungu.disabled = false;
+
+        // 3-2) 과거 선택값 적용
+        if (currentSigungu) {
+        const sigOpt = Array.from(sigungu.options).find(o => o.value === currentSigungu);
+        if (sigOpt) sigungu.value = currentSigungu;
+    }
+    }
+    }
+    }
+
+        // 변경 시 시군구 다시 로드
+        sido.addEventListener('change', async (e) => {
+        const opt = e.target.selectedOptions[0];
+        const sidoId = opt ? opt.dataset.sidoId : '';
+        if (!sidoId) {
+        sigungu.innerHTML = '<option value="">시/군/구</option>';
+        sigungu.disabled = true;
+        return;
+    }
+        const { data } = await axios.get('/api/regions/sigungu', { params: { sidoId } });
+        sigungu.innerHTML = '<option value="">시/군/구</option>' +
+        data.map(g => `<option value="${g.name}">${g.name}</option>`).join('');
+        sigungu.disabled = false;
+    });
+
+        initRegion();
+</script>
+
+
+
+
+
+</html>
