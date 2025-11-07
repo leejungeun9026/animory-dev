@@ -8,7 +8,7 @@ import lombok.*;
 @Table(name="tbl_spr_file")
 @Getter
 @Setter
-@ToString(exclude = "sprboard")
+@ToString(exclude = "sprBoard")
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
