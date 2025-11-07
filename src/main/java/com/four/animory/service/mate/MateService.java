@@ -1,23 +1,24 @@
 package com.four.animory.service.mate;
 
 import com.four.animory.domain.mate.MateBoard;
+import com.four.animory.domain.user.Member;
 import com.four.animory.dto.mate.MateBoardDTO;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 public interface MateService {
+    void registerMateBoard(MateBoardDTO mateBoardDTO, Member member);
     List<MateBoardDTO> findAllMateBoards();
-    void registerMateBoard(MateBoardDTO mateBoardDTO);
-
+    MateBoardDTO findMateBoardById(Long bno, Integer mode);
+    void updateMateBoard(MateBoardDTO mateBoardDTO);
+    void deleteMateBoardById(Long bno);
 
 
     default MateBoard dtoToEntity(MateBoardDTO mateBoardDTO) {
         MateBoard mateBoard = MateBoard.builder()
                 .category(mateBoardDTO.getCategory())
-                .state(mateBoardDTO.getState())
-                .petInfo(mateBoardDTO.getPerInfo())
                 .sido(mateBoardDTO.getSido())
+                .sigungu(mateBoardDTO.getSigungu())
                 .title(mateBoardDTO.getTitle())
                 .content(mateBoardDTO.getContent())
                 .build();
@@ -27,12 +28,15 @@ public interface MateService {
     default MateBoardDTO entityToDTO(MateBoard mateBoard){
         MateBoardDTO mateBoardDTO = MateBoardDTO.builder()
                 .bno(mateBoard.getBno())
-                .state(mateBoard.getState())
-                .perInfo(mateBoard.getPetInfo())
+
+                .category(mateBoard.getCategory())
+
                 .sido(mateBoard.getSido())
                 .sigungu(mateBoard.getSigungu())
                 .title(mateBoard.getTitle())
                 .content(mateBoard.getContent())
+                .username(mateBoard.getMember().getUsername())
+                .nickname(mateBoard.getMember().getNickname())
                 .readCount(mateBoard.getReadCount())
                 .regDate(mateBoard.getRegDate())
                 .updateDate(mateBoard.getUpdateDate())

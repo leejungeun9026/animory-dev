@@ -19,16 +19,17 @@
                     <form action="">
                         <div class="d-flex gap-2">
                             <select class="form-select form-select-sm w-auto flex-shrink-1" id="" name="">
+                                <option value="">-----</option>
                                 <option value="tc">제목+내용</option>
                                 <option value="t">제목</option>
                                 <option value="c">내용</option>
                                 <option value="w">작성자</option>
-<!--                                <option th:selected="${pageRequestDTO.type=='tc'}" value="tc">제목+내용</option>-->
-<!--                                <option th:selected="${pageRequestDTO.type=='t'}" value="t">제목</option>-->
-<!--                                <option th:selected="${pageRequestDTO.type=='c'}" value="c">내용</option>-->
-<!--                                <option th:selected="${pageRequestDTO.type=='w'}" value="w">작성자</option>-->
+                                <!--                                <option th:selected="${pageRequestDTO.type=='tc'}" value="tc">제목+내용</option>-->
+                                <!--                                <option th:selected="${pageRequestDTO.type=='t'}" value="t">제목</option>-->
+                                <!--                                <option th:selected="${pageRequestDTO.type=='c'}" value="c">내용</option>-->
+                                <!--                                <option th:selected="${pageRequestDTO.type=='w'}" value="w">작성자</option>-->
                             </select>
-<!--                            <input type="text" name="keyword" class="input-control" th:value="${pageRequestDTO.keyword}">-->
+                            <!--                            <input type="text" name="keyword" class="input-control" th:value="${pageRequestDTO.keyword}">-->
                             <input class="form-control form-control-sm" name="keyword" placeholder="검색어를 입력하세요"
                                    type="text">
                             <button class="btn btn-sm btn-secondary text-nowrap" type="submit">
@@ -62,31 +63,47 @@
                         </tr>
                         </thead>
                         <tbody>
-                        <tr th:each="board : ${mateboards}">
+                        <tr th:each="board:${mateboardList}">
                             <td th:text="${board.bno}"></td>
                             <td>
+
+
                                 <div class="py-2">
                                     <div class="d-flex gap-2 flex-nowrap mb-2">
-                                        <p class="badge badge-success">모집완료</p>
-                                        <p class="badge badge-warning">&#x1F43E; 같이가요</p>
-                                        <p class="badge badge-outline-secondary">강아지</p>
+                                        <div class="badge badge-gray mb-2">
+                                            <span>[[${board.sido}]]</span> / <span>[[${board.sigungu}]]</span>
+                                        </div>
+                                        <!-- 표시 뱃지 -->
+                                        <p class="badge badge-info"
+                                           th:if="${board != null and (board.category == '1:1 모집' or board.category == '그룹 모집')}"
+                                           th:text="${board.category}">
+                                        </p>
+<!--                                        <p class="badge badge-success mb-2">[[${board.category}]]</p>-->
+                                        <!-- 표시 뱃지 끝 -->
                                     </div>
-                                    <a class="d-block mb-1" th:href="@{/mate/view/{bno}(bno=${board.bno})}">
+                                    <a class="d-block mb-1" th:href="@{/mate/view(bno=${board.bno})}">
                                         <h5 class="text-overflew-line-2">[[${board.title}]]</h5>
                                     </a>
-                                    <div class="d-flex gap-2 flex-nowrap text-secondary">
-                                        <p th:text="${board.nickname}">작성자</p>
-                                        <p th:text="${#temporals.format(board.updateDate, 'yyyy.MM.dd HH:mm')}"></p>
-                                        <p class="ms-auto"><i class="fa-regular fa-eye me-1"></i>
-                                            <span th:text="${board.readCount}"></span>
-                                        </p>
-<!--                                        <p><i class="fa-regular fa-heart me-1 text-danger"></i>-->
-<!--                                            <span th:text="${board.likecount}"></span>-->
-<!--                                        </p>-->
-<!--                                        <p><i class="fa-regular fa-comment-dots me-1"></i>-->
-<!--                                            <span th:text="${board.replycount}"></span>-->
-<!--                                        </p>-->
-                                    </div>
+
+
+                                </div>
+
+
+                                <a class="d-block mb-1" th:href="@{/mate/view/{bno}(bno=${board.bno})}">
+                                    <h5 class="text-overflew-line-2">[[${board.title}]]</h5>
+                                </a>
+                                <div class="d-flex gap-2 flex-nowrap text-secondary">
+                                    <p th:text="${board.nickname}">작성자</p>
+                                    <p th:text="${#temporals.format(board.updateDate, 'yyyy.MM.dd')}"></p>
+                                    <p class="ms-auto"><i class="fa-regular fa-eye me-1">[[${board.readCount}]]</i>
+                                        <span th:text="${board.readCount}"></span>
+                                    </p>
+                                    <!--                                        <p><i class="fa-regular fa-heart me-1 text-danger"></i>-->
+                                    <!--                                            <span th:text="${board.likecount}"></span>-->
+                                    <!--                                        </p>-->
+                                    <!--                                        <p><i class="fa-regular fa-comment-dots me-1"></i>-->
+                                    <!--                                            <span th:text="${board.replycount}"></span>-->
+                                    <!--                                        </p>-->
                                 </div>
                             </td>
                         </tr>
@@ -130,7 +147,33 @@
 
 <script layout:fragment="pagescript" th:inline="javascript">
     // 페이지에 필요한 스크립트 작성 부분
+    /////// 사용자 정보 - 시도,시군구 정보 초기화 ///////
+    const sido = document.querySelector("#sido")
+    const sigungu = document.querySelector("#sigungu")
 
+    async function loadSido() {
+        const {data} = await axios.get('/api/regions/sido');
+        sido.innerHTML = `<option value="">지역 전체</option>` +
+            data.map(s => `<option value="${s.name}" data-sido-id="${s.id}">${s.name}</option>`).join('');
+    }
+
+    async function loadSigungu(sidoId) {
+        if (!sidoId) {
+            sigungu.innerHTML = '<option value="">시/군/구</option>';
+            return;
+        }
+        const {data} = await axios.get('/api/regions/sigungu', {params: {sidoId}});
+        sigungu.innerHTML = '<option value="">전체</option>' +
+            data.map(g => `<option value="${g.name}">${g.name}</option>`).join('');
+    }
+
+    sido.addEventListener('change', (e) => {
+        const selectedOption = e.target.selectedOptions[0]; // 선택된 <option> 요소
+        const sidoId = selectedOption.dataset.sidoId;       // data-sidoid 값 읽기
+        loadSigungu(sidoId);
+    });
+
+    loadSido()
     // 페이지에 필요한 스크립트 작성 끝
 </script>
 

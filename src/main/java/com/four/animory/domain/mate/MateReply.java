@@ -29,6 +29,6 @@ public class MateReply extends BaseEntity {
     private boolean deleted;
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="mid")
-    private Member Member;
+    private Member member;
 
 }
