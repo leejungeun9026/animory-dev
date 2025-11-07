@@ -7,5 +7,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @Log4j2
+@RequestMapping("/sitter/replies")
 public class SitterReplyController {
+
+
 }
