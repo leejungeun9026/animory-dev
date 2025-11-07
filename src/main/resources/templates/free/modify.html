@@ -13,7 +13,7 @@
     <h3 class="memomentKkukkkuk fw-normal mt-2">게시글 수정</h3>
   </div>
   <div class="board_area">
-    <form action="/free/modify" enctype="multipart/form-data" method="post" entype>
+    <form action="/free/modify" enctype="multipart/form-data" method="post" entype="multipart/form-data">
         <input type="hidden" name="bno" th:value="${freeBoard.bno}">
       <div class="mb-2">
         <select class="form-select w-auto" id="btype" name="btype" required>
@@ -32,9 +32,28 @@
         <textarea class="form-control" cols="30" id="content" name="content" required rows="10">[[${freeBoard.content}]]
         </textarea>
       </div>
-      <div class="mb-3">
-        <input class="form-control" multiple name="files" type="file">
-      </div>
+        <tr class="mb-3">
+            <td>
+                <span class="input-group-text">첨부파일</span>
+                <div class="col" th:if="${freeBoard.freeFileDTOS !=null && freeBoard.freeFileDTOS.size()>0}">
+                    <div class="container-fluid d-flex uploadResult" style="flex-wrap: wrap">
+                        <div th:each="freeDTO:${freeBoard.freeFileDTOS}">
+                            <div th:if="${freeDTO.image}">
+                                <img class="mb-3" th:src="|/uploads/free/s_${freeDTO.uuid}_${freeDTO.filename}|">
+                                <span th:text="${freeDTO.filename}"></span>
+                            </div>
+                            <div th:unless="${freeDTO.image}">
+                                <img class="mb-3" src="/uploads/free/images/file.jpg" width="100" height="100">
+                                <span th:text="${freeDTO.filename}"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </td>
+        <tr>
+        <div class="mb-3">
+            <input class="form-control" multiple name="files" type="file">
+        </div>
       <div class="button_wrap">
         <div class="row g-2">
             <div class="col d-flex justify-content-end gap-2">

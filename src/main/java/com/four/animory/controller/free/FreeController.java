@@ -40,62 +40,6 @@ public class FreeController {
     @Value("${com.four.animory.upload.path}")
     private String uploadPath;
 
-
-    private List<FreeFileDTO> fileUpload(UploadFileDTO uploadFileDTO){
-        String freeUploadPath = uploadPath + "\\free";
-        List<FreeFileDTO> list = new ArrayList<>(); // 파일 업로드 결과를 보려고
-        if(uploadFileDTO.getFiles() != null){ // 파일이 올라왔으면
-            uploadFileDTO.getFiles().forEach(multiFile -> {
-                String originalFileName=multiFile.getOriginalFilename();
-                log.info("originalFileName:"+originalFileName);
-                String uuid= UUID.randomUUID().toString(); // uuid+스트링 형태 -> 변수에 넣겠다.
-                Path savePath = Paths.get(freeUploadPath,uuid+"_"+originalFileName); // 파일이 저장될 path가 만들어짐
-                boolean image = false;
-                try {
-                    multiFile.transferTo(savePath); // 전체 파일 경로로 저장
-                    if(Files.probeContentType(savePath).startsWith("image")){
-                        image=true;
-                        File thumbnail = new File(freeUploadPath,"s_"+uuid+"_"+originalFileName);
-                        Thumbnailator.createThumbnail(savePath.toFile(),thumbnail,200,200); // 가로세로 크기
-                    } // 이미지라는 이름으로 시작하면
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-                FreeFileDTO freeFileDTO = FreeFileDTO.builder()
-                        .uuid(uuid)
-                        .filename(originalFileName)
-                        .image(image)
-                        .build();
-                list.add(freeFileDTO); // 리스트에 계속 담아줌.
-//                list.add(uuid+"_"+originalFileName);
-            });
-        }
-        return list;
-    }
-    // 파일을 수정할 때 삭제하는 메서드라서 반환이 필요없다.
-    public void removeFile(List<FreeFileDTO> fileDTOS) { // 이미지일 경우에는 썸네일이 옴
-        String freeUploadPath = uploadPath + "\\free";
-        for(FreeFileDTO freeFileDTO: fileDTOS){
-            String filename=freeFileDTO.getUuid()+"_"+freeFileDTO.getFilename();
-            Resource resource = new FileSystemResource(freeUploadPath+File.separator+filename);
-            String resourceName = resource.getFilename();
-            boolean removed=false;
-
-            try{
-                String contentType=Files.probeContentType(resource.getFile().toPath());
-                removed=resource.getFile().delete(); // 원본 파일 삭제
-
-                if(contentType.startsWith("image")){
-                    String fileName1="s_"+filename; // 썸네일 파일
-                    File thumFile=new File(freeUploadPath+File.separator+fileName1); // 원본 파일로 형태로 만들어짐
-                    thumFile.delete(); // 원본 파일이 삭제 됨.
-                }
-            }catch (IOException e){
-                e.printStackTrace();
-            }
-        }
-    }
-
     @Autowired
     private FreeService freeService;
 
@@ -119,40 +63,50 @@ public class FreeController {
         return "free/register"; // templates/free/register.html
     }
 
-    @PostMapping("/register")
-    public String registerPost(FreeBoardDTO freeBoardDTO, @AuthenticationPrincipal PrincipalDetails principalDetails, UploadFileDTO uploadFileDTO) {
-        List<FreeFileDTO> fileDTOS=null;
-        if(uploadFileDTO.getFiles()!=null
-                && !uploadFileDTO.getFiles().get(0).getOriginalFilename().equals("")){ // 파일 이름이 공백이 아닐 떄
-            fileDTOS=fileUpload(uploadFileDTO);
-        }
-        freeBoardDTO.setFreeFileDTOS(fileDTOS);
-        Member member = principalDetails.getMember();
-        log.info(member);
-        freeService.registerFreeBoard(freeBoardDTO, member); // 서비스에는 DTO만 전달
-        return "redirect:/free/list";
-    }
-
     @GetMapping("/modify")
     public String modify(Long bno, Integer mode, Model model) {
-        log.info("모드 확인:" + mode);
         FreeBoardDTO freeBoardDTO = freeService.findFreeBoardById(bno, mode);
         model.addAttribute("freeBoard", freeBoardDTO);
         return "free/modify";
     }
 
-    @PostMapping("/modify")
-    public String modify(FreeBoardDTO freeBoardDTO) {
-        freeService.updateFreeBoard(freeBoardDTO);
-        return "redirect:/free/view?bno=" + freeBoardDTO.getBno();
-    }
-
-
     @GetMapping("remove")
     public String removeFreeBoard(Long bno) {
+        log.info("removeFreeBoard");
+        FreeBoardDTO freeBoardDTO = freeService.findFreeBoardById(bno,2);
+        List<FreeFileDTO> freeFileDTOS = freeBoardDTO.getFreeFileDTOS();
+        if (freeFileDTOS != null && !freeFileDTOS.isEmpty()) {
+            log.info("!!!!!!!!! removeFreeBoard");
+            removeFile(freeFileDTOS);
+        }
         freeService.deleteFreeBoardById(bno);
         return "redirect:/free/list";
     }
+
+    public void removeFile(List<FreeFileDTO> freeFileDTO) { // 이미지일 경우에는 썸네일이 옴
+        String freeUploadPath = uploadPath + "\\free";
+        for(FreeFileDTO freeFileDTO1: freeFileDTO){
+            String filename=freeFileDTO1.getUuid()+"_"+freeFileDTO1.getFilename();
+            log.info("removeFile: "+filename);
+            Resource resource = new FileSystemResource(freeUploadPath+File.separator+filename);
+            String resourceName = resource.getFilename();
+            boolean removed=false;
+
+            try{
+                String contentType=Files.probeContentType(resource.getFile().toPath());
+                removed=resource.getFile().delete(); // 원본 파일 삭제
+
+                if(contentType.startsWith("image")){
+                    String fileName1="s_"+filename; // 썸네일 파일
+                    File thumFile=new File(freeUploadPath+File.separator+fileName1); // 원본 파일로 형태로 만들어짐
+                    thumFile.delete(); // 원본 파일이 삭제 됨.
+                }
+            }catch (IOException e){
+                e.printStackTrace();
+            }
+        }
+    }
+
 
     @ResponseBody
     @GetMapping("/like")
