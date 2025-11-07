@@ -19,7 +19,7 @@ import java.util.Map;
 
 @RestController
 @Log4j2
-@RequestMapping("/replies")
+@RequestMapping("/sprreplies")
 public class SprReplyController {
     @Autowired
     private SprReplyService sprReplyService;

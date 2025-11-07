@@ -187,7 +187,7 @@
 
     async function printReplies(bno, page, size, goLast){
 
-        const response = await axios.get(`/replies/list/${bno}`, {params:{page, size: Number(size)}})
+        const response = await axios.get(`/sprreplies/list/${bno}`, {params:{page, size: Number(size)}})
         let data = response.data;
 
         if(goLast){
@@ -228,7 +228,7 @@
             deleted : false
         }
         try{
-            const response = await axios.post(`/replies/`, replyObj);
+            const response = await axios.post(`/sprreplies/`, replyObj);
             const result = response.data;
 
             replyText.value = '';
@@ -247,11 +247,11 @@
 
     const modifyCloseBtn = document.querySelector(".modifyCloseBtn")
     async function modifyReply(replyObj){
-        const response = await axios.put(`/replies/${replyObj.rno}`, replyObj);
+        const response = await axios.put(`/sprreplies/${replyObj.rno}`, replyObj);
         return response.data;
     }
     async function getReply(rno){
-        const response = await axios.get(`/replies/${rno}`)
+        const response = await axios.get(`/sprreplies/${rno}`)
         return response.data;
     }
 
@@ -267,7 +267,7 @@
         const rno = li.getAttribute("data-rno")
         if(target.classList.contains("modifyBtn")) {
             try {
-                const response = await axios.get(`/replies/${rno}`)
+                const response = await axios.get(`/sprreplies/${rno}`)
                 const reply = response.data
                 modifyText.value = reply.content
                 modifyModal.show()
@@ -278,7 +278,7 @@
 
         if(target.classList.contains("deleteBtn")){
             try{
-                await axios.post(`/replies/delete/${rno}`)
+                await axios.post(`/sprreplies/delete/${rno}`)
                 printReplies(bno, page, size, false)
             }catch (err){
                 console.error(err)
@@ -290,7 +290,7 @@
         modifyBtn2.onclick = async function () {
             const updatedContent = modifyText.value
 
-            await axios.put(`/replies/${rno}`, {
+            await axios.put(`/sprreplies/${rno}`, {
                 rno: rno,
                 content: updatedContent
             })
