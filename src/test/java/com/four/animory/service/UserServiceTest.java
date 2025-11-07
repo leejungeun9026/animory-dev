@@ -4,6 +4,7 @@ import com.four.animory.domain.user.Member;
 import com.four.animory.domain.user.Pet;
 import com.four.animory.repository.user.MemberRepository;
 import com.four.animory.repository.user.PetRepository;
+import com.four.animory.service.user.UserService;
 import jakarta.transaction.Transactional;
 import lombok.extern.log4j.Log4j2;
 import org.junit.jupiter.api.Test;
@@ -20,8 +21,10 @@ public class UserServiceTest {
     private PetRepository petRepository;
     @Autowired
     private BCryptPasswordEncoder bCryptPasswordEncoder;
+  @Autowired
+  private UserService userService;
 
-    @Test
+  @Test
     public void insertUserTest(){
         Member member = Member.builder()
                 .username("test")
@@ -59,5 +62,11 @@ public class UserServiceTest {
                 .sitter(false)
                 .build();
         memberRepository.save(member);
+    }
+
+    @Test
+    public void getPetCountByMemberTest(){
+      int count = userService.getPetListByMemberId(14L).size();
+      log.info(count);
     }
 }

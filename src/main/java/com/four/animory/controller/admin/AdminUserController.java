@@ -1,13 +1,11 @@
 package com.four.animory.controller.admin;
 
-import com.four.animory.dto.region.SidoDTO;
 import com.four.animory.dto.user.MemberDTO;
-import com.four.animory.dto.user.MemberListPetCountDTO;
+import com.four.animory.dto.user.MemberWithPetCountDTO;
 import com.four.animory.dto.user.PetDTO;
 import com.four.animory.service.user.UserService;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Sort;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -28,7 +26,7 @@ public class AdminUserController {
   @GetMapping("/list")
   public void list(Model model) {
     log.info("admin member list success.....");
-    List<MemberListPetCountDTO> list = userService.getMemberListPetCount();
+    List<MemberWithPetCountDTO> list = userService.getMemberListPetCount();
     model.addAttribute("memberList", list);
   }
 
