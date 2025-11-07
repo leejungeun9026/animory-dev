@@ -9,7 +9,7 @@ import lombok.*;
 @Table(name = "tbl_notice_reply")
 @Getter
 @Setter
-@ToString(exclude = {"board", "member"})
+@ToString(exclude = {"noticeBoard", "member"})
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
@@ -24,10 +24,10 @@ public class NoticeReply extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "bno", nullable = false)
-    private NoticeBoard board;
+    private NoticeBoard noticeBoard;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "mno", nullable = false)
+    @JoinColumn(name = "mid", nullable = false)
     private Member member;
 
     @Column(nullable = false)
@@ -36,6 +36,7 @@ public class NoticeReply extends BaseEntity {
    
   // 게시판에서만 삭제되고 db에서는 삭제 안됨
     public void softDelete() {
+
         this.deleted = true;
     }
 }
