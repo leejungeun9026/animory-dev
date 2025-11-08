@@ -89,7 +89,7 @@ public class FreeSearchImpl extends QuerydslRepositorySupport implements FreeSea
                         booleanBuilder.or(qFreeBoard.content.contains(keyword));
                         break;
                     case "w":
-                        booleanBuilder.or(qFreeBoard.member.username.contains(keyword));
+                        booleanBuilder.or(qFreeBoard.member.nickname.contains(keyword));
                         break;
                 }
             } query.where(booleanBuilder);
@@ -97,11 +97,15 @@ public class FreeSearchImpl extends QuerydslRepositorySupport implements FreeSea
         query.where(qFreeBoard.bno.gt(0));
         JPQLQuery<FreeBoardListReplyCountDTO> dtoQuery = query.select(Projections.bean(FreeBoardListReplyCountDTO.class,
             qFreeBoard.bno,
-                qFreeBoard.title,
-                qFreeBoard.member.username.as("username"),
-                qFreeBoard.readcount,
-                qFreeBoard.regDate,
-                qFreeReply.count().as("replycount")));
+            qFreeBoard.title,
+            qFreeBoard.member.username.as("username"),
+            qFreeBoard.readcount,
+            qFreeBoard.regDate,
+            qFreeBoard.updateDate,
+            qFreeReply.count().as("replycount"),
+            qFreeBoard.btype,
+            qFreeBoard.likecount,
+            qFreeBoard.member.nickname.as("nickname")));
         this.getQuerydsl().applyPagination(pageable, query);
         List<FreeBoardListReplyCountDTO> dtoList=dtoQuery.fetch();
         long count = query.fetchCount();

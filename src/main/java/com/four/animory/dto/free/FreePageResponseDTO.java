@@ -28,7 +28,7 @@ public class FreePageResponseDTO<E> {
     this.page = freePageRequestDTO.getPage();
     this.size = freePageRequestDTO.getSize();
     this.total = total;
-    this.pageBlockSize = 3;
+    this.pageBlockSize = 5;
     this.dtoList = dtoList;
 
     this.first = 1;

@@ -41,7 +41,7 @@
                             <div class="d-flex gap-2 flex-nowrap text-secondary">
                                 <p>[[${#temporals.format(freeBoard.updateDate, 'yyyy.MM.dd HH:mm')}]]</p>
                                 <p class="ms-auto"><i class="fa-regular fa-eye me-1"></i>[[${freeBoard.readcount}]]</p>
-                                <p id="likeBtn">
+                                <p id="">
                                     <i id="likeIcon"
                                        th:class="${freeBoard.likecount >= 1} ? 'fa-solid fa-heart me-1 text-danger' : 'fa-regular fa-heart me-1 text-danger'"></i>
                                     <span id="likeCount">[[${freeBoard.likecount}]]</span>
@@ -52,7 +52,7 @@
                     </tr>
                     </thead>
                 </table>
-                    <tbody>
+                <tbody>
                     <!-- 첨부파일이 있으면 노출 -->
                     <tr class="mb-3">
                         <td>
@@ -77,14 +77,19 @@
                             <div class="tb_content">[[${freeBoard.content}]]</div>
                         </td>
                     </tr>
-                    </tbody>
-                </table>
+                    <tr>
+                        <td class="px-0 py-3">
+                            <div th:align="center">
+                                <button type="button" class="btn btn-outline-danger" id="likeBtn">좋아요!</button>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
             </div>
         </div>
     </div>
     <!-- /* //view 화면 html 코드 작성 끝 */ -->
 </div>
-
 <script layout:fragment="pagescript" th:inline="javascript">
     /////// 대댓글 textarea toggle ///////
     const btnReReplyWriteViews = document.querySelectorAll(".btnReReplyWriteView")

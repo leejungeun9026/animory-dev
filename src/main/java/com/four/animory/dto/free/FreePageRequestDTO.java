@@ -27,7 +27,7 @@ public class FreePageRequestDTO {
   @Min(value = 3)
   @Max(value = 100)
   @Positive
-  private int size = 3;
+  private int size = 5;
 
   private String link;
   private String type;

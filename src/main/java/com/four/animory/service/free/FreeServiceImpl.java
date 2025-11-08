@@ -9,6 +9,7 @@ import com.four.animory.dto.free.FreePageResponseDTO;
 import com.four.animory.dto.free.FreeBoardListReplyCountDTO;
 import com.four.animory.repository.free.FreeBoardRepository;
 import com.four.animory.repository.user.MemberRepository;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -16,10 +17,12 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
+@Log4j2
 public class FreeServiceImpl implements FreeService{
     @Autowired
     FreeBoardRepository freeBoardRepository;
@@ -109,6 +112,7 @@ public class FreeServiceImpl implements FreeService{
     public FreePageResponseDTO<FreeBoardListReplyCountDTO> getListReplyCount(FreePageRequestDTO freePageRequestDTO) {
         String[] types = freePageRequestDTO.getTypes();
         String keyword = freePageRequestDTO.getKeyword();
+
         Pageable pageable = freePageRequestDTO.getPageable("bno");
         Page<FreeBoardListReplyCountDTO> result = freeBoardRepository.searchWithReplyCount(types, keyword, pageable);
 
