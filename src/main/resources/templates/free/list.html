@@ -8,19 +8,20 @@
 <!-- /* view 화면 html 코드 작성 부분 */ -->
   <div class="page_title mb-4 mb-md-5">
     <h3 class="memomentKkukkkuk fw-normal mb-2">커뮤니티</h3>
-    <small class="text-secondary">커뮤니티 글쓰기는 회원만 가능합니다 수정테스트</small>
+    <small class="text-secondary">커뮤니티 글쓰기는 회원만 가능합니다.</small>
   </div>
   <div class="board_area">
     <div class="row g-4">
       <div class="col-12 col-sm-10 col-md-8 col-lg-6 mx-auto">
         <section class="search_area">
-          <form action="">
+          <form th:action="@{/free/list}" method="get">
+          <input type="hidden" name="size" th:value="${FreePageRequestDTO.size}">
             <div class="d-flex gap-2">
               <select name="" id="" class="form-select form-select-sm w-auto flex-shrink-1">
-                <option value="tc">제목+내용</option>
-                <option value="t">제목</option>
-                <option value="c">내용</option>
-                <option value="w">작성자</option>
+                <option value="tc" th:selected="${FreePageRequestDTO.type=='tc'}">제목+내용</option>
+                <option value="t" th:selected="${FreePageRequestDTO.type=='t'}">제목</option>
+                <option value="c" th:selected="${FreePageRequestDTO.type=='c'}">내용</option>
+                <option value="w" th:selected="${FreePageRequestDTO.type=='w'}">작성자</option>
               </select>
               <input name="keyword" type="text" class="form-control form-control-sm" placeholder="검색어를 입력하세요">
               <button type="submit" class="btn btn-sm btn-secondary text-nowrap"><i class="fa-solid fa-magnifying-glass me-1"></i>검색</button>

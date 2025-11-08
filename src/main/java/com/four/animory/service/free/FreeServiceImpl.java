@@ -1,21 +1,23 @@
 package com.four.animory.service.free;
 
 import com.four.animory.domain.free.FreeBoard;
-import com.four.animory.domain.free.FreeFile;
-import com.four.animory.domain.spr.SprBoard;
 import com.four.animory.domain.user.Member;
 import com.four.animory.dto.free.FreeBoardDTO;
 import com.four.animory.dto.free.FreeFileDTO;
-import com.four.animory.dto.spr.SprBoardDTO;
+import com.four.animory.dto.free.FreePageRequestDTO;
+import com.four.animory.dto.free.FreePageResponseDTO;
+import com.four.animory.dto.free.FreeBoardListReplyCountDTO;
 import com.four.animory.repository.free.FreeBoardRepository;
 import com.four.animory.repository.user.MemberRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class FreeServiceImpl implements FreeService{
@@ -84,5 +86,38 @@ public class FreeServiceImpl implements FreeService{
         FreeBoardDTO dto = entityToDTO(freeBoard);
         return dto;
     }
+
+    @Override
+    public FreePageResponseDTO<FreeBoardDTO> getList(FreePageRequestDTO freePageRequestDTO) {
+        Pageable pageable = freePageRequestDTO.getPageable("bno");
+        Page<FreeBoard> result = freeBoardRepository.findAll(pageable);
+
+            List<FreeBoardDTO> dtoList = result.getContent().stream()
+                .map(freeBoard -> entityToDTO(freeBoard))
+                .collect(Collectors.toList());
+        int total = (int) result.getTotalElements(); // 객체의 레코드 수
+
+        FreePageResponseDTO<FreeBoardDTO> freePageResponseDTO = FreePageResponseDTO.<FreeBoardDTO> withAll()
+                .freePageRequestDTO(freePageRequestDTO)
+                .dtoList(dtoList)
+                .total(total)
+                .build();
+        return freePageResponseDTO;
+    }
+
+    @Override
+    public FreePageResponseDTO<FreeBoardListReplyCountDTO> getListReplyCount(FreePageRequestDTO freePageRequestDTO) {
+        String[] types = freePageRequestDTO.getTypes();
+        String keyword = freePageRequestDTO.getKeyword();
+        Pageable pageable = freePageRequestDTO.getPageable("bno");
+        Page<FreeBoardListReplyCountDTO> result = freeBoardRepository.searchWithReplyCount(types, keyword, pageable);
+
+        return FreePageResponseDTO.<FreeBoardListReplyCountDTO> withAll()
+                .freePageRequestDTO(freePageRequestDTO)
+                .dtoList(result.getContent())
+                .total((int)result.getTotalElements())
+                .build();
+    }
+
 
 }

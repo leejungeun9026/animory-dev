@@ -24,9 +24,9 @@ public class FreePageResponseDTO<E> {
   private List<E> dtoList;  // 실제 데이터 목록
 
   @Builder(builderMethodName = "withAll")
-  public FreePageResponseDTO(PageRequestDTO pageRequestDTO, List<E> dtoList, int total) {
-    this.page = pageRequestDTO.getPage();
-    this.size = pageRequestDTO.getSize();
+  public FreePageResponseDTO(FreePageRequestDTO freePageRequestDTO, List<E> dtoList, int total) {
+    this.page = freePageRequestDTO.getPage();
+    this.size = freePageRequestDTO.getSize();
     this.total = total;
     this.pageBlockSize = 3;
     this.dtoList = dtoList;

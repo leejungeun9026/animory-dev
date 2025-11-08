@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface FreeBoardRepository extends JpaRepository<FreeBoard, Long> {
+public interface FreeBoardRepository extends JpaRepository<FreeBoard, Long>, FreeSearch {
     List<FreeBoard> bno(Long bno);
 
     @EntityGraph(attributePaths = {"fileSet"}) // FreeBoard 엔티티에 연관된 imageSet을 한 번에 같이 가져오겠다는 뜻
