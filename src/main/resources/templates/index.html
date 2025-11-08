@@ -2,6 +2,102 @@
 <html lang="en" layout:decorate="~{include/user}"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       xmlns:th="http://www.thymeleaf.org">
-<div layout:fragment="content">
-  <a href="" class="btn btn-primary">버튼</a>
+<div layout:fragment="index">
+  <section class="main_visual">
+    <div class="swiper mvSwiper">
+      <ul class="swiper-wrapper">
+        <li class="swiper-slide">
+          <a href="">
+            <img alt="" src="/images/TPL06363_Banner_Template.jpg">
+          </a>
+        </li>
+        <li class="swiper-slide">
+          <a href="">
+            <img alt="" src="/images/TPL07070_Banner_Template.jpg">
+          </a>
+        </li>
+        <li class="swiper-slide">
+          <a href="">
+            <img alt="" src="/images/TPL08674_Banner_Template.jpg">
+          </a>
+        </li>
+        <li class="swiper-slide">
+          <a href="">
+            <img alt="" src="/images/TPL10689_Banner_Template.jpg">
+          </a>
+        </li>
+        <li class="swiper-slide">
+          <a href="">
+            <img alt="" src="/images/TPL12238_Banner_Template.jpg">
+          </a>
+        </li>
+      </ul>
+    </div>
+  </section>
+  <section>
+    <div class="inner">
+      <div class="container-fluid">
+        <div class="card rounded-4">
+          <div class="card-body p-4">
+            <div class="section_title mb-2 mb-md-3">
+              <h3 class="memomentKkukkkuk fw-normal"><i class="fa-solid fa-paw text-primary"></i> 커뮤니티</h3>
+            </div>
+            <div class="row">
+              <ul class="row row-cols-1 row-cols-md-2 gx-3">
+                <li>
+                  <div class="py-2 border-bottom">
+                    <div class="d-flex gap-2 align-items-center flex-nowrap mb-1">
+                      <p class="badge badge-outline-secondary">뱃지</p><a href=""><h6 class="text-overflew-line-1">제목</h6></a>
+                    </div>
+                    <div class="d-flex gap-2 flex-nowrap text-secondary">
+                      <p>작성자</p>
+                      <p>yyyy-MM-dd HH:mm:ss</p>
+                      <p class="ms-auto"><i class="fa-regular fa-eye me-1"></i>123</p>
+                      <p><i class="fa-regular fa-heart me-1 text-danger"></i>22</p>
+                      <p><i class="fa-regular fa-comment-dots me-1"></i>33</p>
+                    </div>
+                  </div>
+                </li>
+                <li>
+                  <div class="py-2 border-bottom">
+                    <div class="d-flex gap-2 align-items-center flex-nowrap mb-1">
+                      <p class="badge badge-outline-secondary">뱃지</p><a href=""><h6 class="text-overflew-line-1">제목</h6></a>
+                    </div>
+                    <div class="d-flex gap-2 flex-nowrap text-secondary">
+                      <p>작성자</p>
+                      <p>yyyy-MM-dd HH:mm:ss</p>
+                      <p class="ms-auto"><i class="fa-regular fa-eye me-1"></i>123</p>
+                      <p><i class="fa-regular fa-heart me-1 text-danger"></i>22</p>
+                      <p><i class="fa-regular fa-comment-dots me-1"></i>33</p>
+                    </div>
+                  </div>
+                </li>
+              </ul>
+            </div>
+          </div>
+          <div class="card-footer bg-transparent py-3 text-center">
+            <a href="/free/list">커뮤니티 더보기<i class="fa-solid fa-chevron-right ms-1"></i></a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
 </div>
+
+<script layout:fragment="pagescript" th:inline="javascript">
+    var swiper = new Swiper(".mvSwiper", {
+        slidesPerView: 1,
+        loop: true,
+        autoplay: {
+            delay: 2500,
+            disableOnInteraction: false,
+        },
+        breakpoints: {
+            768: {
+                slidesPerView: "auto",
+                centeredSlides: true
+            }
+        }
+    });
+
+</script>

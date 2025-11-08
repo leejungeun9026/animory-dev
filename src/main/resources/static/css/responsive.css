@@ -21,6 +21,10 @@
         align-items: start;
     }
 
+    .mvSwiper .swiper-slide {
+        margin: 24px 12px;
+    }
+
 }
 /* breakpoints-lg 992 끝 */
 
@@ -99,6 +103,18 @@
         transform: translateY(-50%);
         cursor: pointer;
     }
+
+    .mvSwiper {
+        margin-bottom: 24px;
+    }
+
+    .mvSwiper .swiper-slide {
+        width: 100%;
+        margin: 0;
+    }
+    .mvSwiper .swiper-slide > a {
+        border-radius: 0;
+    }
 }
 /* breakpoints-md 768 끝 */
 
@@ -125,6 +141,8 @@
     .main_header .gnb > li > a > p {
         font-size: 1.125rem;
     }
+
+
 
 }
 
