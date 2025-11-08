@@ -47,7 +47,7 @@
     left: calc(var(--bs-gutter-x)* 1);
     top: 50%;
     transform: translateY(-50%);
-    max-width: 120px;
+    max-width: 200px;
     width: 100%;
 }
 .header .logo img {
