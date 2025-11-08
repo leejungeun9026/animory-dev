@@ -3,8 +3,8 @@ package com.four.animory.service.free;
 import com.four.animory.domain.free.FreeBoard;
 import com.four.animory.domain.free.FreeFile;
 import com.four.animory.domain.user.Member;
-import com.four.animory.dto.common.PageRequestDTO;
 import com.four.animory.dto.free.*;
+import com.four.animory.dto.free.FreeBoardListReplyCountDTO;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -17,6 +17,9 @@ public interface FreeService {
     void updateFreeBoard(FreeBoardDTO freeBoardDTO);
     void deleteFreeBoardById(Long bno);
     FreeBoardDTO updateLikecount(Long bno);
+
+    FreePageResponseDTO<FreeBoardDTO> getList(FreePageRequestDTO freePageRequestDTO);
+    FreePageResponseDTO<FreeBoardListReplyCountDTO> getListReplyCount(FreePageRequestDTO freePageRequestDTO);
 
 
     // dto -> Entity

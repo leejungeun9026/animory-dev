@@ -1,25 +1,16 @@
 package com.four.animory.controller.free;
 
 import com.four.animory.config.auth.PrincipalDetails;
-import com.four.animory.domain.free.FreeBoard;
 import com.four.animory.domain.user.Member;
-import com.four.animory.dto.free.FreeBoardDTO;
-import com.four.animory.dto.free.FreeFileDTO;
-import com.four.animory.dto.free.upload.UploadFileDTO;
-import com.four.animory.dto.spr.SprBoardDTO;
-import com.four.animory.dto.user.MemberDTO;
+import com.four.animory.dto.free.*;
 import com.four.animory.service.free.FreeService;
 
 import lombok.extern.log4j.Log4j2;
-import net.coobird.thumbnailator.Thumbnailator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
-import org.springframework.data.jpa.domain.JpaSort;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -27,11 +18,7 @@ import org.springframework.web.bind.annotation.*;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 @Controller
 @Log4j2
@@ -43,12 +30,25 @@ public class FreeController {
     @Autowired
     private FreeService freeService;
 
-    @GetMapping("/list")
+    //    @GetMapping("/list")
     public String list(Model model) {
         List<FreeBoardDTO> freeboardList = freeService.findAllFreeBoards();
         model.addAttribute("freeboardList", freeboardList);
         return "free/list";
     }
+
+    @GetMapping("/list")
+    public String replyCountList(FreePageRequestDTO freePageRequestDTO, Model model) {
+        List<FreeBoardDTO> freeboardList = freeService.findAllFreeBoards();
+        model.addAttribute("freeboardList", freeboardList);
+
+        FreePageResponseDTO<FreeBoardListReplyCountDTO> freePageResponseDTO =
+        freeService.getListReplyCount(freePageRequestDTO);
+        model.addAttribute("freePageResponseDTO", freePageResponseDTO);
+        model.addAttribute("freePageRequestDTO",  freePageRequestDTO);
+        return "free/list";
+    }
+
 
     @GetMapping("/view")
     public void view(Long bno, Integer mode, Model model) {
