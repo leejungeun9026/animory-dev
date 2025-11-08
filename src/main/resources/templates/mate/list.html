@@ -123,25 +123,6 @@
                             <li class="page-item">
                                 <a class="page-link" th:data-num="${responseDTO.end}"><i class="fa-solid fa-angles-right"></i></a>
                             </li>
-
-
-<!--/*                                <a class="page-link"><i class="fa-solid fa-angles-left"></i></a>-->
-<!--                            </li>-->
-<!--                            <li class="page-item">-->
-<!--                                <a class="page-link"><i class="fa-solid fa-chevron-left"></i></a>-->
-<!--                            </li>-->
-<!--                            <li class="page-item active">-->
-<!--                                <a class="page-link">1</a>-->
-<!--                            </li>-->
-<!--                            <li class="page-item">-->
-<!--                                <a class="page-link">2</a>-->
-<!--                            </li>-->
-<!--                            <li class="page-item">-->
-<!--                                <a class="page-link"><i class="fa-solid fa-chevron-right"></i></a>-->
-<!--                            </li>-->
-<!--                            <li class="page-item">-->
-<!--                                <a class="page-link"><i class="fa-solid fa-angles-right"></i></a>-->
-<!--                            </li>*/-->
                         </ul>
                     </nav>
                 </section>
@@ -183,6 +164,27 @@
     });
 
     loadSido()
+
+    /// 페이징
+
+    document.querySelector(".pagination").addEventListener("click", function (e){
+        e.preventDefault()
+        e.stopPropagation()
+
+        const target = e.target.closest('a')
+        if(!target){
+            return
+        }
+        const num = target.getAttribute("data-num")
+        const formOjb = document.querySelector("form")
+        formOjb.innerHTML+=`<input type='hidden' name='page' value='${num}'>`
+        formOjb.submit()
+    })
+
+
+
+
+
     // 페이지에 필요한 스크립트 작성 끝
 </script>
 

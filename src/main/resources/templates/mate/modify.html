@@ -25,10 +25,10 @@
             </div>
 
             <div class="mb-2">
-                <select class="form-select w-auto" id="category" name="category" th:value="${mateBoard.category}" required>
+                <select class="form-select w-auto" id="category" name="category" required>
                     <option value="">카테고리(필수)</option>
-                    <option value="1:1 모집">1:1 모집</option>
-                    <option value="그룹 모집">그룹 모집</option>
+                    <option value="1:1 모집" th:selected="${mateBoard.category} == '1:1 모집'">1:1 모집</option>
+                    <option value="그룹 모집" th:selected="${mateBoard.category} == '그룹 모집'">그룹 모집</option>
                 </select>
             </div>
 
@@ -86,90 +86,17 @@
 </div>
 
 <script layout:fragment="pagescript" th:inline="javascript">
-    // /////// 카테고리 및 타입 설정 ///////
-    // const cate = document.getElementById("category")
-    // const sido1 = document.getElementById("sido")
-    // const sigungu1 = document.getElementById("sigungu")
-    // cate.addEventListener("change", function (e) {
-    //     console.log(e.target.value)
-    //     let val = e.target.value
-    //     if (val === "1:1") {
-    //         sido1.classList.remove("d-none")
-    //         sido1.classList.add("d-block")
-    //         sigungu1.classList.remove("d-none")
-    //         sigungu1.classList.add("d-block")
-    //     } else { (val === "그룹")
-    //         sido1.classList.remove("d-block")
-    //         sido1.classList.add("d-none")
-    //         sigungu1.classList.remove("d-block")
-    //         sigungu1.classList.add("d-none")
-    //     }
-    // })
 
 
+    // 시군구 수정 - 이전 값 미리보기
+    const sido    = document.getElementById('sido');
+    const sigungu = document.getElementById('sigungu');
 
-
-
-    //
-    //
-    // /////// 사용자 정보 - 시도,시군구 정보 초기화 ///////
-    // const sido = document.querySelector("#sido")
-    // const sigungu = document.querySelector("#sigungu")
-    //
-    // async function loadSido() {
-    //     const memberSido = /*[[${memberDTO != null ? memberDTO.sido : null}]]*/ null;
-    //     const memberSiGungu = /*[[${memberDTO != null ? memberDTO.sigungu : null}]]*/ null;
-    //     const {data: sidoList} = await axios.get('/api/regions/sido');
-    //     sido.innerHTML = `<option value="">시/도</option>` +
-    //         sidoList.map(s =>
-    //             `<option value="${s.name}" data-sido-id="${s.id}" ${s.name === memberSido ? 'selected' : ''}>${s.name}</option>`
-    //         ).join('');
-    //     const selectedOption = sido.selectedOptions[0]; // 선택된 <option> 요소
-    //     const sidoId = selectedOption.dataset.sidoId;       // data-sidoid 값 읽기
-    //
-    //     // loadSigungu랑 거의 같음
-    //     // memberSiGungu 를 가지고 selected 하는 부분만 다름
-    //     if (!sidoId) {
-    //         sigungu.innerHTML = '<option value="">시/군/구</option>';
-    //         sigungu.disabled = true;
-    //         return;
-    //     }
-    //     const {data: sigunguList} = await axios.get('/api/regions/sigungu', {params: {sidoId}});
-    //     sigungu.innerHTML = '<option value="">시/군/구</option>' +
-    //         sigunguList.map(g => `<option value="${g.name}" ${g.name === memberSiGungu ? 'selected' : ''}>${g.name}</option>`).join('');
-    //     sigungu.disabled = false;
-    //
-    // }
-    //
-    // async function loadSigungu(sidoId) {
-    //     if (!sidoId) {
-    //         sigungu.innerHTML = '<option value="">시/군/구</option>';
-    //         sigungu.disabled = true;
-    //         return;
-    //     }
-    //     const {data} = await axios.get('/api/regions/sigungu', {params: {sidoId}});
-    //     sigungu.innerHTML = '<option value="">시/군/구</option>' +
-    //         data.map(g => `<option value="${g.name}">${g.name}</option>`).join('');
-    //     sigungu.disabled = false;
-    // }
-    //
-    // sido.addEventListener('change', (e) => {
-    //     const selectedOption = e.target.selectedOptions[0]; // 선택된 <option> 요소
-    //     const sidoId = selectedOption.dataset.sidoId;       // data-sidoid 값 읽기
-    //     loadSigungu(sidoId);
-    // });
-    //
-    // loadSido()
-
-// 시군구 수정 - 이전 값 미리보기
-        const sido    = document.getElementById('sido');
-        const sigungu = document.getElementById('sigungu');
-
-        async function initRegion() {
+    async function initRegion() {
         // 1) 시/도 옵션 로드
         const { data: sidoList } = await axios.get('/api/regions/sido');
         sido.innerHTML = '<option value="">시/도</option>' +
-        sidoList.map(s => `<option value="${s.name}" data-sido-id="${s.id}">${s.name}</option>`).join('');
+            sidoList.map(s => `<option value="${s.name}" data-sido-id="${s.id}">${s.name}</option>`).join('');
 
         // 2) 등록 당시 값 읽기
         const currentSido    = sido.dataset.currentSido || '';
@@ -177,47 +104,45 @@
 
         // 3) 시/도가 있으면 선택 후 해당 시군구 로드
         if (currentSido) {
-        // 시/도 선택
-        const sidoOption = Array.from(sido.options).find(o => o.value === currentSido);
-        if (sidoOption) {
-        sido.value = currentSido;
+            // 시/도 선택
+            const sidoOption = Array.from(sido.options).find(o => o.value === currentSido);
+            if (sidoOption) {
+                sido.value = currentSido;
 
-        // 3-1) 시군구 로드
-        const sidoId = sidoOption.dataset.sidoId;
-        const { data: sigunguList } = await axios.get('/api/regions/sigungu', { params: { sidoId } });
-        sigungu.innerHTML = '<option value="">시/군/구</option>' +
-        sigunguList.map(g => `<option value="${g.name}">${g.name}</option>`).join('');
-        sigungu.disabled = false;
+                // 3-1) 시군구 로드
+                const sidoId = sidoOption.dataset.sidoId;
+                const { data: sigunguList } = await axios.get('/api/regions/sigungu', { params: { sidoId } });
+                sigungu.innerHTML = '<option value="">시/군/구</option>' +
+                    sigunguList.map(g => `<option value="${g.name}">${g.name}</option>`).join('');
+                sigungu.disabled = false;
 
-        // 3-2) 과거 선택값 적용
-        if (currentSigungu) {
-        const sigOpt = Array.from(sigungu.options).find(o => o.value === currentSigungu);
-        if (sigOpt) sigungu.value = currentSigungu;
-    }
-    }
-    }
+                // 3-2) 과거 선택값 적용
+                if (currentSigungu) {
+                    const sigOpt = Array.from(sigungu.options).find(o => o.value === currentSigungu);
+                    if (sigOpt) sigungu.value = currentSigungu;
+                }
+            }
+        }
     }
 
-        // 변경 시 시군구 다시 로드
-        sido.addEventListener('change', async (e) => {
+    // 변경 시 시군구 다시 로드
+    sido.addEventListener('change', async (e) => {
         const opt = e.target.selectedOptions[0];
         const sidoId = opt ? opt.dataset.sidoId : '';
         if (!sidoId) {
-        sigungu.innerHTML = '<option value="">시/군/구</option>';
-        sigungu.disabled = true;
-        return;
-    }
+            sigungu.innerHTML = '<option value="">시/군/구</option>';
+            sigungu.disabled = true;
+            return;
+        }
         const { data } = await axios.get('/api/regions/sigungu', { params: { sidoId } });
         sigungu.innerHTML = '<option value="">시/군/구</option>' +
-        data.map(g => `<option value="${g.name}">${g.name}</option>`).join('');
+            data.map(g => `<option value="${g.name}">${g.name}</option>`).join('');
         sigungu.disabled = false;
     });
 
-        initRegion();
+    initRegion();
+
+
 </script>
-
-
-
-
 
 </html>

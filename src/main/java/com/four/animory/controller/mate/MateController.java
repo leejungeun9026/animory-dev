@@ -5,30 +5,52 @@ import com.four.animory.domain.user.Member;
 import com.four.animory.dto.common.PageRequestDTO;
 import com.four.animory.dto.common.PageResponseDTO;
 import com.four.animory.dto.free.FreeBoardDTO;
+import com.four.animory.dto.free.upload.UploadFileDTO;
 import com.four.animory.dto.mate.MateBoardDTO;
+import com.four.animory.dto.mate.MateFileDTO;
+import com.four.animory.dto.mate.upload.MateUploadFileDTO;
+import com.four.animory.dto.spr.SprBoardDTO;
+import com.four.animory.dto.spr.SprFileDTO;
+import com.four.animory.dto.spr.upload.SprUploadFileDTO;
+import com.four.animory.dto.user.MemberDTO;
 import com.four.animory.service.mate.MateService;
 import com.four.animory.service.user.UserService;
 import lombok.extern.log4j.Log4j2;
+import net.coobird.thumbnailator.Thumbnailator;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.FileSystemResource;
+import org.springframework.core.io.Resource;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 @Controller
 @Log4j2
 @RequestMapping("/mate")
 public class MateController {
+    @Value("${com.four.animory.upload.path}")
+    private String uploadPath;
 
-    @Autowired
+        @Autowired
     private MateService mateService;
 
     @Autowired
     private UserService userService;
+
+
 
      //1차 list
 //    @GetMapping("/list")
@@ -42,7 +64,6 @@ public class MateController {
     @GetMapping("/list")
     public String list(PageRequestDTO pageRequestDTO, Model model) {
         PageResponseDTO<MateBoardDTO> responseDTO = mateService.getList(pageRequestDTO);
-
         model.addAttribute("responseDTO", responseDTO);
         return "mate/list";
     }
@@ -52,6 +73,7 @@ public class MateController {
         if(mode == null) mode = 1;
         model.addAttribute("board", mateService.findMateBoardById(bno,mode));
     }
+
 
     @GetMapping("/register")
     public String registerGet(@AuthenticationPrincipal PrincipalDetails principalDetails, Model model) {
@@ -87,6 +109,7 @@ public class MateController {
         mateService.deleteMateBoardById(bno);
         return "redirect:/mate/list";
     }
+
 
 
 
