@@ -37,7 +37,7 @@
   <header class="header" id="header">
     <div class="container-fluid">
       <div class="logo">
-        <h1><a href="/"><img src="/images/logo.gif" style="height:36px; display: block"></a></h1>
+        <h1><a href="/"><img src="/images/logo.gif"></a></h1>
       </div>
       <nav>
         <ul class="gnb">
@@ -86,10 +86,10 @@
           <!-- 로그인 전 -->
           <th:block sec:authorize="!isAuthenticated()">
             <li>
-              <a class="btn btn-sm btn-outline-main" href="/member/login">로그인</a>
+              <a class="btn btn-sm btn-outline-main text-nowrap" href="/member/login">로그인</a>
             </li>
             <li>
-              <a class="btn btn-sm btn-main" href="/member/join">회원가입</a>
+              <a class="btn btn-sm btn-main text-nowrap" href="/member/join">회원가입</a>
             </li>
           </th:block>
           <!-- //로그인 전 -->
@@ -97,10 +97,10 @@
           <!-- 로그인 후 -->
           <th:block sec:authorize="isAuthenticated()">
             <li>
-              <a class="btn btn-sm btn-outline-main" href="/member/mypage">마이페이지</a>
+              <a class="btn btn-sm btn-outline-main text-nowrap" href="/member/mypage">마이페이지</a>
             </li>
             <li>
-              <a class="btn btn-sm btn-gray" href="/member/logout">로그아웃</a>
+              <a class="btn btn-sm btn-gray text-nowrap" href="/member/logout">로그아웃</a>
             </li>
           </th:block>
           <!-- //로그인 후 -->
@@ -128,7 +128,16 @@
   <!-- /* main_container 끝 */ -->
 
   <footer class="footer" id="footer">
-
+    <div class="row">
+      <div class="col-12">
+        <div class="footer_logo mx-auto">
+          <img src="/images/logo_w.png" alt="">
+        </div>
+      </div>
+      <div class="col-12 text-center mt-2">
+        <p>Copyright ⓒ 2025 by Animory. All rights reserved.</p>
+      </div>
+    </div>
   </footer>
 </div>
 

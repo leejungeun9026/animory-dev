@@ -12,9 +12,24 @@
 
 
 @media all and (max-width: 992px) { /* breakpoints-lg */
+    .header .logo {
+        width: 140px;
+    }
+    .header nav .gnb {
+        gap: 8px;
+        justify-content: center;
+        align-items: start;
+    }
+
+}
+/* breakpoints-lg 992 끝 */
+
+
+
+@media all and (max-width: 768px) { /* breakpoints-md */
     :root {
         --header-height: 60px;
-        --footer-height: 200px;
+        --footer-height: 120px;
     }
 
     /* header change */
@@ -40,8 +55,8 @@
     }
     .header nav .gnb {
         position: static;
-        left: none;
-        top: none;
+        left: unset;
+        top: unset;
         transform: none;
         width: 100%;
         max-width: 100%;
@@ -84,14 +99,6 @@
         transform: translateY(-50%);
         cursor: pointer;
     }
-
-}
-/* breakpoints-lg 992 끝 */
-
-
-
-@media all and (max-width: 768px) { /* breakpoints-md */
-
 }
 /* breakpoints-md 768 끝 */
 
@@ -110,7 +117,7 @@
 
     /* header */
     .header .logo {
-        max-width: 160px;
+        max-width: 130px;
     }
     .header .sign {
         top: 17.65px;
@@ -119,4 +126,11 @@
         font-size: 1.125rem;
     }
 
+}
+
+@media all and (max-width: 340px) {
+    .header .sign {
+        left: 168px;
+        right: unset;
+    }
 }

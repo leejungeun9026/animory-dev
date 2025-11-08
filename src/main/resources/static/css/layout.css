@@ -9,7 +9,7 @@
 
 :root {
     --header-height: 80px;
-    --footer-height: 200px;
+    --footer-height: 130px;
 }
 
 .memomentKkukkkuk {
@@ -18,13 +18,13 @@
 
 /* header - common */
 .header {
-    min-width: 320px;
     background: #ffffff;
     border-bottom: 1px solid var(--bs-border-color);
     color: var(--bs-emphasis-color);
 }
 .header .container-fluid {
     position: relative;
+    min-width: 340px;
     max-width: 1200px;
     transition: font-size 0.3s;
 }
@@ -47,7 +47,7 @@
     left: calc(var(--bs-gutter-x)* 1);
     top: 50%;
     transform: translateY(-50%);
-    max-width: 200px;
+    max-width: 177px;
     width: 100%;
 }
 .header .logo img {
@@ -113,44 +113,23 @@
 
 /******************** footer ********************/
 .footer {
-    padding: 30px 0 50px;
+    padding: 30px 0 40px;
     height: var(--footer-height);
-    background: #000;
-    color: var(--bs-reverse-emphasis-color);
+    background: #222;
 }
-.footer_menu {
-    display: flex;
-    justify-content: center;
-    gap: 32px;
+.footer_logo{
+    width: 120px;
 }
-.footer_menu * {
-    font-size: 14px;
+.footer_logo > img {
+    display: block;
+    opacity: 0.8;
+    width: 100%;
+}
+.footer p {
+    font-size: 0.875rem;
+    color: var(--bs-gray-500);
 }
 
-.footer .logo {
-    display: block;
-    max-width: 100px;
-    width: 100%;
-    opacity: 0.5;
-}
-.footer .logo img {
-    display: block;
-    width: 100%;
-}
-.footer .info * {
-    font-size: 14px;
-}
-.footer .info > p {
-    opacity: 0.5;
-    font-size: 14px;
-}
-.footer .info > p > span {
-    margin-right: 0.75rem;
-    white-space: nowrap;
-}
-.footer .info > p.copyright {
-    opacity: 0.8;
-}
 
 /* quick_menu */
 .quick_menu {
