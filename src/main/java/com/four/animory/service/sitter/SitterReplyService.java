@@ -3,12 +3,16 @@ package com.four.animory.service.sitter;
 import com.four.animory.domain.sitter.SitterReply;
 import com.four.animory.dto.sitter.SitterBoardDTO;
 import com.four.animory.dto.sitter.SitterReplyDTO;
+import org.springframework.web.bind.annotation.PathVariable;
 
 import java.util.List;
 
 public interface SitterReplyService {
   void insertReply(SitterReplyDTO sitterReplyDTO);
   List<SitterReplyDTO> findAllByBno(Long bno);
+  SitterReplyDTO getReply(Long rno);
+  void updateReply(SitterReplyDTO sitterReplyDTO);
+  void deleteReply(Long rno);
 
   default SitterReply dtoToEntity(SitterReplyDTO sitterReplyDTO){
     return SitterReply.builder()

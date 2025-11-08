@@ -37,7 +37,7 @@
               </div>
               <div class="col-4 col-lg">
                 <select name="state" id="state" class="form-select form-select-sm" aria-label="카테고리">
-                  <option value="y">완료 포함</option>
+                  <option value="y" th:selected="${sitterBoardPageRequestDTO.state=='y'}">완료 포함</option>
                   <option value="n" th:selected="${sitterBoardPageRequestDTO.state=='n'}">완료 제외</option>
                 </select>
               </div>

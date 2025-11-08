@@ -28,4 +28,20 @@ public class SitterReplyController {
   public List<SitterReplyDTO> getReplyList(@PathVariable("bno") Long bno) {
     return sitterReplyService.findAllByBno(bno);
   }
+
+  @GetMapping("/{rno}")
+  public SitterReplyDTO getReply(@PathVariable("rno") Long rno) {
+    return sitterReplyService.getReply(rno);
+  }
+
+  @PutMapping(value = "/{rno}", consumes =  MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+  public void modifyReply(@PathVariable("rno")Long rno, @RequestBody SitterReplyDTO sitterReplyDTO){
+    log.info(sitterReplyDTO);
+    sitterReplyService.updateReply(sitterReplyDTO);
+  }
+
+  @DeleteMapping("/{rno}")
+  public void deleteReply(@PathVariable("rno")Long rno){
+    sitterReplyService.deleteReply(rno);
+  }
 }

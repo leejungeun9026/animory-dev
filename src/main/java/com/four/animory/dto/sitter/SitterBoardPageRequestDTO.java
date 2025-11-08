@@ -33,7 +33,7 @@ public class SitterBoardPageRequestDTO {
   private String sigungu;
   private String category;
   @Builder.Default
-  private String state = "n";
+  private String state = "y";
   private String petInfo;
   private String field;
   private String keyword;

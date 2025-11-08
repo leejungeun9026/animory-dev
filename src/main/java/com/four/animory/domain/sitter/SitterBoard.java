@@ -52,6 +52,7 @@ public class SitterBoard extends BaseEntity {
   }
 
   public void changeBoard(SitterBoardDTO sitterBoardDTO){
+    this.state = sitterBoardDTO.getState();
     this.petInfo = sitterBoardDTO.getPetInfo();
     this.sido = sitterBoardDTO.getSido();
     this.sigungu = sitterBoardDTO.getSigungu();
