@@ -41,4 +41,24 @@ public class SitterReplyServiceImpl implements SitterReplyService {
     }
     return sitterReplyDTOList;
   }
+
+  @Override
+  public SitterReplyDTO getReply(Long rno) {
+    SitterReply sitterReply = sitterReplyRepository.findById(rno).orElse(null);
+    log.info(sitterReply);
+    return entityToDTO(sitterReply);
+  }
+
+  @Override
+  public void updateReply(SitterReplyDTO sitterReplyDTO) {
+    SitterReply sitterReply = sitterReplyRepository.findById(sitterReplyDTO.getRno()).orElse(null);
+    log.info(sitterReply);
+    sitterReply.setContent(sitterReplyDTO.getContent());
+    sitterReplyRepository.save(sitterReply);
+  }
+
+  @Override
+  public void deleteReply(Long rno) {
+    sitterReplyRepository.deleteById(rno);
+  }
 }

@@ -14,14 +14,16 @@
   </div>
   <div class="board_area">
     <form action="/sitter/modify" enctype="multipart/form-data" method="post">
-      <input type="text" name="bno" th:value="${board.bno}">
-      <input type="text" name="username" th:value="${board.username}">
-      <div class="mb-2">
+      <input type="hidden" name="bno" th:value="${board.bno}">
+      <input type="hidden" name="category" th:value="${board.category}">
+      <input type="hidden" name="username" th:value="${board.username}">
+      <div class="d-flex gap-2 mb-2">
         <select class="form-select w-auto" id="category" aria-label="구인구직" disabled>
           <option value="구해요" th:selected="${board.category == '구해요'}">구하고 싶어요</option>
           <option value="일해요" th:selected="${board.category == '일해요'}">일하고 싶어요</option>
         </select>
-        <input type="hidden" name="category" th:value="${board.category}">
+        <select class="form-select w-auto" name="state" id="state" aria-label="상태" >
+        </select>
       </div>
       <div class="mb-2">
         <select class="form-select" id="petInfo" name="petInfo">
@@ -67,14 +69,30 @@
 <script layout:fragment="pagescript" th:inline="javascript">
     /////// 카테고리 및 타입 가져오기 ///////
     const readCate = [[${board.category}]]
+    const readState = [[${board.state}]]
+    const state = document.getElementById("state")
     const petInfo = document.getElementById("petInfo")
     console.log(readCate)
     if(readCate==="구해요"){
         petInfo.classList.remove("d-none")
         petInfo.classList.add("d-block")
+        if(readState === "구인중") {
+            state.innerHTML = `<option value="구인중" selected>구인중</option>
+                              <option value="구인완료">구인완료</option>`
+        } else {
+            state.innerHTML = `<option value="구인중">구인중</option>
+                              <option value="구인완료" selected>구인완료</option>`
+        }
     } else if(readCate==="일해요"){
         petInfo.classList.remove("d-block")
         petInfo.classList.add("d-none")
+        if(readState === "구직중") {
+            state.innerHTML = `<option value="구직중" selected>구직중</option>
+                              <option value="구직완료">구직완료</option>`
+        } else {
+            state.innerHTML = `<option value="구직중" >구직중</option>
+                              <option value="구직완료" selected>구직완료</option>`
+        }
     }
 
 

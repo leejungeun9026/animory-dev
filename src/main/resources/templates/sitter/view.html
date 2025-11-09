@@ -21,10 +21,10 @@
             <td class="tb_title border-bottom pb-3 px-0">
               <div class="d-flex gap-2 flex-nowrap align-items-end mb-2">
                 <div class="d-flex gap-2 flex-nowrap align-items-center">
-                  <p th:class="${board.state == '구인중' or board.state == '구직중' ? 'badge badge-info':'badge badge-success'}">
-                    [[${board.state}]]</p>
                   <p class="badge badge-warning" th:if="${board.category == '구해요'}">&#x1F440; 돌봄 구해요</p>
                   <p class="badge badge-danger" th:if="${board.category == '일해요'}">&#x1F525; 돌봄 일해요</p>
+                  <p th:class="${board.state == '구인중' or board.state == '구직중' ? 'badge badge-info':'badge badge-success'}">
+                    [[${board.state}]]</p>
                   <p class="badge badge-outline-secondary" th:text="${board.petInfo == 'dog' ? '강아지' : '고양이'}"></p>
                 </div>
                 <!-- 로그인 사용자 == 글작성자 같을 경우만 노출 -->
@@ -80,8 +80,8 @@
                     작성자에게만 내 연락처가 공개됩니다.</small>
                 </div>
                 <div class="mb-2">
-                  <textarea class="form-control" id="replyText" name="replyText"
-                            placeholder="신청 한마디를 입력해 주세요(최대 1000자)" required></textarea>
+                  <textarea aria-label="신청내용" class="form-control" id="replyText"
+                            name="replyText" placeholder="신청 한마디를 입력해 주세요(최대 1000자)" required></textarea>
                 </div>
                 <div class="row">
                   <div class="col-12 col-sm-4 col-md-2 ms-auto">
@@ -110,7 +110,7 @@
         <div class="modal-footer border-top-0">
           <div class="d-flex justify-content-center gap-2 flex-nowrap w-100">
             <button class="btn btn-lg btn-gray w-100" data-bs-dismiss="modal" type="button">그만두기</button>
-            <a class="btn btn-lg btn-danger w-100" th:href="@{/sitter/remove(bno=${board.bno})}" type="button">삭제하기</a>
+            <a class="btn btn-lg btn-danger w-100" th:href="@{/sitter/remove(bno=${board.bno})}">삭제하기</a>
           </div>
         </div>
       </div>
@@ -128,6 +128,27 @@
           <p></p>
         </div>
         <div class="modal-footer border-top-0">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal" data-bs-backdrop="static" data-bs-keyboard="false" id="modifyReplyModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered modal-sm">
+      <div class="modal-content">
+        <div class="modal-header border-bottom-0">
+          <h5 class="modal-title">신청정보 수정하기</h5>
+          <button aria-label="Close" class="btn-close" data-bs-dismiss="modal" type="button"></button>
+        </div>
+        <div class="modal-body py-0">
+          <input aria-label="신청내용" class="form-control form-control-sm" id="modifyReplyText" name="modifyReplyText"
+                 type="text">
+        </div>
+        <div class="modal-footer border-top-0">
+          <div class="d-flex justify-content-center gap-2 flex-nowrap w-100">
+            <button class="btn btn-lg btn-gray w-100" data-bs-dismiss="modal" type="button">취소</button>
+            <button class="btnModifyRegisterReply btn btn-lg btn-main w-100" type="button">저장하기</button>
+          </div>
         </div>
       </div>
     </div>
@@ -173,6 +194,21 @@
         return response.data
     }
 
+    async function getReply(rno) {
+        let response = await axios.get(`/sitter/replies/${rno}`)
+        return response.data
+    }
+
+    async function modifyReply(replyObj) {
+        let response = await axios.put(`/sitter/replies/${replyObj.rno}`, replyObj)
+        return response.data
+    }
+
+    async function deleteReply(rno) {
+        let response = await axios.delete(`/sitter/replies/${rno}`)
+        return response.data
+    }
+
     function printReplyList(responseResult) {
         for (let cnt of countReplies) {
             cnt.innerText = responseResult.length
@@ -195,11 +231,15 @@
                             </div>`
                 }
                 if (loginNickname === boardNickname) {
-                    str += `<div class="col-12 col-sm-4 ms-sm-auto">
+                    str += `<div class="align-self-center col-12 col-sm-4 ms-sm-auto">
                             <div class="d-flex flex-nowrap gap-2">
-                              <a href="/sitter/${reply.rno}" class="btn btn-gray w-100 text-nowrap">프로필 보기</a>
-                              <button class="btn btn-success w-100 text-nowrap">구인하기</button>
-                            </div>
+                              <a href="/sitter/${reply.rno}" class="btn btn-gray w-100 text-nowrap">프로필 보기</a>`
+                    if(category === "구해요") {
+                        str += `<button class="btn btn-success w-100 text-nowrap">구인하기</button>`
+                    } else if (category === "일해요") {
+                        str += `<button class="btn btn-success w-100 text-nowrap">구직하기</button>`
+                    }
+                    str += `</div>
                           </div>`
                 } else if (loginNickname === reply.nickname) {
                     str += `<div class="col-auto">
@@ -208,8 +248,8 @@
                                   <i class="fa-solid fa-ellipsis"></i>
                                 </button>
                                 <ul class="dropdown-menu">
-                                  <li><button type="button" id="btnModifyReply" class="dropdown-item">수정</button></li>
-                                  <li><button type="button" id="btnDeleteReply" class="dropdown-item">삭제</button></li>
+                                  <li><button type="button" data-num="${reply.rno}" class="btnModifyReply dropdown-item">수정</button></li>
+                                  <li><button type="button" data-num="${reply.rno}" class="btnDeleteReply dropdown-item">삭제</button></li>
                                 </ul>
                               </div>
                             </div>`
@@ -229,25 +269,25 @@
     }
 
     /////// 대댓글 textarea toggle ///////
-    function reReplyStr() {
-        return `<div class="reReplyWriteArea">
-                <div class="d-flex justify-content-start align-items-start gap-2 py-2">
-                  <div class="flex-grow-1">
-                    <div class="mb-2">
-                      <textarea name="reReplyText" id="reReplyText" class="form-control" placeholder="대댓글 내용을 입력해주세요(최대 1000자)"></textarea>
-                    </div>
-                    <div class="d-flex">
-                      <button class="btnReReplyRegister ms-auto btn btn-main">대댓글 쓰기</button>
-                    </div>
-                  </div>
-                  <div class="flex-shrink-1">
-                    <button class="btnReReplyWriteClose btn btn-xs btn-outline-danger">
-                      <i class="fa-solid fa-xmark"></i>
-                    </button>
-                  </div>
-                </div>
-              </div>`
-    }
+    // function reReplyStr() {
+    //     return `<div class="reReplyWriteArea">
+    //             <div class="d-flex justify-content-start align-items-start gap-2 py-2">
+    //               <div class="flex-grow-1">
+    //                 <div class="mb-2">
+    //                   <textarea name="reReplyText" id="reReplyText" class="form-control" placeholder="대댓글 내용을 입력해주세요(최대 1000자)"></textarea>
+    //                 </div>
+    //                 <div class="d-flex">
+    //                   <button class="btnReReplyRegister ms-auto btn btn-main">대댓글 쓰기</button>
+    //                 </div>
+    //               </div>
+    //               <div class="flex-shrink-1">
+    //                 <button class="btnReReplyWriteClose btn btn-xs btn-outline-danger">
+    //                   <i class="fa-solid fa-xmark"></i>
+    //                 </button>
+    //               </div>
+    //             </div>
+    //           </div>`
+    // }
 
 
     loadReplyList()
@@ -308,21 +348,74 @@
             }
         }
     })
-    //
-    // document.addEventListener("DOMContentLoaded", () => {
-    //     let replyListLi = document.querySelectorAll("#replyList li");
-    //     console.log(replyListLi.length);
-    //     const btnModifyReply = document.getElementById("btnModifyReply")
-    //     const btnRemoveReply = document.getElementById("btnRemoveReply")
-    //
-    //     if(btnModifyReply != null) {
-    //         btnModifyReply.addEventListener("click", function(e){
-    //             e.preventDefault()
-    //             let result = e.target
-    //             console.log(result)
-    //         })
-    //     }
-    // });
+
+
+
+    const modalEl = document.getElementById('modifyReplyModal');
+    const modifyReplyModal = bootstrap.Modal.getOrCreateInstance(modalEl);
+    const modifyReplyBody = modalEl.querySelector(".modal-body");
+
+    // 댓글 수정 모달에서 수정처리
+    modalEl.addEventListener("click", function(e){
+        if (!e.target.matches(".btnModifyRegisterReply")) return;
+        e.preventDefault();
+
+        const rnoInput  = modifyReplyBody.querySelector('#modifyReplyRno');
+        const textInput = modifyReplyBody.querySelector('#modifyReplyText');
+        const replyObj = {
+            rno: rnoInput.value,
+            content: textInput.value
+        };
+
+        modifyReply(replyObj).then(reply=>{
+            modifyReplyModal.hide();
+            loadReplyList();
+        }).catch (result => {
+            console.error(err)
+        })
+    })
+
+    // 댓글 리스트에서 수정/삭제 처리
+    replyList.addEventListener("click", function(e){
+        const btnModify = e.target.closest(".btnModifyReply");
+        const btnDelete = e.target.closest(".btnDeleteReply");
+
+        if (!btnModify && !btnDelete) return;
+        e.preventDefault();
+
+        // 공통 rno 추출: 클릭한 버튼에서 data-num 가져오기
+        const clickedBtn = btnModify || btnDelete;
+        const rno = clickedBtn?.dataset?.num;
+        if (!rno) return;
+
+        // 수정 모달 띄우기
+        if (btnModify) {
+            getReply(rno)
+                .then(reply => {
+                // 모달 내용 갱신 후 표시
+                modifyReplyBody.innerHTML = `<input type="hidden" id="modifyReplyRno">
+                                             <input type="text" id="modifyReplyText" class="form-control form-control-sm" aria-label="신청내용">
+                                            `
+                modifyReplyBody.querySelector('#modifyReplyRno').value = reply.rno;
+                modifyReplyBody.querySelector('#modifyReplyText').value = reply.content ?? '';
+
+                modifyReplyModal.show();
+            }).catch(result=>{
+                console.error(result);
+            })
+        }
+
+        // 삭제하기
+        if (btnDelete) {
+            deleteReply(rno).then(result=>{
+                loadReplyList()
+            }).catch(result=>{
+                console.error(result)
+            })
+        }
+    });
+
+
 
 
 

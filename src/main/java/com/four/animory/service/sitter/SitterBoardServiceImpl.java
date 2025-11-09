@@ -7,7 +7,9 @@ import com.four.animory.dto.sitter.SitterBoardPageRequestDTO;
 import com.four.animory.dto.sitter.SitterBoardPageResponseDTO;
 import com.four.animory.dto.user.MemberDTO;
 import com.four.animory.repository.sitter.SitterBoardRepository;
+import com.four.animory.repository.sitter.SitterReplyRepository;
 import com.four.animory.repository.user.MemberRepository;
+import jakarta.transaction.Transactional;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -19,11 +21,14 @@ import java.util.List;
 
 @Service
 @Log4j2
+@Transactional
 public class SitterBoardServiceImpl implements SitterBoardService {
   @Autowired
   private SitterBoardRepository sitterBoardRepository;
   @Autowired
   private MemberRepository memberRepository;
+  @Autowired
+  private SitterReplyRepository sitterReplyRepository;
 
   @Override
   public void insertSitterBoard(SitterBoardDTO sitterBoardDTO, MemberDTO memberDTO) {
@@ -89,6 +94,7 @@ public class SitterBoardServiceImpl implements SitterBoardService {
 
   @Override
   public int deleteBoard(Long bno) {
+    sitterReplyRepository.deleteAllReplyByBno(bno);
     sitterBoardRepository.deleteById(bno);
     SitterBoard result = sitterBoardRepository.findById(bno).orElse(null);
     if (result == null){
