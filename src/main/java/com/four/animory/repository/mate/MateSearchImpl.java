@@ -41,6 +41,12 @@ public class MateSearchImpl extends QuerydslRepositorySupport implements MateSea
         }
         query.where(qmateBoard.bno.gt(0));
 
+        //member를 가지고 와야지 실제 author를 넣을 수 있어
+        this.getQuerydsl().applyPagination(pageable, query);
+        List<MateBoard> list = query.fetch();
+        long count = query.fetchCount();
+        return new PageImpl<>(list, pageable, count);
+
 
 //        JPQLQuery<MateReplyCountDTO> dtoQuery=query.select(
 //                Projections.bean(MateReplyCountDTO.class,
@@ -51,11 +57,9 @@ public class MateSearchImpl extends QuerydslRepositorySupport implements MateSea
 //                        qmateBoard.regDate));
 ////                        qmatereply.count().as("replyCount")));
 
-        //member를 가지고 와야지 실제 author를 넣을 수 있어
-        this.getQuerydsl().applyPagination(pageable, query);
-        List<MateBoard> list = query.fetch();
-        long count = query.fetchCount();
-        return new PageImpl<>(list, pageable, count);
+
+
+
 
     }
 }

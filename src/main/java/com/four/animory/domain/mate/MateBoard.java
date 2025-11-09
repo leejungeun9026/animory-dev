@@ -1,9 +1,11 @@
 package com.four.animory.domain.mate;
 
 import com.four.animory.domain.BaseEntity;
+import com.four.animory.domain.mate.MateFile;
 import com.four.animory.domain.user.Member;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.BatchSize;
 import org.hibernate.annotations.ColumnDefault;
 
 import java.time.LocalDateTime;
@@ -14,7 +16,7 @@ import java.util.Set;
 @Table(name = "tbl_mate_board")
 @Getter
 @Setter
-@ToString(exclude = "member")
+@ToString(exclude = {"member", "fileSet"})
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
@@ -40,6 +42,7 @@ public class MateBoard extends BaseEntity {
     @Column(name="duedate", nullable = true, length = 300)
     private String dueDate;
 
+
     @ManyToOne(fetch = FetchType.LAZY)
 //    @JoinColumn(name="mid") //fat info
     private Member member;
@@ -50,10 +53,29 @@ public class MateBoard extends BaseEntity {
         this.category = category;
     }
 
-
     public void updateReadCount(){ this.readCount = this.readCount + 1; }
 
-//    @OneToMany(mappedBy = "sitterBoard", fetch = FetchType.LAZY, cascae = CascadeType.ALL)
-//    private Set<MateFile> fileSet = new HashSet<>();
+    @OneToMany(mappedBy = "mateBoard", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    @BatchSize(size = 20)
+    private Set<MateFile> fileSet = new HashSet<>();
+    public void addFile(String uuid, String fileName, boolean image){
+        MateFile mateFile = MateFile.builder()
+                .uuid(uuid)
+                .fileName(fileName)
+                .mateBoard(this)
+                .ord(fileSet.size())
+                .image(image)
+                .build();
+        fileSet.add(mateFile);
+    }
+
+    public void removeFile(){
+        fileSet.forEach(mateFile ->
+                mateFile.changeMateBoard(null));
+        this.fileSet.clear();
+    }
+
+
 
 }

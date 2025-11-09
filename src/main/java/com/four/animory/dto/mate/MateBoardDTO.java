@@ -1,6 +1,7 @@
 package com.four.animory.dto.mate;
 
 import com.four.animory.domain.mate.MateFile;
+import com.four.animory.dto.spr.SprFileDTO;
 import jakarta.validation.constraints.Future;
 import jakarta.validation.constraints.NotEmpty;
 import lombok.AllArgsConstructor;
@@ -35,7 +36,7 @@ public class MateBoardDTO {
     private int readCount;
     private LocalDateTime regDate;
     private LocalDateTime updateDate;
-    private List<MateFile> fileDTOs;
+    private List<MateFileDTO> mateFileDTOs;
     private boolean complete;
     @Future
     private String dueDate;

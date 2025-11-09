@@ -1,12 +1,10 @@
 package com.four.animory.service.mate;
 
 
-import com.four.animory.domain.free.FreeBoard;
 import com.four.animory.domain.mate.MateBoard;
 import com.four.animory.domain.user.Member;
 import com.four.animory.dto.common.PageRequestDTO;
 import com.four.animory.dto.common.PageResponseDTO;
-import com.four.animory.dto.free.FreeBoardDTO;
 import com.four.animory.dto.mate.MateBoardDTO;
 import com.four.animory.repository.mate.MateBoardRepository;
 import com.four.animory.repository.user.MemberRepository;
@@ -47,10 +45,9 @@ public class MateServiceImpl implements MateService {
     }
 
 
-
     @Override
     public MateBoardDTO findMateBoardById(Long bno, Integer mode) {
-        MateBoard mateBoard = mateBoardRepository.findById(bno).orElse(null);
+        MateBoard mateBoard = mateBoardRepository.findByIdWithImages(bno).orElse(null);
         if(mode == 1){
             mateBoard.updateReadCount();
             mateBoardRepository.save(mateBoard);
@@ -70,10 +67,10 @@ public class MateServiceImpl implements MateService {
     @Override
     public void deleteMateBoardById(Long bno) {
         mateBoardRepository.deleteById(bno);
-
     }
 
     // 검색 + 페이징 -> DTO 변환
+
 
     @Override
     public PageResponseDTO<MateBoardDTO> getList(PageRequestDTO pageRequestDTO) {
