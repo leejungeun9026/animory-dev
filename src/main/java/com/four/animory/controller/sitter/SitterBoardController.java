@@ -1,37 +1,48 @@
 package com.four.animory.controller.sitter;
 
 import com.four.animory.config.auth.PrincipalDetails;
-import com.four.animory.dto.sitter.SitterBoardDTO;
-import com.four.animory.dto.sitter.SitterBoardListDTO;
-import com.four.animory.dto.sitter.SitterBoardPageRequestDTO;
-import com.four.animory.dto.sitter.SitterBoardPageResponseDTO;
+import com.four.animory.domain.sitter.SitterFile;
+import com.four.animory.dto.sitter.*;
+import com.four.animory.dto.sitter.file.SitterUploadFileDTO;
 import com.four.animory.dto.user.MemberDTO;
 import com.four.animory.dto.user.MemberWithPetCountDTO;
 import com.four.animory.service.sitter.SitterBoardService;
-import com.four.animory.service.sitter.SitterReplyService;
 import com.four.animory.service.user.UserService;
+import jakarta.validation.Valid;
 import lombok.extern.log4j.Log4j2;
+import net.coobird.thumbnailator.Thumbnailator;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.FileSystemResource;
+import org.springframework.core.io.Resource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.UUID;
 
 @Controller
 @Log4j2
 @RequestMapping("/sitter")
 public class SitterBoardController {
-//    @Value("${com.four.animory.upload.path}")
-//    private String uploadRootPath;
+    @Value("${com.four.animory.upload.path}")
+    private String uploadRootPath;
 
   @Autowired
   private SitterBoardService sitterBoardService;
-  @Autowired
-  private SitterReplyService sitterReplyService;
   @Autowired
   private UserService userService;
 
@@ -50,7 +61,13 @@ public class SitterBoardController {
   }
 
   @PostMapping("/register")
-  public String registerPost(@AuthenticationPrincipal PrincipalDetails principal, SitterBoardDTO sitterBoardDTO) {
+  public String registerPost(@AuthenticationPrincipal PrincipalDetails principal, @Valid SitterBoardDTO sitterBoardDTO, SitterUploadFileDTO sitterUploadFileDTO) {
+    List<SitterFileDTO> sitterFileDTO = null;
+    if(sitterUploadFileDTO.getFiles() != null && !sitterUploadFileDTO.getFiles().get(0).getOriginalFilename().equals("")) {
+      sitterFileDTO = uploadFile(sitterUploadFileDTO);
+    }
+    sitterBoardDTO.setFileDTOs(sitterFileDTO);
+
     MemberDTO memberDTO = userService.getMemberByUsername(principal.getUsername());
     sitterBoardService.insertSitterBoard(sitterBoardDTO, memberDTO);
     return "redirect:/sitter/list";
@@ -76,7 +93,7 @@ public class SitterBoardController {
   }
 
   @PostMapping("/modify")
-  public String modify(@AuthenticationPrincipal PrincipalDetails principal, SitterBoardDTO sitterBoardDTO){
+  public String modify(@AuthenticationPrincipal PrincipalDetails principal, SitterBoardDTO sitterBoardDTO, SitterUploadFileDTO sitterUploadFileDTO, @RequestParam("deleteFileUuid") String deleteFileUuid){
     String boardUsername = sitterBoardDTO.getUsername();
     String loginUsername = principal.getMember().getUsername();
     // 글 작성자와 로그인한 유저 일치여부 확인
@@ -107,5 +124,62 @@ public class SitterBoardController {
       return "redirect:/sitter/list";
     }
     return "redirect:/sitter/view?bno=" + bno + "&mode=0";
+  }
+
+
+  private List<SitterFileDTO> uploadFile(SitterUploadFileDTO uploadFileDTO) {
+    String uploadPath = uploadRootPath + "\\sitter";
+    List<SitterFileDTO> list = new ArrayList<>();
+
+    if(uploadFileDTO.getFiles() != null) {
+      uploadFileDTO.getFiles().forEach(multipartFile -> {
+        String originalName = multipartFile.getOriginalFilename();
+        String uuid = UUID.randomUUID().toString();
+        Path savePath = Paths.get(uploadPath, uuid + "_" + originalName);
+
+        boolean image = false;
+        try{
+          multipartFile.transferTo(savePath);
+
+          if(Files.probeContentType(savePath).startsWith("image")) {
+            image = true;
+            File thumbFile = new File(uploadPath, "s_" + uuid + "_" + originalName);
+            Thumbnailator.createThumbnail(savePath.toFile(), thumbFile, 200, 200);
+          }
+        } catch(IOException e) {
+          e.printStackTrace();
+        }
+        SitterFileDTO sitterFileDTO = SitterFileDTO.builder()
+            .uuid(uuid)
+            .filename(originalName)
+            .image(image)
+            .build();
+        list.add(sitterFileDTO);
+      });
+    }
+    return list;
+  }
+
+  public void removeFile(List<SitterFileDTO> sitterFileDTOs) {
+    String uploadPath = uploadRootPath + "\\sitter";
+
+    for(SitterFileDTO dtos: sitterFileDTOs){
+      String filename = dtos.getUuid()+"_"+dtos.getFilename();
+      Resource resource = new FileSystemResource(uploadPath+File.separator+filename);
+
+      String resourceName = resource.getFilename();
+      boolean removed = false;
+      try {
+        String contentType = Files.probeContentType(resource.getFile().toPath());
+        removed = resource.getFile().delete();
+        if(contentType.startsWith("image")){
+          // 썸네일이 있다면 s_삭제하고 오리지날 파일도 지움
+          File thumbnailFile = new File(uploadPath + File.separator + "s_" + filename);
+          thumbnailFile.delete();
+        }
+      } catch (Exception e) {
+        e.printStackTrace();
+      }
+    }
   }
 }

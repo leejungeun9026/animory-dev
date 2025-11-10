@@ -1,21 +1,21 @@
 package com.four.animory.service.sitter;
 
 import com.four.animory.domain.sitter.SitterBoard;
-import com.four.animory.dto.sitter.SitterBoardDTO;
-import com.four.animory.dto.sitter.SitterBoardListDTO;
-import com.four.animory.dto.sitter.SitterBoardPageRequestDTO;
-import com.four.animory.dto.sitter.SitterBoardPageResponseDTO;
+import com.four.animory.domain.sitter.SitterFile;
+import com.four.animory.dto.sitter.*;
+import com.four.animory.dto.sitter.file.SitterUploadResultDTO;
 import com.four.animory.dto.user.MemberDTO;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 public interface SitterBoardService {
   void insertSitterBoard(SitterBoardDTO sitterBoardDTO, MemberDTO memberDTO);
-  List<SitterBoardDTO> getSitterBoardList();
   SitterBoardDTO getSitterBoardById(Long bno, String mode);
   SitterBoardPageResponseDTO<SitterBoardListDTO> getSitterBoardListSearchPage(SitterBoardPageRequestDTO sitterBoardPageRequestDTO);
   void updateBoard(SitterBoardDTO sitterBoardDTO);
   int deleteBoard(Long bno);
+  List<SitterBoardListDTO> getRecent(int count);
 
   default SitterBoard dtoToEntity(SitterBoardDTO sitterBoardDTO){
     SitterBoard sitterBoard = SitterBoard.builder()
@@ -28,6 +28,11 @@ public interface SitterBoardService {
         .title(sitterBoardDTO.getTitle())
         .content(sitterBoardDTO.getContent())
         .build();
+    if(sitterBoardDTO.getFileDTOs() != null){
+      sitterBoardDTO.getFileDTOs().forEach(fileDTO -> {
+        sitterBoard.addFiles(fileDTO.getUuid(), fileDTO.getFilename(), fileDTO.isImage());
+      });
+    }
     return sitterBoard;
   }
 
@@ -47,6 +52,20 @@ public interface SitterBoardService {
         .regDate(sitterBoard.getRegDate())
         .updateDate(sitterBoard.getUpdateDate())
         .build();
+    List<SitterFileDTO> sitterFileDTOs = sitterBoard.getFileSet().stream()
+        .sorted()
+        .map(file -> fileEntityToDTO(file))
+        .collect(Collectors.toList());
+    sitterBoardDTO.setFileDTOs(sitterFileDTOs);
     return sitterBoardDTO;
+  }
+
+  default SitterFileDTO fileEntityToDTO(SitterFile sitterFile){
+    return SitterFileDTO.builder()
+        .uuid(sitterFile.getUuid())
+        .filename(sitterFile.getFilename())
+        .image(sitterFile.isImage())
+        .ord(sitterFile.getOrd())
+        .build();
   }
 }

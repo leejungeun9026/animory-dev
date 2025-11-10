@@ -50,6 +50,25 @@
       </div>
       <div class="mb-3">
         <input class="form-control" multiple name="files" type="file">
+        <input type="text" name="deleteFileUuid" id="deleteFileUuid">
+        <ul id="fileList" class="list-group mt-2" th:if="${board.fileDTOs != null && board.fileDTOs.size > 0}">
+          <li class="list-group-item px-2" th:each="file:${board.fileDTOs}">
+            <div class="d-flex align-items-center gap-2">
+              <div class="img_wrap thumb_40x40 border-1">
+                <img th:src="|/sitter/view/s_${file.uuid}_${file.filename}|">
+              </div>
+              <div>
+                <p>[[${file.getFilename()}]]</p>
+                <input type="text" name="keepFileUuid" th:value="${file.uuid}">
+              </div>
+              <div class="btn_wrap ms-auto">
+                <button class="btnDeleteFile btn btn-xs btn-danger" th:data-uuid="${file.uuid}">
+                  <i class="fa-solid fa-xmark"></i>
+                </button>
+              </div>
+            </div>
+          </li>
+        </ul>
       </div>
       <div class="button_wrap">
         <div class="row g-2">
@@ -145,4 +164,21 @@
 
     loadSido()
 
+
+
+
+    /////// 첨부파일 삭제 ///////
+    const fileList = document.getElementById("fileList")
+    const deleteFileUuidInput = document.getElementById("deleteFileUuid")
+    const deleted = new Set()
+
+    fileList.addEventListener("click", function(e){
+        const btn = e.target.closest(".btnDeleteFile")
+        if(!btn) return
+        const uuid = btn.dataset.uuid
+        deleted.add(uuid)
+
+        btn.closest("li").remove()
+        deleteFileUuidInput.value = Array.from(deleted).join(',')
+    })
 </script>

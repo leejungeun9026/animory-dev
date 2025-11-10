@@ -22,8 +22,8 @@
         </select>
       </div>
       <div class="mb-2">
-        <select class="form-select" id="petInfo" name="petInfo">
-          <option value="">돌봄이 필요한 아이는</option>
+        <select class="form-select" id="petInfo" name="petInfo" required>
+          <option value="">돌봄이 필요(가능)한 아이는</option>
           <option value="dog">강아지</option>
           <option value="cat">고양이</option>
         </select>
@@ -46,7 +46,7 @@
                   required rows="10"></textarea>
       </div>
       <div class="mb-3">
-        <input class="form-control" multiple name="files" type="file">
+        <input class="form-control" multiple name="files" type="file" accept=".jpg,.jpeg,.png, .gif">
       </div>
       <div class="button_wrap">
         <div class="row g-2">
@@ -65,21 +65,26 @@
 
 <script layout:fragment="pagescript" th:inline="javascript">
     /////// 카테고리 및 타입 설정 ///////
-    const cate = document.getElementById("category")
-    const petInfo = document.getElementById("petInfo")
-    petInfo.classList.add("d-none")
-    cate.addEventListener("change", function (e) {
-        console.log(e.target.value)
-        let val = e.target.value
-        if (val === "일해요") {
-            petInfo.classList.remove("d-block")
-            petInfo.classList.add("d-none")
-            petInfo.value = ''
-        } else {
-            petInfo.classList.remove("d-none")
-            petInfo.classList.add("d-block")
-        }
-    })
+    // const cate = document.getElementById("category")
+    // const petInfo = document.getElementById("petInfo")
+    // petInfo.classList.add("d-none")
+    // petInfo.setAttribute("disabled", true)
+    // petInfo.removeAttribute("required")
+    // cate.addEventListener("change", function (e) {
+    //     let val = e.target.value
+    //     if (val === "일해요") {
+    //         petInfo.classList.remove("d-block")
+    //         petInfo.classList.add("d-none")
+    //         petInfo.setAttribute("disabled", true)
+    //         petInfo.removeAttribute("required")
+    //         petInfo.value = ''
+    //     } else {
+    //         petInfo.classList.remove("d-none")
+    //         petInfo.classList.add("d-block")
+    //         petInfo.setAttribute("required", false)
+    //         petInfo.removeAttribute("disabled")
+    //     }
+    // })
 
     /////// 사용자 정보 - 시도,시군구 정보 초기화 ///////
     const sido = document.querySelector("#sido")

@@ -1,10 +1,9 @@
 package com.four.animory.service.sitter;
 
 import com.four.animory.domain.sitter.SitterBoard;
-import com.four.animory.dto.sitter.SitterBoardDTO;
-import com.four.animory.dto.sitter.SitterBoardListDTO;
-import com.four.animory.dto.sitter.SitterBoardPageRequestDTO;
-import com.four.animory.dto.sitter.SitterBoardPageResponseDTO;
+import com.four.animory.dto.sitter.*;
+import com.four.animory.dto.sitter.file.SitterUploadFileDTO;
+import com.four.animory.dto.sitter.file.SitterUploadResultDTO;
 import com.four.animory.dto.user.MemberDTO;
 import com.four.animory.repository.sitter.SitterBoardRepository;
 import com.four.animory.repository.sitter.SitterReplyRepository;
@@ -13,6 +12,7 @@ import jakarta.transaction.Transactional;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
@@ -43,18 +43,8 @@ public class SitterBoardServiceImpl implements SitterBoardService {
   }
 
   @Override
-  public List<SitterBoardDTO> getSitterBoardList() {
-    List<SitterBoard> sitterBoardList = sitterBoardRepository.findAll();
-    List<SitterBoardDTO> sitterBoardDTOList = new ArrayList<>();
-    for(SitterBoard sitterBoard : sitterBoardList) {
-      sitterBoardDTOList.add(entityToDTO(sitterBoard));
-    }
-    return sitterBoardDTOList;
-  }
-
-  @Override
   public SitterBoardDTO getSitterBoardById(Long bno, String mode) {
-    SitterBoard board = sitterBoardRepository.findById(bno).orElse(null);
+    SitterBoard board = sitterBoardRepository.findByIdWithImages(bno).orElse(null);
     if(mode.equals("1")){
       board.updateReadCount();
       sitterBoardRepository.save(board);
@@ -103,4 +93,11 @@ public class SitterBoardServiceImpl implements SitterBoardService {
       return 0;
     }
   }
+
+  @Override
+  public List<SitterBoardListDTO> getRecent(int count) {
+    Pageable top10 = PageRequest.of(0, count);
+    return sitterBoardRepository.findRecentWithReplyCount(top10);
+  }
+
 }

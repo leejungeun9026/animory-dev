@@ -59,4 +59,15 @@ public class SitterBoard extends BaseEntity {
     this.title = sitterBoardDTO.getTitle();
     this.content = sitterBoardDTO.getContent();
   }
+
+  public void addFiles(String uuid, String filename, boolean image) {
+    SitterFile sitterFile = SitterFile.builder()
+        .uuid(uuid)
+        .filename(filename)
+        .sitterBoard(this)
+        .ord(fileSet.size())
+        .image(image)
+        .build();
+    fileSet.add(sitterFile);
+  }
 }

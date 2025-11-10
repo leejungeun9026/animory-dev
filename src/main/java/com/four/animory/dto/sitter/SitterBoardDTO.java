@@ -16,7 +16,6 @@ import java.util.List;
 @Builder
 public class SitterBoardDTO {
   private Long bno;
-  @NotEmpty
   private String state;
   @NotEmpty
   private String category;
@@ -29,11 +28,10 @@ public class SitterBoardDTO {
   private String title;
   @NotEmpty
   private String content;
-  @NotEmpty
   private String nickname;
   private String username;
   private int readCount;
   private LocalDateTime regDate;
   private LocalDateTime updateDate;
-  private List<SitterFile> fileDTOs;
+  private List<SitterFileDTO> fileDTOs;
 }
