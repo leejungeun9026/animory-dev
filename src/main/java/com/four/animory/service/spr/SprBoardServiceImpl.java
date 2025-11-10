@@ -15,6 +15,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Service
 @Transactional
 public class SprBoardServiceImpl implements SprBoardService {
@@ -86,5 +89,14 @@ public class SprBoardServiceImpl implements SprBoardService {
         SprBoardDTO dto = entityToDTO(sprBoard);
         return dto;
     }
+
+    @Override
+    public List<SprBoardDTO> getTop10SprBoards() {
+        List<SprBoard> sprBoards = sprRepository.findTop10ByOrderByRecommendDesc();
+        return sprBoards.stream()
+                .map(this::entityToDTO)
+                .collect(Collectors.toList());
+    }
+
 
 }

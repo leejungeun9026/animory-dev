@@ -28,7 +28,7 @@
                                         <!-- 표시 뱃지 끝 -->
                                     </div>
                                     <!-- 로그인 사용자 == 글작성자 같을 경우만 노출 -->
-                                    <div class="d-flex gap-1 flex-nowrap ms-auto">
+                                    <div class="d-flex gap-1 flex-nowrap ms-auto" th:if="${#authentication.principal.username==board.username}">
                                         <a th:href="@{/spr/remove(bno=${board.bno})}" class="btn btn-danger">삭제</a>
                                         <a th:href="@{/spr/modify(bno=${board.bno}, mode=2)}" class="btn btn-gray">수정</a>
                                     </div>
@@ -131,46 +131,129 @@
     const replyList = document.querySelector(".replyList")
     const replyPaging = document.querySelector(".replyPaging")
     const boardUsername = [[${board.username}]]
+    // 지금 로그인 중인 회원의 username
     const loginUser = [[${#authentication.principal.username}]]
+    const loginRole = [[${#authentication.principal.authorities[0].authority}]]
 
-    function printList(dtoList){
-        let str='';
-        if(dtoList && dtoList.length>0){
-            for(let dto of dtoList){
-                str += `<li class="reply_list border-bottom" data-rno="${dto.rno}">
-                                            <div class="d-flex justify-content-start align-items-start gap-2 py-2">
-                                                <div class="flex-grow-1">`
-                if(dto.deleted === true){
-                    str += `<div class="replyContent">삭제된 댓글입니다.</div>`
-                }else if(dto.secret === true){
-                    if(dto.username === loginUser || boardUsername === loginUser){
-                        str += `<b>${dto.author}</b><div class="replyContent">${dto.content}</div>`
-                    }else{
-                        str += `<div class="replyContent">비밀 댓글입니다.</div>`
-                    }
-                } else if(dto.secret === false){
-                    str += `<b>${dto.author}</b><div class="replyContent">${dto.content}</div>`
+    function buildDropdown(dto){
+        // 1) 관리자 → 모두 가능
+        if(loginRole === "ADMIN"){
+            return `
+            <ul class="dropdown-menu">
+                <li><a class="dropdown-item modifyBtn" href="">수정</a></li>
+                <li><a class="dropdown-item deleteBtn" href="">삭제</a></li>
+                <li><a class="btnReReplyWriteView dropdown-item">대댓글 달기</a></li>
+            </ul>`;
+        }
+
+        // 2) 댓글 작성자 → 모두 가능
+        if(dto.username === loginUser){
+            return `
+            <ul class="dropdown-menu">
+                <li><a class="dropdown-item modifyBtn" href="">수정</a></li>
+                <li><a class="dropdown-item deleteBtn" href="">삭제</a></li>
+                <li><a class="btnReReplyWriteView dropdown-item">대댓글 달기</a></li>
+            </ul>`;
+        }
+
+        // 3) 비밀 "원댓글" 이고 게시글 작성자라면 → 대댓글 달기만 가능
+        if(dto.secret && !dto.parentRno && boardUsername === loginUser){
+            return `
+            <ul class="dropdown-menu">
+                <li><a class="btnReReplyWriteView dropdown-item">대댓글 달기</a></li>
+            </ul>`;
+        }
+
+        // 4) 그 외 → 드롭다운 없음
+        return ``;
+    }
+
+    function renderReply(dto){
+        let contentHtml = "";
+
+        if(dto.deleted){
+            contentHtml = `<div class="replyContent text-muted">삭제된 댓글입니다.</div>`;
+        }
+        else if(dto.secret){
+            if(dto.parentRno){
+                // 비밀 대댓글 → 작성자, 부모댓글작성자, 관리자만 열람
+                if(dto.username === loginUser || dto.parentUsername === loginUser || loginRole === "ADMIN"){
+                    contentHtml = `<b>${dto.author}</b> <span style="color:#0078ff;">@${dto.parentAuthor}</span> <div class="replyContent">${dto.content}</div>`;
+                } else {
+                    contentHtml = `<div class="replyContent">비밀 대댓글입니다.</div>`;
                 }
-                str += `   </div>
-                        <div class="flex-shrink-1">
-                            <div class="btn-group">
-                                ${dto.deleted === false ? `
-                                <button type="button" class="btn btn-xs rounded-2 btn-outline-gray" data-bs-toggle="dropdown" aria-expanded="false">
-                                    <i class="fa-solid fa-ellipsis"></i>
-                                </button>
-                                <ul class="dropdown-menu">
-                                    <li><a class="dropdown-item modifyBtn" href="">수정</a></li>
-                                    <li><a class="dropdown-item deleteBtn" href="">삭제</a></li>
-                                    <li><a class="btnReReplyWriteView dropdown-item">대댓글 달기</a></li>
-                                </ul>`: ''}
-                            </div>
-                        </div>
-                    </div>
-                </li>`;
+            }
+            else {
+                // 비밀 댓글 → 작성자, 게시글작성자, 관리자만 열람
+                if(dto.username === loginUser || boardUsername === loginUser || loginRole === "ADMIN"){
+                    contentHtml = `<b>${dto.author}</b><div class="replyContent">${dto.content}</div>`;
+                } else {
+                    contentHtml = `<div class="replyContent">비밀 댓글입니다.</div>`;
+                }
             }
         }
-        replyList.innerHTML=str
+        else {
+            // 일반 댓글
+            if(dto.parentRno){
+                contentHtml = `<b>${dto.author}</b> <span style="color:#0078ff;">@${dto.parentAuthor}</span> <div class="replyContent">${dto.content}</div>`;
+            } else {
+                contentHtml = `<b>${dto.author}</b><div class="replyContent">${dto.content}</div>`;
+            }
+        }
+
+        return `
+        <li class="reply_list" data-rno="${dto.rno}">
+            <div class="d-flex justify-content-start align-items-start gap-2 py-2">
+                <div class="flex-grow-1">
+                    ${contentHtml}
+                </div>
+                <div class="flex-shrink-1">
+                    ${dto.deleted ? '' : `
+                    <div class="btn-group">
+                        <button type="button" class="btn btn-xs rounded-2 btn-outline-gray" data-bs-toggle="dropdown">
+                            <i class="fa-solid fa-ellipsis"></i>
+                        </button>
+                        ${buildDropdown(dto)}
+                    </div>`}
+                </div>
+            </div>
+        </li>`;
     }
+
+    function printList(dtoList){
+        // 1) 댓글 맵 생성
+        const replyMap = {};
+        dtoList.forEach(dto => {
+            replyMap[dto.rno] = { ...dto, children: [] };
+        });
+
+        // 2) 부모-자식 연결
+        let rootList = [];
+        dtoList.forEach(dto => {
+            if(dto.parentRno){
+                replyMap[dto.parentRno].children.push(replyMap[dto.rno]);
+            } else {
+                rootList.push(replyMap[dto.rno]);
+            }
+        });
+
+        // 3) 재귀 렌더링
+        let html = "";
+
+        function renderTree(reply){
+            html += renderReply(reply); // 기존 렌더 함수 그대로 사용
+
+            // 자식 댓글 재귀 호출
+            reply.children.forEach(child => renderTree(child));
+        }
+
+        // 4) 최상위 댓글부터 시작
+        rootList.forEach(r => renderTree(r));
+
+        replyList.innerHTML = html;
+    }
+
+
 
     function printPages(data){
         if(!data.dtoList || data.dtoList.length === 0){
@@ -235,6 +318,11 @@
             secret : isSecret ? 1:0,
             deleted : false
         }
+        if(replyText.value === ""){
+            alert("댓글 내용을 입력해주세요")
+            replyText.focus();
+            return
+        }
         try{
             const response = await axios.post(`/sprreplies/`, replyObj);
             const result = response.data;
@@ -251,19 +339,65 @@
 
     const modifyModal = new bootstrap.Modal(document.querySelector(".modifyModal"))
     const modifyText = document.querySelector(".modifyText")
-
     const modifyCloseBtn = document.querySelector(".modifyCloseBtn")
 
+    // 댓글을 드롭박스 클릭 이벤트
     replyList.addEventListener("click", async function (e) {
-        e.preventDefault()
-        e.stopPropagation()
 
-        const target = e.target.closest("a");
+        const target = e.target.closest("a, button");
+        if(target){
+            e.preventDefault()
+            e.stopPropagation()
+        }
         if (!target) {
             return
         }
         const li = target.closest("li.reply_list")
         const rno = li.getAttribute("data-rno")
+
+        // 대댓글 달기 버튼을 눌렀을 때 창이 열려있으면 닫고 열려있지 않다면 키게함
+        if(target.classList.contains("btnReReplyWriteView")){
+            const exist = li.querySelector(".reReplyWriteArea")
+            if(exist){
+                exist.remove()
+                return
+            }
+            li.insertAdjacentHTML("beforeend",reReplyStr())
+            return
+        }
+
+        // 대댓글 작성 버튼을 누를 때
+        if(target.classList.contains("btnReReplyRegister")){
+            const box = target.closest(".reReplyWriteArea")
+            const reReplyText = box.querySelector("#reReplyText")
+            const isSecret = box.querySelector(".secretCheck").checked
+
+            if(reReplyText.value === ""){
+                alert("대댓글 내용을 입력해주세요")
+                reReplyText.focus();
+                return
+            }
+            try{
+                await axios.post(`/sprreplies/`,{
+                    bno : bno,
+                    content: reReplyText.value,
+                    secret: isSecret ? true : false,
+                    deleted: false,
+                    parentRno: rno
+                })
+                box.remove()
+                printReplies(bno, page, size, false)
+            }catch (err){
+                console.log(err);
+            }
+            return
+        }
+
+        if(target.classList.contains("btnReReplyWriteClose")){
+            target.closest(".reReplyWriteArea").remove()
+            return
+        }
+
         if (target.classList.contains("modifyBtn")) {
             try {
                 const response = await axios.get(`/sprreplies/${rno}`)
@@ -304,11 +438,19 @@
 
     })
 
+    replyList.addEventListener("click", function(e){
+        const target = e.target.closest(".btnReReplyWriteClose");
+        if(!target) return;
+        const box = target.closest(".reReplyWriteArea");
+        box.remove();
+    });
 
 
 
 
-  /////// 대댓글 textarea toggle ///////
+
+
+    /////// 대댓글 textarea toggle ///////
   function reReplyStr() {
       return `<div class="reReplyWriteArea">
                 <div class="d-flex justify-content-start align-items-start gap-2 py-2">
@@ -317,8 +459,8 @@
                       <textarea name="reReplyText" id="reReplyText" class="form-control" placeholder="대댓글 내용을 입력해주세요(최대 1000자)"></textarea>
                     </div>
                     <div class="d-flex">
-                      <label class="form-check-label" for="secret1">비밀대댓글</label>
-                      <input class="form-check-input secretCheck" name="secret" type="checkbox" id="secret1">
+                      <input class="form-check-input secretCheck" name="secret" type="checkbox">
+                      <span>비밀대댓글</span>
                       <button class="btnReReplyRegister ms-auto btn btn-main">대댓글 쓰기</button>
                     </div>
                   </div>

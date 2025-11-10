@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
@@ -49,7 +50,12 @@ public class SprReplyController {
     }
     @PostMapping("/delete/{rno}")
     public ResponseEntity<String> deleteReply(@PathVariable("rno") Long rno, @AuthenticationPrincipal UserDetails userDetails){
-        sprReplyService.remove(rno, userDetails.getUsername());
+        String loginRole = userDetails.getAuthorities().stream()
+                        .findFirst()
+                        .map(GrantedAuthority::getAuthority)
+                        .orElse("USER");
+
+        sprReplyService.remove(rno, userDetails.getUsername(), loginRole);
         return ResponseEntity.ok("삭제되었습니다.");
     }
     @PutMapping(value = "/{rno}", consumes = MediaType.APPLICATION_JSON_VALUE)

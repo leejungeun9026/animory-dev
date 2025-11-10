@@ -18,6 +18,9 @@ public interface SprReplyRepository extends JpaRepository<SprReply,Long> {
     @Query("delete from SprReply r where r.sprBoard.bno=:bno")
     void deleteBySprBoardId(Long bno);
 
+    List<SprReply> findBySprBoardAndParentIsNull(SprBoard sprBoard);
+
+    List<SprReply> findByParent(SprReply sprReply);
 
     List<SprReply> findBySprBoardBnoAndDeletedIsFalse(Long bno);
     void deleteBySprBoard_Bno(Long bno);

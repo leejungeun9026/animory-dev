@@ -18,6 +18,7 @@ public interface SprBoardService {
     void updateBoard(SprBoardDTO sprBoardDTO);
     void deleteBoardById(Long bno);
     SprBoardDTO updateRecommend(Long bno);
+    List<SprBoardDTO> getTop10SprBoards();
 
 
     default SprBoard dtoToEntity(SprBoardDTO sprBoardDTO) {
@@ -55,6 +56,7 @@ public interface SprBoardService {
                 .recommend(sprBoard.getRecommend())
                 .complete(sprBoard.isComplete())
                 .username(sprBoard.getMember().getUsername())
+                .replyCount((long)sprBoard.getReplies().size())
                 .build();
         List<SprFileDTO> sprFileDTOList = sprBoard.getFileSet().stream()
                 .sorted()

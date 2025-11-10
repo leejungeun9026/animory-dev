@@ -24,4 +24,7 @@ public class SprReplyDTO {
     private boolean deleted;
     private Long mid;
     private String username;
+    private Long parentRno;
+    private String parentUsername;
+    private String parentAuthor;
 }
