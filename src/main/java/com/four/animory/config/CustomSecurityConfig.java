@@ -18,6 +18,8 @@ import org.springframework.security.web.SecurityFilterChain;
 @RequiredArgsConstructor
 @Log4j2
 public class CustomSecurityConfig {
+    private final CustomLoginSuccessHandler customLoginSuccessHandler;
+
   // 인증, 인가 설정
   @Bean
   public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -27,19 +29,19 @@ public class CustomSecurityConfig {
         .cors(httpSecurityCorsConfigurer -> httpSecurityCorsConfigurer.disable())
         .authorizeHttpRequests(authorizeRequest -> authorizeRequest
             .dispatcherTypeMatchers(DispatcherType.FORWARD).permitAll()
-            .requestMatchers("/", "/index","/member/login", "/member/join").permitAll()
-            .requestMatchers("/member/mypage", "/member/modifyPet").authenticated()
-            .requestMatchers("/free/list", "/mate/list", "/spr/list", "/sitter/list", "/notice/list").permitAll()
-            .requestMatchers("/free/**", "/mate/**", "/spr/**","/sprreplies/**", "/sitter/**", "/notice/**").authenticated()
-            .requestMatchers("/admin", "/admin/login").permitAll()
-            .requestMatchers("/admin/**").hasAuthority("ADMIN")
+//            .requestMatchers(HttpMethod.GET, "/board/**").permitAll()
+//            .requestMatchers("/admin", "/admin/login").permitAll()
+//            .requestMatchers("/admin/**").hasAuthority("ADMIN")
+//            .requestMatchers("/", "/member/**", "/sitter/**").permitAll()
+            .requestMatchers("/", "/**").permitAll()
             .anyRequest().authenticated())
         .formLogin(formLoginConfigure -> formLoginConfigure
             .loginPage("/member/login")
             .loginProcessingUrl("/member/loginRegister")
             .usernameParameter("username")
             .passwordParameter("password")
-            .defaultSuccessUrl("/")
+//            .defaultSuccessUrl("/", false)
+            .successHandler(customLoginSuccessHandler)
             .permitAll())
         .logout(logoutConfigure -> logoutConfigure
             .logoutUrl("/member/logout")
@@ -59,7 +61,6 @@ public class CustomSecurityConfig {
   @Bean
   public WebSecurityCustomizer configurer() {
     return (web->web.ignoring()
-        .requestMatchers(PathRequest.toStaticResources().atCommonLocations())
-        .requestMatchers("/fonts/**", "/favicon.ico", "/robots.txt"));
+        .requestMatchers(PathRequest.toStaticResources().atCommonLocations()));
   }
 }
