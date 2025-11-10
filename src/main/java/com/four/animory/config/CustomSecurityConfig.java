@@ -33,7 +33,7 @@ public class CustomSecurityConfig {
             .requestMatchers("/", "/index","/member/login", "/member/join").permitAll()
             .requestMatchers("/member/mypage", "/member/modifyPet").authenticated()
             .requestMatchers("/free/list", "/mate/list", "/spr/list", "/sitter/list", "/notice/list").permitAll()
-            .requestMatchers("/free/**", "/mate/**", "/spr/**", "/sitter/**", "/notice/**").authenticated()
+            .requestMatchers("/free/**", "/mate/**", "/spr/**","/sprreplies/**", "/sitter/**", "/notice/**").authenticated()
             .requestMatchers("/admin", "/admin/login").permitAll()
             .requestMatchers("/admin/**").hasAuthority("ADMIN")
             .anyRequest().authenticated())
