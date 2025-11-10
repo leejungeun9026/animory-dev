@@ -30,11 +30,12 @@ public class CustomSecurityConfig {
         .cors(httpSecurityCorsConfigurer -> httpSecurityCorsConfigurer.disable())
         .authorizeHttpRequests(authorizeRequest -> authorizeRequest
             .dispatcherTypeMatchers(DispatcherType.FORWARD).permitAll()
-//            .requestMatchers(HttpMethod.GET, "/board/**").permitAll()
-//            .requestMatchers("/admin", "/admin/login").permitAll()
-//            .requestMatchers("/admin/**").hasAuthority("ADMIN")
-//            .requestMatchers("/", "/member/**", "/sitter/**").permitAll()
-            .requestMatchers("/", "/**").permitAll()
+            .requestMatchers("/", "/index","/member/login", "/member/join").permitAll()
+            .requestMatchers("/member/mypage", "/member/modifyPet").authenticated()
+            .requestMatchers("/free/list", "/mate/list", "/spr/list", "/sitter/list", "/notice/list").permitAll()
+            .requestMatchers("/free/**", "/mate/**", "/spr/**", "/sitter/**", "/notice/**").authenticated()
+            .requestMatchers("/admin", "/admin/login").permitAll()
+            .requestMatchers("/admin/**").hasAuthority("ADMIN")
             .anyRequest().authenticated())
         .formLogin(formLoginConfigure -> formLoginConfigure
             .loginPage("/member/login")
@@ -63,6 +64,7 @@ public class CustomSecurityConfig {
   @Bean
   public WebSecurityCustomizer configurer() {
     return (web->web.ignoring()
-        .requestMatchers(PathRequest.toStaticResources().atCommonLocations()));
+        .requestMatchers(PathRequest.toStaticResources().atCommonLocations())
+        .requestMatchers("/fonts/**", "/favicon.ico", "/robots.txt"));
   }
 }
