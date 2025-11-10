@@ -6,6 +6,8 @@ import com.four.animory.dto.common.PageResponseDTO;
 import com.four.animory.dto.notice.NoticeBoardDTO;
 import org.springframework.data.domain.Page;
 
+import java.util.List;
+
 public interface NoticeService {
 
     void registerNotice(NoticeBoardDTO noticeBoardDTO);
@@ -13,6 +15,7 @@ public interface NoticeService {
     NoticeBoardDTO findNoticeById(Long bno, int mode);
     void updateNotice(NoticeBoardDTO dto);
     void removeNotice(Long bno);
+    List<NoticeBoard> getTop10FreeBoardList();
 
 
     PageResponseDTO<NoticeBoardDTO> getList(PageRequestDTO pageRequestDTO);

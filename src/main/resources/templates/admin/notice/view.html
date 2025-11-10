@@ -27,8 +27,8 @@
               <h4 class="py-2" th:text="${notice.title}">제목</h4>
               <div class="d-flex gap-2 flex-nowrap text-secondary">
                 <p>작성자</p>
-                <p>2025-10-10</p>
-                <p class="ms-auto"><i class="fa-regular fa-eye me-1"></i>12</p>
+                <p th:text="${#temporals.format(notice.regDate, 'yyyy-MM-dd')}">2025-10-10</p>
+                <p class="ms-auto"><i class="fa-regular fa-eye me-1"></i><span th:text="${notice.readCount}">1</span></p>
                 <p><i class="fa-regular fa-heart me-1 text-danger"></i>56</p>
                 <p><i class="fa-regular fa-comment-dots me-1"></i>8</p>
               </div>
@@ -187,5 +187,107 @@
 </div>
 
 <script layout:fragment="pagescript" th:inline="javascript">
+    // ===== 최소 옵션: 공지글 번호 =====
+    const bno = [[${notice.bno}]];
 
+    // ===== 필요한 엘리먼트 =====
+    const listEl   = document.querySelector(".reply_list_area ul");   // 댓글 목록 UL
+    const btnWrite = document.querySelector(".btnReplyRegister");     // 댓글 쓰기 버튼
+    const taWrite  = document.querySelector("#replyText");            // 댓글 입력 textarea
+
+    // (선택) CSRF 사용 중이면 meta에서 읽어서 헤더에 넣어줌. 없으면 무시됨.
+    const csrfToken  = document.querySelector('meta[name="_csrf"]')?.content;
+    const csrfHeader = document.querySelector('meta[name="_csrf_header"]')?.content;
+
+    // 공통 fetch 헬퍼(심플)
+    async function call(url, method = "GET", data) {
+        const headers = {"Content-Type":"application/json"};
+        if (csrfToken && csrfHeader) headers[csrfHeader] = csrfToken;
+        const res = await fetch(url, {
+            method,
+            headers,
+            body: data ? JSON.stringify(data) : null
+        });
+        if (res.status === 401) { alert("로그인이 필요합니다."); throw new Error("401"); }
+        if (!res.ok) { throw new Error("HTTP " + res.status); }
+        const ct = res.headers.get("content-type") || "";
+        return ct.includes("application/json") ? res.json() : res.text();
+    }
+
+    // 목록 그리기 (아주 단순)
+    function render(list) {
+        if (!list || list.length === 0) {
+            listEl.innerHTML = `<li class="border-bottom py-3 text-secondary">등록된 댓글이 없습니다.</li>`;
+            return;
+        }
+        listEl.innerHTML = list.map(d => `
+      <li class="reply_list border-bottom" data-rno="${d.rno}">
+        <div class="d-flex justify-content-start align-items-start gap-2 py-2">
+          <div class="flex-grow-1">
+            ${d.deleted ? "" : `<b>${d.nickname ?? "작성자"}</b>`}
+            <div class="replyContent">${escapeHtml(d.content)}</div>
+          </div>
+          <div class="flex-shrink-1">
+            ${d.deleted ? "" : `
+            <div class="btn-group">
+              <button type="button" class="btn btn-xs rounded-2 btn-outline-gray" data-bs-toggle="dropdown" aria-expanded="false">
+                <i class="fa-solid fa-ellipsis"></i>
+              </button>
+              <ul class="dropdown-menu">
+                <!-- 관리자: 누구 댓글이든 삭제 가능 -->
+                <li><a class="dropdown-item btnDel" href="">삭제</a></li>
+              </ul>
+            </div>`}
+          </div>
+        </div>
+      </li>
+    `).join("");
+    }
+
+    // HTML 이스케이프 (간단)
+    function escapeHtml(s){ return String(s ?? "").replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;"); }
+
+    // 댓글 목록 불러오기
+    async function load() {
+        try {
+            // 페이징 간단히: 1페이지 100개
+            const data = await call(`/noticereplies/list/${bno}?page=1&size=100`);
+            render(Array.isArray(data.dtoList) ? data.dtoList : []);
+        } catch(e) {
+            console.error(e); render([]);
+        }
+    }
+
+    // 등록
+    btnWrite?.addEventListener("click", async () => {
+        const content = (taWrite?.value || "").trim();
+        if (!content) return alert("댓글 내용을 입력해주세요.");
+        try {
+            await call(`/noticereplies/`, "POST", { bno, content, deleted:false });
+            taWrite.value = "";
+            await load();
+        } catch(e) {
+            console.error(e); alert("댓글 등록 중 오류가 발생했습니다.");
+        }
+    });
+
+    // 삭제(관리자: 남의 댓글도 가능) – 이벤트 위임
+    listEl?.addEventListener("click", async (e) => {
+        const a = e.target.closest(".btnDel");
+        if (!a) return;
+        e.preventDefault();
+        const li  = e.target.closest("li.reply_list");
+        const rno = li?.getAttribute("data-rno");
+        if (!rno) return;
+        if (!confirm("이 댓글을 삭제하시겠어요?")) return;
+        try {
+            await call(`/noticereplies/delete/${rno}`, "POST");
+            await load();
+        } catch(e) {
+            console.error(e); alert("삭제 중 오류가 발생했습니다.");
+        }
+    });
+
+    // 첫 로딩
+    document.addEventListener("DOMContentLoaded", load);
 </script>

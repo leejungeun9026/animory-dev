@@ -27,7 +27,7 @@ public class NoticeReply extends BaseEntity {
     private NoticeBoard noticeBoard;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "mid", nullable = false)
+    @JoinColumn(name = "mno", nullable = false)
     private Member member;
 
     @Column(nullable = false)
