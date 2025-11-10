@@ -1,5 +1,5 @@
-//package com.four.animory.controller.mate;
-//
+package com.four.animory.controller.mate;
+
 //import com.four.animory.dto.mate.MateBoardDTO;
 //import com.four.animory.dto.mate.MateFileDTO;
 //import com.four.animory.dto.mate.upload.MateUploadFileDTO;
@@ -16,11 +16,10 @@
 //import java.util.ArrayList;
 //import java.util.List;
 //import java.util.UUID;
-//
-//public class MateUpdownController {
-//
-//
-//
+
+public class MateUpdownController {
+
+
 //
 //    private List<MateFileDTO> fileUpload(MateUploadFileDTO mateUploadFileDTO){
 //        String matePath = Paths.get(uploadPath, "mate").toString();
@@ -92,3 +91,8 @@
 //
 //
 //}
+
+
+
+
+}

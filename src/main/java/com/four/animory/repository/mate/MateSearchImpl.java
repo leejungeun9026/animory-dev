@@ -2,9 +2,7 @@ package com.four.animory.repository.mate;
 
 import com.four.animory.domain.mate.MateBoard;
 import com.four.animory.domain.mate.QMateBoard;
-import com.four.animory.dto.mate.MateReplyCountDTO;
 import com.querydsl.core.BooleanBuilder;
-import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.JPQLQuery;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;

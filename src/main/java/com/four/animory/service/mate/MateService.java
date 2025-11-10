@@ -5,8 +5,10 @@ import com.four.animory.domain.mate.MateFile;
 import com.four.animory.domain.user.Member;
 import com.four.animory.dto.common.PageRequestDTO;
 import com.four.animory.dto.common.PageResponseDTO;
+import com.four.animory.dto.free.FreeBoardDTO;
 import com.four.animory.dto.mate.MateBoardDTO;
 import com.four.animory.dto.mate.MateFileDTO;
+import org.springframework.data.domain.Page;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -17,9 +19,13 @@ public interface MateService {
     MateBoardDTO findMateBoardById(Long bno, Integer mode);
     void updateMateBoard(MateBoardDTO mateBoardDTO);
     void deleteMateBoardById(Long bno);
+    MateBoardDTO updateLikecount(Long bno);
+    List<MateBoard> getTop10MateBoardList();
+
+
+
     PageResponseDTO<MateBoardDTO> getList(PageRequestDTO pageRequestDTO);
 //    PageResponseDTO<BoardListReplyCountDTO> getListReplyCount(PageRequestDTO pageRequestDTO);
-
 
     default MateBoard dtoToEntity(MateBoardDTO mateBoardDTO) {
         MateBoard mateBoard = MateBoard.builder()
@@ -27,6 +33,7 @@ public interface MateService {
                 .sido(mateBoardDTO.getSido())
                 .sigungu(mateBoardDTO.getSigungu())
                 .title(mateBoardDTO.getTitle())
+                .likecount(mateBoardDTO.getLikecount())
                 .content(mateBoardDTO.getContent())
                 .dueDate(mateBoardDTO.getDueDate())
                 .build();
@@ -45,6 +52,7 @@ public interface MateService {
                 .title(mateBoard.getTitle())
                 .content(mateBoard.getContent())
                 .readCount(mateBoard.getReadCount())
+                .likecount(mateBoard.getLikecount())
                 .regDate(mateBoard.getRegDate())
                 .updateDate(mateBoard.getUpdateDate())
                 .sido(mateBoard.getSido())

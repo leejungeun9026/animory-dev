@@ -1,12 +1,13 @@
 ﻿<!DOCTYPE html>
 <html lang="en" layout:decorate="~{include/user}"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity6"
       xmlns:th="http://www.thymeleaf.org">
 
 <div layout:fragment="content">
     <!-- /* view 화면 html 코드 작성 부분 */ -->
     <div class="page_title mb-4">
-        <a class="d-inline-flex align-items-baseline" href="">
+        <a class="d-inline-flex align-items-baseline" href="/mate/list">
             <small class="text-danger">산책 게시판 <i class="fa-solid fa-chevron-right fs-xs"></i></small>
         </a>
         <h3 class="memomentKkukkkuk fw-normal mt-2">게시글 보기</h3>
@@ -28,7 +29,7 @@
                                 </div>
                                 <!-- 로그인 사용자 == 글작성자 같을 경우만 노출 -->
                                 <div class="d-flex gap-1 flex-nowrap ms-auto">
-                                    <a class="btn btn-danger" th:href="@{/mate/remove(bno=${board.bno}, mode=2)}">삭제</a>
+                                    <a class="btn btn-danger" th:href="@{/mate/remove(bno=${board.bno})}">삭제</a>
                                     <a class="btn btn-gray" th:href="@{/mate/modify(bno=${board.bno}, mode=2)}">수정</a>
                                     <!--                         추가 할 것-->
                                 </div>
@@ -37,8 +38,27 @@
                             <h4 class="py-2">[[${board.title}]]</h4>
                             <div class="d-flex gap-2 flex-nowrap text-secondary">
                                 <p>[[${board.nickname}]]</p>
+                                <p>[[${#temporals.format(board.regDate, 'yyyy-MM-dd HH:mm:ss')}]]</p>
 
+                                <p class="ms-auto mb-0 d-flex align-items-center">
+                                    <i class="fa-regular fa-eye me-1"></i>
+                                    <span>[[${board.readCount}]]</span>
+
+                                    <i class="like-btn"
+                                       th:attr="data-bno=${board.bno}"
+                                       th:class="${board.likecount >= 1}
+                                         ? 'fa-solid fa-heart ms-3 me-1 text-danger'
+                                         : 'fa-regular fa-heart ms-3 me-1 text-danger'"></i>
+
+                                    <span class="like-count"
+                                          th:attr="data-bno=${board.bno}"
+                                          th:text="${board.likecount}">0</span>
+
+                                    <i class="fa-regular fa-comment-dots ms-3 me-1"></i>
+                                    <span>[[${board.replyCount} ?: 0]]</span>
+                                </p>
                             </div>
+
                         </td>
                     </tr>
                     </thead>
@@ -63,127 +83,62 @@
                     </tr>
                     <tr>
                         <td class="px-0 pt-3">
-                            <p><i class="fa-regular fa-comment-dots me-1"></i>댓글 <b class="text-danger">8</b></p>
-                            <div class="reply_list_area">
-                                <ul>
-                                    <li class="reply_list border-bottom">
-                                        <div class="d-flex justify-content-start align-items-start gap-2 py-2">
-                                            <div class="flex-grow-1">
-                                                <b>댓작성자</b>
-                                                <div class="replyContent">어쩌고저쩌고</div>
-                                            </div>
-                                            <div class="flex-shrink-1">
-                                                <div class="btn-group">
-                                                    <button aria-expanded="false" class="btn btn-xs rounded-2 btn-outline-gray"
-                                                            data-bs-toggle="dropdown" type="button">
-                                                        <i class="fa-solid fa-ellipsis"></i>
-                                                    </button>
-                                                    <ul class="dropdown-menu">
-                                                        <li><a class="dropdown-item" href="">수정</a></li>
-                                                        <li><a class="dropdown-item" href="">삭제</a></li>
-                                                        <li><a class="btnReReplyWriteView dropdown-item">대댓글 달기</a></li>
-                                                    </ul>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="reply_depth2 ps-4">
-                                            <ul>
-                                                <li class="rerpley_list border-top">
-                                                    <div class="d-flex justify-content-start align-items-start gap-2 py-2">
-                                                        <div class="flex-grow-1">
-                                                            <b>대댓작성자</b>
-                                                            <div class="replyContent">어쩌고저쩌고</div>
-                                                        </div>
-                                                        <div class="flex-shrink-1">
-                                                            <div class="btn-group">
-                                                                <button aria-expanded="false"
-                                                                        class="btn btn-xs rounded-2 btn-outline-gray"
-                                                                        data-bs-toggle="dropdown" type="button">
-                                                                    <i class="fa-solid fa-ellipsis"></i>
-                                                                </button>
-                                                                <ul class="dropdown-menu">
-                                                                    <li><a class="dropdown-item" href="">수정</a></li>
-                                                                    <li><a class="dropdown-item" href="">삭제</a></li>
-                                                                </ul>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </li>
-                                                <li class="border-top">
-                                                    <div class="d-flex justify-content-start align-items-start gap-2 py-2">
-                                                        <div class="flex-grow-1">
-                                                            <b>댓작성자</b>
-                                                            <div class="replyContent">어쩌고저쩌고</div>
-                                                        </div>
-                                                        <div class="flex-shrink-1">
-                                                            <div class="btn-group">
-                                                                <button aria-expanded="false"
-                                                                        class="btn btn-xs rounded-2 btn-outline-gray"
-                                                                        data-bs-toggle="dropdown" type="button">
-                                                                    <i class="fa-solid fa-ellipsis"></i>
-                                                                </button>
-                                                                <ul class="dropdown-menu">
-                                                                    <li><a class="dropdown-item" href="">수정</a></li>
-                                                                    <li><a class="dropdown-item" href="">삭제</a></li>
-                                                                </ul>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </li>
-                                            </ul>
-                                        </div>
-                                    </li>
-                                    <li class="reply_list border-bottom">
-                                        <div class="d-flex justify-content-start align-items-start gap-2 py-2">
-                                            <div class="flex-grow-1">
-                                                <b>댓작성자</b>
-                                                <div class="replyContent">어쩌고저쩌고</div>
-                                            </div>
-                                            <div class="flex-shrink-1">
-                                                <div class="btn-group">
-                                                    <button aria-expanded="false" class="btn btn-xs rounded-2 btn-outline-gray"
-                                                            data-bs-toggle="dropdown" type="button">
-                                                        <i class="fa-solid fa-ellipsis"></i>
-                                                    </button>
-                                                    <ul class="dropdown-menu">
-                                                        <li><a class="dropdown-item" href="">수정</a></li>
-                                                        <li><a class="dropdown-item" href="">삭제</a></li>
-                                                        <li><a class="btnReReplyWriteView dropdown-item">대댓글 달기</a></li>
-                                                    </ul>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </li>
-                                    <li class="reply_list border-bottom">
-                                        <div class="d-flex justify-content-start align-items-start gap-2 py-2">
-                                            <div class="flex-grow-1">
-                                                <b>댓작성자</b>
-                                                <div class="replyContent">어쩌고저쩌고</div>
-                                            </div>
-                                            <div class="flex-shrink-1">
-                                                <div class="btn-group">
-                                                    <button aria-expanded="false" class="btn btn-xs rounded-2 btn-outline-gray"
-                                                            data-bs-toggle="dropdown" type="button">
-                                                        <i class="fa-solid fa-ellipsis"></i>
-                                                    </button>
-                                                    <ul class="dropdown-menu">
-                                                        <li><a class="dropdown-item" href="">수정</a></li>
-                                                        <li><a class="dropdown-item" href="">삭제</a></li>
-                                                        <li><a class="btnReReplyWriteView dropdown-item">대댓글 달기</a></li>
-                                                    </ul>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </li>
-                                </ul>
+
+
+
+                            <div th:align="center">
+                                <button type="button" class="btn btn-outline-danger" id="likeBtn">좋아요!</button>
                             </div>
-                            <div class="reply_write_area pt-3">
-                                <div class="mb-2">
-                                    <textarea class="form-control" id="replyText" name="replyText"
-                                              placeholder="댓글 내용을 입력해주세요(최대 1000자)"></textarea>
+                            <div class="mt-1 tb_content"
+                                 th:if="${board.dueDate != null}" th:align="right">
+                                신청마감일 :<span th:text="${#strings.replace(board.dueDate, 'T', ' ')}"></span>
+                            </div>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td class="px-0 pt-3">
+                            <p><i class="fa-regular fa-comment-dots me-1"></i>댓글 <b class="text-dange">[[${board.replyCount}]]</b>
+                            </p>
+
+                            <!--댓글 리스트 영역-->
+                            <div class="reply_list_area">
+                                <ul class="replyList"></ul>
+                                <ul class="replyPaging pagination pagination-sm mt-3"></ul>
+                            </div>
+                            <div>
+                                <ul class="pagination replyPaging"></ul>
+                            </div>
+                            <div class="replyModal">
+                                <div class="reply_write_area pt-3">
+                                    <div class="mb-2">
+                                        <textarea class="replyText form-control" name="replyText"
+                                                  placeholder="댓글 내용을 입력해주세요(최대 1000자)"></textarea>
+                                    </div>
+                                    <div class="d-flex">
+                                        <label class="form-check-label" for="secret">비밀댓글</label>
+                                        <input class="form-check-input secretCheck" id="secret" name="secret"
+                                               type="checkbox">
+                                        <button class="btnReplyRegister ms-auto btn btn-main" type="button">댓글 쓰기
+                                        </button>
+                                    </div>
                                 </div>
-                                <div class="d-flex">
-                                    <button class="btnReplyRegister ms-auto btn btn-main">댓글 쓰기</button>
+                            </div>
+
+                            <!-- 댓글 수정 -->
+                            <div class="modal modifyModal" tabindex="-1">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <div class="modal-body">
+                                            <div class="input-group mb-3">
+                                                <input class="form-control modifyText" type="text">
+                                            </div>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button class="btn btn-dark modifyCloseBtn" type="button">닫기</button>
+                                            <button class="btn btn-primary modifyBtn2" type="button">수정</button>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </td>
@@ -196,10 +151,192 @@
     <!-- /* //view 화면 html 코드 작성 끝 */ -->
 </div>
 
-<script layout:fragment="pagescript" th:inline="javascript">
-    /////// 대댓글 textarea toggle ///////
-    const btnReReplyWriteViews = document.querySelectorAll(".btnReReplyWriteView")
 
+<script layout:fragment="pagescript" th:inline="javascript">
+    const bno = [[${board.bno}]];
+    const boardUsername = [[${board.username}]];
+    const loginUser = [[${#authentication.principal.username}]];
+
+    const replyList = document.querySelector(".replyList")
+    const replyPaging = document.querySelector(".replyPaging")
+
+
+    function printList(dtoList) {
+        let str = '';
+        if (dtoList && dtoList.length > 0) {
+            for (let dto of dtoList) {
+                str += `<li class="reply_list border-bottom" data-rno="${dto.rno}">
+                                            <div class="d-flex justify-content-start align-items-start gap-2 py-2">
+                                                <div class="flex-grow-1">`
+                if (dto.deleted === true) {
+                    str += `<div class="replyContent">삭제된 댓글입니다.</div>`
+                } else if (dto.secret === true) {
+                    if (dto.username === loginUser || boardUsername === loginUser) {
+                        str += `<b>${dto.nickname}</b><div class="replyContent">${dto.content}</div>`
+                    } else {
+                        str += `<div class="replyContent">비밀 댓글입니다.</div>`
+                    }
+                } else if (dto.secret === false) {
+                    str += `<b>${dto.nickname}</b><div class="replyContent">${dto.content}</div>`
+                }
+                str += `   </div>
+                        <div class="flex-shrink-1">
+                            <div class="btn-group">
+                                ${dto.deleted === false ? `
+                                <button type="button" class="btn btn-xs rounded-2 btn-outline-gray" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <i class="fa-solid fa-ellipsis"></i>
+                                </button>
+                                <ul class="dropdown-menu">
+                                    <li><a class="dropdown-item modifyBtn" href="">수정</a></li>
+                                    <li><a class="dropdown-item deleteBtn" href="">삭제</a></li>
+                                    <li><a class="btnReReplyWriteView dropdown-item">대댓글 달기</a></li>
+                                </ul>` : ''}
+                            </div>
+                        </div>
+                    </div>
+                </li>`;
+            }
+        }
+        replyList.innerHTML = str
+    }
+
+    function printPages(data) {
+        if (!data.dtoList || data.dtoList.length === 0) {
+            replyPaging.innerHTML = ''
+            return
+        }
+        let pageStr = ''
+        if (data.prev) {
+            pageStr += `<li class="page-item"><a class="page-link" data-page="${data.start - 1}"><i class="fa-solid fa-chevron-left"></i></a></li>`
+        }
+        for (let i = data.start; i <= data.end; i++) {
+            pageStr += `<li class="page-item ${Number(i) === Number(data.page) ? "active" : ""}"><a class="page-link" data-page="${i}">${i}</a></li>`
+        }
+        if (data.next) {
+            pageStr += `<li class="page-item"><a class="page-link" data-page="${data.end + 1}"><i class="fa-solid fa-chevron-right"></i></a></li>`
+        }
+        replyPaging.innerHTML = pageStr
+    }
+
+    let page = 1
+    let size = 10
+
+
+
+    async function printReplies(bno, page, size, goLast) {
+
+        const response = await axios.get(`/matereplies/list/${bno}`, {params: {page, size: Number(size)}})
+        let data = response.data;
+
+        if (goLast) {
+            const total = response.data.total;
+            const lastPage = Math.ceil(total / size);
+            return printReplies(bno, lastPage, size, false);
+        }
+        printList(data.dtoList)
+        printPages(data);
+    }
+
+    printReplies(bno, page, size, false)
+
+    const registerModal = new bootstrap.Modal(document.querySelector(".replyModal"))
+    const registerBtn = document.querySelector(".btnReplyRegister")
+    const replyText = document.querySelector(".replyText")
+
+
+    replyPaging.addEventListener("click", function (e) {
+        e.preventDefault()
+        e.stopPropagation()
+
+        const target = e.target.closest('a')
+        if (!target) {
+            return
+        }
+        const pageNum = Number(target.getAttribute("data-page"));
+        page = pageNum
+        printReplies(bno, page, size, false)
+    }, false)
+
+    registerBtn.addEventListener("click", async function (e) {
+        const isSecret = document.querySelector(".secretCheck").checked
+
+        const replyObj = {
+            bno: bno,
+            content: replyText.value,
+            secret: isSecret ? 1 : 0,
+            deleted: false
+        }
+        try {
+            const response = await axios.post(`/matereplies/`, replyObj);
+            const result = response.data;
+
+            replyText.value = '';
+            document.querySelector(".secretCheck").checked = false;
+
+            printReplies(bno, 1, 10, false);
+        } catch (error) {
+            alert("댓글 입력 오류");
+            console.log(error);
+        }
+    }, false)
+
+    const modifyModal = new bootstrap.Modal(document.querySelector(".modifyModal"))
+    const modifyText = document.querySelector(".modifyText")
+
+    const modifyCloseBtn = document.querySelector(".modifyCloseBtn")
+
+    replyList.addEventListener("click", async function (e) {
+        e.preventDefault()
+        e.stopPropagation()
+
+        const target = e.target.closest("a");
+        if (!target) {
+            return
+        }
+        const li = target.closest("li.reply_list")
+        const rno = li.getAttribute("data-rno")
+        if (target.classList.contains("modifyBtn")) {
+            try {
+                const response = await axios.get(`/matereplies/${rno}`)
+                const reply = response.data
+                modifyText.value = reply.content
+                modifyModal.show()
+            } catch (err) {
+                console.log(err)
+            }
+        }
+
+        if (target.classList.contains("deleteBtn")) {
+            try {
+                await axios.post(`/matereplies/delete/${rno}`)
+                printReplies(bno, page, size, false)
+            } catch (err) {
+                console.log(err)
+            }
+        }
+
+
+        const modifyBtn2 = document.querySelector(".modifyBtn2")
+        modifyBtn2.onclick = async function () {
+            const updatedContent = modifyText.value
+
+            await axios.put(`/matereplies/${rno}`, {
+                rno: rno,
+                content: updatedContent
+            })
+
+            modifyModal.hide();
+
+            printReplies(bno, page, size, false);
+        }
+        modifyCloseBtn.onclick = function () {
+            modifyModal.hide();
+        }
+
+    })
+
+
+    /////// 대댓글 textarea toggle ///////
     function reReplyStr() {
         return `<div class="reReplyWriteArea">
                 <div class="d-flex justify-content-start align-items-start gap-2 py-2">
@@ -208,6 +345,8 @@
                       <textarea name="reReplyText" id="reReplyText" class="form-control" placeholder="대댓글 내용을 입력해주세요(최대 1000자)"></textarea>
                     </div>
                     <div class="d-flex">
+                      <label class="form-check-label" for="secret1">비밀대댓글</label>
+                      <input class="form-check-input secretCheck" name="secret" type="checkbox" id="secret1">
                       <button class="btnReReplyRegister ms-auto btn btn-main">대댓글 쓰기</button>
                     </div>
                   </div>
@@ -220,29 +359,63 @@
               </div>`
     }
 
-    btnReReplyWriteViews.forEach(btn => {
-        btn.addEventListener("click", function (e) {
-            e.preventDefault()
-            const li = e.target.closest("li.reply_list")
-            console.log(li)
-            // 대댓글 영역이 없으면 만들고 변수 초기화
-            if (li.querySelector(".reply_depth2") == null) {
-                li.insertAdjacentHTML("beforeend", `<div class="reply_depth2 ps-4"></div>`)
-            }
-            const depth2 = li.querySelector(".reply_depth2")
 
-            // 대댓글창이 이미 열려있으면 return, 아니면 추가하기
-            if (depth2.querySelector(".reReplyWriteArea") != null) {
-                return
-            }
-            depth2.insertAdjacentHTML("beforeend", reReplyStr())
+    // 좋아요 버튼 누르면 recommend 수 증가
+    $(document).ready(function(){
+        // likeBtn을 누르면 함수
+        $('#likeBtn').on('click', function (){
+            const bno = [[${board.bno}]]
 
-            const btnReReplyWriteClose = depth2.querySelector(".btnReReplyWriteClose")
-            btnReReplyWriteClose.addEventListener("click", () => {
-                btnReReplyWriteClose.closest(".reReplyWriteArea").remove()
+            $.ajax({
+                url : "/mate/like",
+                type : "GET",
+                data : { bno : bno},
+                success : function(response){
+                    console.log(response);
+                    // 업데이트 된 레코맨드 수 가져오기
+                    var likecount = response.likecount;
+                    $('#likeCount').text(likecount);
+
+                    //추천 수가 0에서 1이 되면 하트 아이콘이 빈하트 -> 꽉 찬 하트로 변화
+                    if(likecount > 0){
+                        $('#likeIcon').removeClass('fa-regular').addClass('fa-solid');
+                    } else {
+                        $('#likeIcon').removeClass('fa-solid').addClass('fa-regular');
+                    }
+                }
             })
+
         })
     })
+
+
+
+    // $(document).ready(function () {
+    //     // likeBtn을 누르면 함수
+    //     $('#likeBtn').on('click', function () {
+    //         const bno = [[${board.bno}]]
+    //
+    //         $.ajax({
+    //             url: "/spr/like",
+    //             type: "GET",
+    //             data: {bno: bno},
+    //             success: function (response) {
+    //                 console.log(response);
+    //                 // 업데이트 된 레코맨드 수 가져오기
+    //                 var recommend = response.recommend;
+    //                 $('#likeCount').text(recommend);
+    //
+    //                 //추천 수가 0에서 1이 되면 하트 아이콘이 빈하트 -> 꽉 찬 하트로 변화
+    //                 if (recommend > 0) {
+    //                     $('#likeIcon').removeClass('fa-regular').addClass('fa-solid');
+    //                 } else {
+    //                     $('#likeIcon').removeClass('fa-solid').addClass('fa-regular');
+    //                 }
+    //             }
+    //         })
+    //
+    //     })
+    // })
 
 
 </script>

@@ -76,26 +76,42 @@
                                     <a class="d-block mb-1" th:href="@{/mate/view(bno=${board.bno})}">
                                         <h5 class="text-overflew-line-2">[[${board.title}]]</h5>
                                     </a>
-                                </div>
-                                <div class="d-flex text-secondary small">
-                                    <!-- 왼쪽: 두 줄(윗줄: 작성자/작성일, 아랫줄: 마감일) -->
-                                    <div class="d-flex flex-column">
-                                        <div class="d-flex gap-2 flex-wrap">
-                                            <span th:text="${board.nickname}">작성자</span>
-                                            <span th:text="${#temporals.format(board.regDate, 'yyyy.MM.dd')}">작성일</span>
+
+                                    <div class="d-flex text-secondary small justify-content-between align-items-start">
+                                        <!-- 왼쪽: 두 줄(윗줄: 작성자/작성일, 아랫줄: 마감일) -->
+                                        <div class="d-flex flex-column">
+                                            <div class="d-flex gap-2 flex-wrap">
+                                                <p class="mb-0">[[${board.nickname}]]</p>
+                                                <p class="mb-0" th:text="${#temporals.format(board.regDate, 'yyyy.MM.dd')}"></p>
+                                             </div>
+                                            <div class="mt-1 text-danger"
+                                               th:if="${board.dueDate != null}">
+                                                신청마감일 :
+                                                <span th:text="${#strings.replace(board.dueDate, 'T', ' ')}"></span>
+                                            </div>
                                         </div>
-                                        <div class="mt-1 text-danger"
-                                             th:if="${board.dueDate != null}">
-                                            신청마감일 :
-                                            <span th:text="${#strings.replace(board.dueDate, 'T', ' ')}"></span>
+                                        <!-- 오른쪽: 조회수 -->
+                                        <div class="d-flex gap-2 flex-nowrap text-secondary">
+                                            <span class="d-inline-flex align-items-center">
+                                                <i class="fa-regular fa-eye me-1"></i>
+                                                <span th:text ="${board.readCount}"></span>
+                                            </span>
+                                            <span class="d-inline-flex align-items-center">
+                                                <i th:class="${board.likecount >= 1} ? 'fa-solid fa-heart me-1 text-danger' : 'fa-regular fa-heart me-1 text-danger'"></i>
+                                                <span th:text ="${board.likecount}"></span>
+                                            </span>
+                                            <p>
+                                                <i class="fa-regular fa-comment-dots me-1"></i>
+                                                [[${board.replyCount} ?: 0]]
+                                            </p>
                                         </div>
                                     </div>
-                                    <!-- 오른쪽: 조회수 -->
-                                    <div class="ms-auto d-flex align-items-start">
-                                        <i class="fa-regular fa-eye me-1"></i>
-                                        <span>[[${board.readCount}]]</span>
-                                    </div>
+
+
+
+
                                 </div>
+
                             </td>
                         </tr>
                         </tbody>
