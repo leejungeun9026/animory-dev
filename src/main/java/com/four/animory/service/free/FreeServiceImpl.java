@@ -123,5 +123,10 @@ public class FreeServiceImpl implements FreeService{
                 .build();
     }
 
+    @Override
+    public List<FreeBoard> getTop10FreeBoardList() {
+        return freeBoardRepository.findTop10ByOrderByBnoDesc();
+    }
+
 
 }

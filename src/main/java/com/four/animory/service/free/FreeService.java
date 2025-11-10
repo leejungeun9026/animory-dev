@@ -5,12 +5,14 @@ import com.four.animory.domain.free.FreeFile;
 import com.four.animory.domain.user.Member;
 import com.four.animory.dto.free.*;
 import com.four.animory.dto.free.FreeBoardListReplyCountDTO;
+import com.four.animory.repository.free.FreeBoardRepository;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
 
 public interface FreeService {
+
     void registerFreeBoard(FreeBoardDTO freeBoardDTO, Member member); // 글 등록
     List<FreeBoardDTO> findAllFreeBoards(); // 게시글 전부 가져오기
     FreeBoardDTO findFreeBoardById(Long bno,Integer mode);
@@ -20,6 +22,8 @@ public interface FreeService {
 
     FreePageResponseDTO<FreeBoardDTO> getList(FreePageRequestDTO freePageRequestDTO);
     FreePageResponseDTO<FreeBoardListReplyCountDTO> getListReplyCount(FreePageRequestDTO freePageRequestDTO);
+
+    List<FreeBoard> getTop10FreeBoardList();
 
 
     // dto -> Entity

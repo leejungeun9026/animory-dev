@@ -61,7 +61,9 @@
                     </p>
                   </div>
                   <a th:href="|@{/free/view(bno=${board.bno})}&${freePageRequestDTO.getLink()}|" class="d-block mb-1">
-                    <h5 class="text-overflew-line-2" >[[${board.title}]]</h5>
+                    <h5 class="text-overflew-line-2" >[[${board.title}]]
+                        <span class="badge progress-bar-success" style="background-color:cornflowerblue">[[${board.replycount}]]</span>
+                    </h5>
                   </a>
                   <div class="d-flex gap-2 flex-nowrap text-secondary">
                     <p>[[${board.nickname}]]</p>

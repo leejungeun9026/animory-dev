@@ -20,4 +20,6 @@ public interface FreeBoardRepository extends JpaRepository<FreeBoard, Long>, Fre
     @Query("select fb from FreeBoard fb where fb.bno=:bno")
     Optional<FreeBoard> findByIdWithImages(Long bno);
 
+    List<FreeBoard> findTop10ByOrderByBnoDesc();
+
 }

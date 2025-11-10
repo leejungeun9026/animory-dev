@@ -1,6 +1,7 @@
 package com.four.animory.controller.free;
 
 import com.four.animory.config.auth.PrincipalDetails;
+import com.four.animory.domain.free.FreeBoard;
 import com.four.animory.domain.user.Member;
 import com.four.animory.dto.free.*;
 import com.four.animory.service.free.FreeService;
@@ -8,6 +9,7 @@ import com.four.animory.service.free.FreeService;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.Banner;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -48,7 +50,6 @@ public class FreeController {
         model.addAttribute("freePageRequestDTO",  freePageRequestDTO);
         return "free/list";
     }
-
 
     @GetMapping("/view")
     public void view(Long bno, Integer mode, Model model) {
@@ -107,10 +108,10 @@ public class FreeController {
         }
     }
 
-
     @ResponseBody
     @GetMapping("/like")
     public FreeBoardDTO updatelikecount(Long bno) {
         return freeService.updateLikecount(bno);
     }
+
 }
