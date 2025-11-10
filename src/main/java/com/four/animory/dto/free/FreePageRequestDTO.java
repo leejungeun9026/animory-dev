@@ -41,9 +41,9 @@ public class FreePageRequestDTO {
     }
   }
 
-  public Pageable getPageable(String...props){
-    return PageRequest.of(this.page-1, size, Sort.by(props).descending());
-  }
+    public Pageable getPageable(String...props){
+        return PageRequest.of(this.page-1, size, Sort.by(props).descending());
+    }
 
   public String getLink(){
     if(link==null){

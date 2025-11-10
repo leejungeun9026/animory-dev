@@ -14,15 +14,12 @@ import java.time.LocalDateTime;
 @Builder
 public class FreeReplyDTO {
     private Long rno;
-    @NotEmpty
     private Long bno;
     @NotEmpty
     private String content;
-    @NotEmpty
     private String username;
-    @NotEmpty
     private String nickname;
-
+    private Long mno;
     private LocalDateTime regDate;
     private LocalDateTime updateDate;
 }

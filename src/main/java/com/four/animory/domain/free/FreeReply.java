@@ -35,4 +35,6 @@ public class FreeReply extends BaseEntity {
     @JoinColumn(name = "mno")
     private Member member;
 
+    private boolean deleted;
+
 }
