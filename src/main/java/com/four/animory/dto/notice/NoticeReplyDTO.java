@@ -1,5 +1,6 @@
 package com.four.animory.dto.notice;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.four.animory.domain.BaseEntity;
 import jakarta.validation.constraints.NotEmpty;
 import lombok.*;
@@ -20,6 +21,8 @@ public class NoticeReplyDTO {
     private Long mno;
     private String nickname;
     private boolean deleted;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime regDate;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime updateDate;
 }

@@ -19,6 +19,8 @@ public interface NoticeReplyService {
     PageResponseDTO<NoticeReplyDTO> getListOfBoard(Long bno, PageRequestDTO pageRequestDTO);
 
 
+
+
     default NoticeReply dtoToEntity(NoticeReplyDTO dto) {
         return NoticeReply.builder()
                 .rno(dto.getRno())

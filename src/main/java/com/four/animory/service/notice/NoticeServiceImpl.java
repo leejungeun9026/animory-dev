@@ -73,6 +73,11 @@ public class NoticeServiceImpl implements NoticeService {
     }
 
     @Override
+    public List<NoticeBoard> getTop10FreeBoardList() {
+        return noticeRepository.findTop10ByOrderByIsPinnedDescBnoDesc();
+    }
+
+    @Override
     public PageResponseDTO<NoticeBoardDTO> getList(PageRequestDTO pageRequestDTO) {
         Pageable pageable = pageRequestDTO.getPageable("bno");
 
