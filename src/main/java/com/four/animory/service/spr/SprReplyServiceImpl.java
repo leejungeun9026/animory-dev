@@ -39,6 +39,11 @@ public class SprReplyServiceImpl implements SprReplyService {
         Member member = memberRepository.findByUsername(username);
         sprReply.setSprBoard(sprBoard);
         sprReply.setMember(member);
+        if(sprReplyDTO.getParentRno() != null){
+            SprReply parent = sprReplyRepository.findById(sprReplyDTO.getParentRno())
+                    .orElse(null);
+            sprReply.setParent(parent);
+        }
         Long rno = sprReplyRepository.save(sprReply).getRno();
         return rno;
     }
@@ -58,8 +63,15 @@ public class SprReplyServiceImpl implements SprReplyService {
     }
 
     @Override
-    public void remove(Long rno, String currentUser) {
+    public void remove(Long rno, String currentUser, String loginRole) {
         SprReply sprReply = sprReplyRepository.findById(rno).orElseThrow(() -> new IllegalArgumentException("댓글이 없습니다."));
+
+        if(loginRole.equals("ADMIN")){
+            sprReply.setDeleted(true);
+            sprReply.setContent("삭제된 댓글입니다");
+            sprReplyRepository.save(sprReply);
+            return;
+        }
         if(!sprReply.getMember().getUsername().equals(currentUser)){
             throw new AccessDeniedException("삭제 권한이 없습니다.");
         }

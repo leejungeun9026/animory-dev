@@ -49,6 +49,9 @@ public class SprBoard extends BaseEntity {
     @Builder.Default
     @BatchSize(size = 20)
     private Set<SprFile> fileSet = new HashSet<>();
+    @OneToMany(mappedBy = "sprBoard", orphanRemoval = true, cascade = CascadeType.ALL)
+    private Set<SprReply> replies;
+
 
     public void change(String title, String content, Boolean complete){
         this.title = title;

@@ -30,4 +30,7 @@ public class SprReply extends BaseEntity {
     private Member member;
     private boolean secret;
     private boolean deleted;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name="parent_rno")
+    private SprReply parent;
 }

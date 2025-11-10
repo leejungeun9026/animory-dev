@@ -24,10 +24,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.io.File;
@@ -57,6 +54,12 @@ public class SprBoardController {
         PageResponseDTO<SprBoardDTO> responseDTO = sprService.getList(pageRequestDTO);
         model.addAttribute("responseDTO",responseDTO);
         model.addAttribute("pageRequestDTO",pageRequestDTO);
+    }
+
+    @GetMapping("/list/category")
+    @ResponseBody
+    public PageResponseDTO<SprBoardDTO> listCategory(PageRequestDTO pageRequestDTO, @RequestParam(value = "category", required = false)String category){
+        return sprService.getList(pageRequestDTO);
     }
 
     @GetMapping("/register")
@@ -178,5 +181,16 @@ public class SprBoardController {
         }
     }
 
+
+//    @GetMapping("/top10")
+//    public String showTop10Boards(PageRequestDTO pageRequestDTO, Model model){
+//        List<SprBoardDTO> sprBoardDTOS = sprService.getTop10SprBoards();
+//        PageResponseDTO<SprBoardDTO> responseDTO = sprService.getList(pageRequestDTO);
+//        model.addAttribute("responseDTO",responseDTO);
+//        model.addAttribute("pageRequestDTO",pageRequestDTO);
+//        model.addAttribute("board",sprBoardDTOS);
+//        return "spr/top10";
+//    }
+    
 
 }
