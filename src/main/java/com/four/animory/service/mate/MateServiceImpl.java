@@ -1,29 +1,40 @@
 package com.four.animory.service.mate;
 
 
+import com.four.animory.domain.free.FreeBoard;
 import com.four.animory.domain.mate.MateBoard;
 import com.four.animory.domain.user.Member;
 import com.four.animory.dto.common.PageRequestDTO;
 import com.four.animory.dto.common.PageResponseDTO;
+import com.four.animory.dto.free.FreeBoardDTO;
 import com.four.animory.dto.mate.MateBoardDTO;
 import com.four.animory.repository.mate.MateBoardRepository;
+import com.four.animory.repository.mate.MateReplyRepository;
 import com.four.animory.repository.user.MemberRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static com.four.animory.domain.mate.QMateBoard.mateBoard;
+
 @Service
+@RequiredArgsConstructor
+@Transactional
 public class MateServiceImpl implements MateService {
     @Autowired
     MateBoardRepository mateBoardRepository;
     @Autowired
     MemberRepository memberRepository;
+    @Autowired
+    private MateReplyRepository mateReplyRepository;
 
     //글 등록하기
     @Override
@@ -66,7 +77,24 @@ public class MateServiceImpl implements MateService {
 
     @Override
     public void deleteMateBoardById(Long bno) {
+        MateBoard mateBoard = mateBoardRepository.findById(bno).orElse(null);
+        mateBoard.removeFile();
+        mateReplyRepository.deleteByMateBoardId(bno);
         mateBoardRepository.deleteById(bno);
+    }
+
+    @Override
+    public MateBoardDTO updateLikecount(Long bno) {
+        MateBoard mateBoard = mateBoardRepository.findById(bno).orElse(null);
+        mateBoard.updateLikecount();
+        mateBoardRepository.save(mateBoard);
+        MateBoardDTO dto = entityToDTO(mateBoard);
+        return dto;
+    }
+
+    @Override
+    public List<MateBoard> getTop10MateBoardList() {
+        return mateBoardRepository.findTop10ByOrderByBnoDesc();
     }
 
     // 검색 + 페이징 -> DTO 변환

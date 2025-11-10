@@ -9,7 +9,7 @@ import lombok.*;
 @Table(name="tbl_mate_reply")
 @Getter
 @Setter
-@ToString(exclude = {"mateBoard", "member"})
+@ToString(exclude = {"mateBoard"})
 
 @Builder
 @NoArgsConstructor
@@ -18,7 +18,7 @@ import lombok.*;
 public class MateReply extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int rno;
+    private Long rno;
 
     @Column(nullable=false, length = 1000)
     private String content;
@@ -26,9 +26,12 @@ public class MateReply extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="bno")
     private MateBoard mateBoard;
-    private boolean deleted;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="mid")
     private Member member;
+
+    private boolean secret;
+    private boolean deleted;
 
 }

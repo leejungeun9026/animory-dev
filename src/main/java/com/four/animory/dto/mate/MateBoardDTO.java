@@ -34,6 +34,9 @@ public class MateBoardDTO {
     private String nickname;
     private String username;
     private int readCount;
+    private int replyCount;
+    private int likecount;
+
     private LocalDateTime regDate;
     private LocalDateTime updateDate;
     private List<MateFileDTO> mateFileDTOs;
