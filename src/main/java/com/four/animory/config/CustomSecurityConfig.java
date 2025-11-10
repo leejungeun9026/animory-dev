@@ -18,9 +18,6 @@ import org.springframework.security.web.SecurityFilterChain;
 @RequiredArgsConstructor
 @Log4j2
 public class CustomSecurityConfig {
-    private final CustomLoginSuccessHandler customLoginSuccessHandler;
-    private final CustomLogoutSuccessHandler customLogoutSuccessHandler;
-
   // 인증, 인가 설정
   @Bean
   public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -42,13 +39,11 @@ public class CustomSecurityConfig {
             .loginProcessingUrl("/member/loginRegister")
             .usernameParameter("username")
             .passwordParameter("password")
-//            .defaultSuccessUrl("/", false)
-            .successHandler(customLoginSuccessHandler)
+            .defaultSuccessUrl("/")
             .permitAll())
         .logout(logoutConfigure -> logoutConfigure
             .logoutUrl("/member/logout")
-//            .logoutSuccessUrl("/")
-            .logoutSuccessHandler(customLogoutSuccessHandler) // 역할별 분기
+            .logoutSuccessUrl("/")
             .invalidateHttpSession(true)
             .clearAuthentication(true))
         .build();
