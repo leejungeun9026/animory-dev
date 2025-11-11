@@ -12,7 +12,9 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -49,8 +51,8 @@ public class SprBoard extends BaseEntity {
     @Builder.Default
     @BatchSize(size = 20)
     private Set<SprFile> fileSet = new HashSet<>();
-    @OneToMany(mappedBy = "sprBoard", orphanRemoval = true, cascade = CascadeType.ALL)
-    private Set<SprReply> replies;
+    @OneToMany(mappedBy = "sprBoard", orphanRemoval = true, cascade = CascadeType.REMOVE)
+    private List<SprReply> replies = new ArrayList<>();
 
 
     public void change(String title, String content, Boolean complete){

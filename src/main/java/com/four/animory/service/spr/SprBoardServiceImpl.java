@@ -37,10 +37,10 @@ public class SprBoardServiceImpl implements SprBoardService {
     }
 
     @Override
-    public PageResponseDTO<SprBoardDTO> getList(PageRequestDTO pageRequestDTO) {
+    public PageResponseDTO<SprBoardDTO> getListByCategory(PageRequestDTO pageRequestDTO, String category, String sort) {
         Pageable pageable = pageRequestDTO.getPageable("bno");
-        Page<SprBoardDTO> result =  sprRepository.searchAll(
-                pageRequestDTO.getTypes(), pageRequestDTO.getKeyword(), pageable);
+        Page<SprBoardDTO> result = sprRepository.searchAll(
+                pageRequestDTO.getTypes(), pageRequestDTO.getKeyword(), pageable, category, sort);
         PageResponseDTO<SprBoardDTO> responseDTO = PageResponseDTO.<SprBoardDTO>withAll()
                 .pageRequestDTO(pageRequestDTO)
                 .dtoList(result.getContent())
@@ -75,9 +75,8 @@ public class SprBoardServiceImpl implements SprBoardService {
 
     @Override
     public void deleteBoardById(Long bno) {
-        SprBoard sprBoard = sprRepository.findById(bno).orElse(null);
+        SprBoard sprBoard = sprRepository.findById(bno).orElseThrow(() -> new IllegalArgumentException("게시물이 없습니다."));
         sprBoard.removeFile();
-        sprReplyRepository.deleteBySprBoardId(bno);
         sprRepository.deleteById(bno);
     }
 

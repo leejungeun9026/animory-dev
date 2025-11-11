@@ -48,10 +48,12 @@ public interface SprReplyService {
             builder.parentRno(sprReply.getParent().getRno());
             builder.parentUsername(sprReply.getParent().getMember().getUsername());
             builder.parentAuthor(sprReply.getParent().getMember().getNickname());
+            builder.parentDeleted(sprReply.getParent().isDeleted());
         }else{
             builder.parentRno(null);
             builder.parentUsername(null);
             builder.parentAuthor(null);
+            builder.parentDeleted(false);
         }
 
         return builder.build();
