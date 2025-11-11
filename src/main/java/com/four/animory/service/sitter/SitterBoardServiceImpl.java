@@ -89,6 +89,17 @@ public class SitterBoardServiceImpl implements SitterBoardService {
   }
 
   @Override
+  public void updateState(Long bno) {
+    SitterBoard board = sitterBoardRepository.findById(bno).orElse(null);
+    if(board.getCategory().equals("구해요")){
+      board.setState("구인완료");
+    } else if (board.getCategory().equals("일해요")){
+      board.setState("구직완료");
+    }
+    sitterBoardRepository.save(board);
+  }
+
+  @Override
   public int deleteBoard(Long bno) {
     sitterReplyRepository.deleteAllReplyByBno(bno);
     sitterBoardRepository.deleteById(bno);

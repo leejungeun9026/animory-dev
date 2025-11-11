@@ -110,7 +110,7 @@
                                         <div class="d-flex gap-2 flex-nowrap text-secondary">
                                             <p>[[${board.author}]]</p>
                                             <p>[[${#temporals.format(board.regDate, 'yyyy-MM-dd')}]]</p>
-                                            <p th:if="${board.category == '공구'}">(마감일)[[${board.dueDate}]]</p>
+                                            <p th:if="${board.category == '공구'}">[[${board.dueDate}]]</p>
                                             <p class="ms-auto"><i class="fa-regular fa-eye me-1"></i>[[${board.readcount}]]</p>
                                             <p th:if="${board.recommend >= 1}"><i class="fa-solid fa-heart me-1 text-danger"></i>[[${board.recommend}]]</p>
                                             <p th:if="${board.recommend == 0}"><i class="fa-regular fa-heart me-1 text-danger"></i>[[${board.recommend}]]</p>
