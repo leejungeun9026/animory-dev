@@ -70,4 +70,9 @@ public class SitterBoard extends BaseEntity {
         .build();
     fileSet.add(sitterFile);
   }
+
+  public void removeFiles() {
+    fileSet.forEach(file -> file.changeBoard(null));
+    this.fileSet.clear();
+  }
 }

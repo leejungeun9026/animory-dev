@@ -51,7 +51,7 @@
           <tr th:if="${board.fileDTOs != null && board.fileDTOs.size > 0}">
             <td class="px-0 py-3">
               <ul>
-                <li th:each="file:${board.fileDTOs}">
+                <li class="mb-2" th:each="file:${board.fileDTOs}">
                   <div class="img_wrap">
                     <img alt="" th:src="|/sitter/view/s_${file.uuid}_${file.filename}|" >
                   </div>
