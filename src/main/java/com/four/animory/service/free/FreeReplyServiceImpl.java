@@ -35,8 +35,13 @@ public class FreeReplyServiceImpl implements FreeReplyService {
         FreeReply freeReply = dtoToEntity(freeReplyDTO);
         FreeBoard freeBoard = freeBoardRepository.findById(freeReplyDTO.getBno()).orElse(null);
         Member member = memberRepository.findByUsername(username);
-        freeReply.setMember(member);
         freeReply.setFreeBoard(freeBoard);
+        freeReply.setMember(member);
+
+        if(freeReplyDTO.getParentRno() != null){
+            FreeReply parent = freeReplyRepository.findById(freeReplyDTO.getParentRno()).orElse(null);
+            freeReply.setParent(parent);
+        }
         Long rno = freeReplyRepository.save(freeReply).getRno();
         return rno;
     }
@@ -56,8 +61,15 @@ public class FreeReplyServiceImpl implements FreeReplyService {
     }
 
     @Override
-    public void deleteFreeReply(Long rno, String currentUser) {
-        FreeReply freeReply = freeReplyRepository.findById(rno).orElse(null);
+    public void deleteFreeReply(Long rno, String currentUser, String loginRole) {
+        FreeReply freeReply = freeReplyRepository.findById(rno).orElseThrow(()-> new IllegalArgumentException("댓글이 없습니다."));
+
+        if(loginRole.equals("ADMIN")){
+            freeReply.setDeleted(true);
+            freeReply.setContent("삭제된 댓글입니다.");
+            freeReplyRepository.save(freeReply);
+            return;
+        }
         if(!freeReply.getMember().getUsername().equals(currentUser)){
             throw new AccessDeniedException("삭제 권한이 없습니다.");
         }
@@ -73,7 +85,7 @@ public class FreeReplyServiceImpl implements FreeReplyService {
 
     @Override
     public FreePageResponseDTO<FreeReplyDTO> getListOfFreeBoard(Long bno, FreePageRequestDTO freePageRequestDTO) {
-        Pageable pageable = freePageRequestDTO.getPageable("bno");
+        Pageable pageable = freePageRequestDTO.getPageable("rno");
         Page<FreeReply> result = freeReplyRepository.listOfBoard(bno, pageable);
         List<FreeReplyDTO> dtoList = result.getContent().stream()
                 .map(this::entityToDto)

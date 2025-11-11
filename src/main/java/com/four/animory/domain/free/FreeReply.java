@@ -18,23 +18,23 @@ public class FreeReply extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long rno;
 
-    @Column(nullable=false, length = 500)
+    @Column(nullable = false, length = 3000)
     private String content;
 
-    @Column(nullable=false, length = 45)
-    private String username;
-
-    @Column(nullable=false, length = 45)
-    private String nickname;
-
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "bno")
+    @JoinColumn(name="bno")
     private FreeBoard freeBoard;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "mno")
+    @JoinColumn(name="mid")
     private Member member;
 
     private boolean deleted;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name="parent_rno")
+    private FreeReply parent;
+
+
 
 }
