@@ -23,7 +23,7 @@ public interface FreeService {
     FreePageResponseDTO<FreeBoardDTO> getList(FreePageRequestDTO freePageRequestDTO);
     FreePageResponseDTO<FreeBoardListReplyCountDTO> getListReplyCount(FreePageRequestDTO freePageRequestDTO);
 
-    List<FreeBoard> getTop10FreeBoardList();
+    List<FreeBoardDTO> getTop10FreeBoardList();
 
 
     // dto -> Entity

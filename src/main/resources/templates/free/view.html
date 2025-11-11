@@ -35,6 +35,7 @@
                             </div>
                             <h4 class="py-2" th:text="${freeBoard.title}"></h4>
                             <div class="d-flex gap-2 flex-nowrap text-secondary">
+                                <p>[[${freeBoard.nickname}]]</p>
                                 <p>[[${#temporals.format(freeBoard.updateDate, 'yyyy.MM.dd HH:mm')}]]</p>
                                 <p class="ms-auto"><i class="fa-regular fa-eye me-1"></i>[[${freeBoard.readcount}]]</p>
                                 <p id="">
@@ -42,7 +43,7 @@
                                        th:class="${freeBoard.likecount >= 1} ? 'fa-solid fa-heart me-1 text-danger' : 'fa-regular fa-heart me-1 text-danger'"></i>
                                     <span id="likeCount">[[${freeBoard.likecount}]]</span>
                                 </p>
-                                <p><i class="fa-regular fa-comment-dots me-1"></i>8</p>
+                                <p><i class="fa-regular fa-comment-dots me-1"></i>[[${freeBoard.replycount}]]</p>
                             </div>
                         </td>
                     </tr>
@@ -52,13 +53,13 @@
                     <!-- 첨부파일이 있으면 노출 -->
                     <tr class="mb-3">
                         <td>
-                            <span class="input-group-text">첨부파일</span>
+<!--                            <span class="input-group-text">첨부파일</span>-->
                             <div class="col" th:if="${freeBoard.freeFileDTOS !=null && freeBoard.freeFileDTOS.size()>0}">
                                 <div class="container-fluid d-flex uploadResult" style="flex-wrap: wrap">
                                     <div th:each="freeDTO:${freeBoard.freeFileDTOS}">
                                         <div th:if="${freeDTO.image}">
                                             <img class="mb-3" th:src="|/uploads/free/s_${freeDTO.uuid}_${freeDTO.filename}|">
-                                            <span th:text="${freeDTO.filename}"></span>
+<!--                                            <span th:text="${freeDTO.filename}"></span>-->
                                         </div>
                                         <div th:unless="${freeDTO.image}">
                                             <img class="mb-3" src="/uploads/free/images/file.jpg" width="100" height="100">
@@ -70,7 +71,7 @@
                         </td>
                     <tr>
                         <td class="px-0 py-3">
-                            <div class="tb_content">[[${freeBoard.content}]]</div>
+                            <div class="tb_content container-fluid">[[${freeBoard.content}]]</div>
                         </td>
                     </tr>
                     <hr/>
@@ -93,7 +94,7 @@
                             <div class="replyModal">
                                 <div class="reply_write_area pt-3">
                                     <div class="mb-2">
-                                        <textarea name="replyText" class="replyText form-control" placeholder="댓글 내용을 입력해주세요(최대 1000자)"></textarea>
+                                        <textarea name="replyText" class="replyText form-control" placeholder="댓글을 입력해주세요(최대 1000자)"></textarea>
                                     </div>
                                     <div class="d-flex">
                                         <button type="button" class="btnReplyRegister ms-auto btn btn-main">댓글 쓰기</button>
@@ -109,7 +110,7 @@
                                             </div>
                                         </div>
                                         <div class="modal-footer">
-                                            <button type="button" class="btn btn-dark modifyCloseBtn">닫기</button>
+                                            <button type="button" class="btn btn-secondary modifyCloseBtn">닫기</button>
                                             <button type="button" class="btn btn-primary modifyBtn2">수정</button>
                                         </div>
                                     </div>
@@ -122,8 +123,9 @@
         </div>
     </div>
 </div>
+
 <script layout:fragment="pagescript" th:inline="javascript">
-    //좋아요 버튼 누르면 recommend 수 증가
+    /////////////////// 좋아요 버튼
     $(document).ready(function(){
         $('#likeBtn').on('click', function (){ // likeBtn을 누르면 함수
             const bno = [[${freeBoard.bno}]]
@@ -148,42 +150,326 @@
         })
     })
 
-    // 댓글
+    ////////////////////// 댓글
     const bno = [[${freeBoard.bno}]]
     const replyList = document.querySelector(".replyList")
     const replyPaging = document.querySelector(".replyPaging")
-    const boardUsername = [[${freeBoard.username}]]
+    const boardUsername = [[${freeBoard.nickname}]]
+
+    // 지금 로그인 중인 회원의 username
     const loginUser = [[${#authentication.principal.username}]]
+    const loginRole = [[${#authentication.principal.authorities[0].authority}]]
 
-    function printList(dtoList){
-        let str = '';
-        if(dtoList && dtoList.length>0){
-            for(let dto of dtoList){
-                str += `<li class="reply_list border-bottom" data-rno="${dto.rno}">
-                                            <div class="d-flex justify-content-start align-items-start gap-2 py-2">
-                                                <div class="flex-grow-1">`
-            }if(dto.deleted === true){
-                str += `<div class="replyContent">삭제된 댓글입니다.</div>`}
-
-            str += `</div>
-                        <div class="flex-shrink-1">
-                            <div class="btn-group">
-                                ${dto.deleted === false ? `
-                                <button type="button" class="btn btn-xs rounded-2 btn-outline-gray" data-bs-toggle="dropdown" aria-expanded="false">
-                                    <i class="fa-solid fa-ellipsis"></i>
-                                </button>
-                                <ul class="dropdown-menu">
-                                    <li><a class="dropdown-item modifyBtn" href="">수정</a></li>
-                                    <li><a class="dropdown-item deleteBtn" href="">삭제</a></li>
-                                    <li><a class="btnReReplyWriteView dropdown-item">대댓글 달기</a></li>
-                                </ul>`: ''}
-                            </div>
-                        </div>
-                    </div>
-                </li>`;
+    function buildDropdown(dto){
+        // 1) 관리자 → 모두 가능
+        if(loginRole === "ADMIN"){
+            return `
+            <ul class="dropdown-menu">
+                <li><a class="dropdown-item modifyBtn" href="">수정</a></li>
+                <li><a class="dropdown-item deleteBtn" href="">삭제</a></li>
+                <li><a class="btnReReplyWriteView dropdown-item">대댓글 달기</a></li>
+            </ul>`;
         }
+        // // 2) 댓글 작성자 → 모두 가능
+        // if(dto.username === loginUser){
+        //     return `
+        //     <ul class="dropdown-menu">
+        //         <li><a class="dropdown-item modifyBtn" href="">수정</a></li>
+        //         <li><a class="dropdown-item deleteBtn" href="">삭제</a></li>
+        //         <li><a class="btnReReplyWriteView dropdown-item">대댓글 달기</a></li>
+        //     </ul>`;
+        // }
+        let dropdownHtml = '<ul class="dropdown-menu">';
+
+        if(dto.username === loginUser){
+            dropdownHtml += `
+        <li><a class="dropdown-item modifyBtn" href="">수정</a></li>
+        <li><a class="dropdown-item deleteBtn" href="">삭제</a></li>`;
+        }
+        dropdownHtml += `<li><a class="btnReReplyWriteView dropdown-item">대댓글 달기</a></li>`;
+        dropdownHtml += '</ul>';
+
+        return dropdownHtml;
+
+        // 댓글 영역 전체에 이벤트 위임
+        document.querySelector(".replyList").addEventListener("click", function(e) {
+            const target = e.target.closest("a");;
+
+            if(target.classList.contains("modifyBtn")) {
+                e.preventDefault();
+                console.log("수정 버튼 클릭");
+                // 수정 기능 호출
+            }
+            if(target.classList.contains("deleteBtn")) {
+                e.preventDefault();
+                console.log("삭제 버튼 클릭");
+                // 삭제 기능 호출
+            }
+            if(target.classList.contains("btnReReplyWriteView")) {
+                e.preventDefault();
+                console.log("대댓글 작성 버튼 클릭");
+                // 대댓글 작성 UI 표시
+            }
+
+        });
+        // 4) 그 외 → 드롭다운 없음
+        return ``;
     }
-    replyList.innerHTML=str
+
+    ///////////////// 댓글(reply)을 화면에 보여주는 HTML을 동적으로 생성하는 함수
+    function renderReply(dto){
+        let contentHtml = "";
+
+        if(dto.deleted){
+            contentHtml = `<div class="replyContent text-muted">삭제된 댓글입니다.</div>`;
+
+        } else {
+            if(dto.parentRno){
+                contentHtml = `<span color:gray;">${dto.rno}</span>
+                        <span style="color:#0078ff;">@${dto.parentNickname}</span> <b>${dto.nickname}</b>
+                       <div class="replyContent">${dto.content}</div>`;
+            } else {
+                contentHtml = `<span color:gray;">${dto.rno}</span>
+                        <b>${dto.nickname}</b>
+                       <div class="replyContent">${dto.content}</div>`;
+            }
+        }
+        return `
+        <li class="reply_list" data-rno="${dto.rno}">
+            <div class="d-flex justify-content-start align-items-start gap-2 py-2">
+                <div class="flex-grow-1">
+                    ${contentHtml}
+                </div>
+                <div class="flex-shrink-1">
+                    ${dto.deleted ? '' : `
+                    <div class="btn-group">
+                        <button type="button" class="btn btn-xs rounded-2 btn-outline-gray" data-bs-toggle="dropdown">
+                            <i class="fa-solid fa-ellipsis"></i>
+                        </button>
+                        ${buildDropdown(dto)}
+                    </div>`}
+                </div>
+            </div>
+        </li>`;
+    }
+
+ //////////////////////// 댓글 리스트를 트리 구조로 정리하는 기능
+    function printList(dtoList){
+        const replyList = document.querySelector(".replyList")
+
+        // 1) 댓글 맵 생성
+        const replyMap = {};
+        dtoList.forEach(dto => {
+            replyMap[dto.rno] = { ...dto, children: [] };
+        });
+
+        // 2) 부모-자식 연결
+        let rootList = [];
+        dtoList.forEach(dto => {
+            if(dto.parentRno){
+                replyMap[dto.parentRno].children.push(replyMap[dto.rno]);
+            } else {
+                rootList.push(replyMap[dto.rno]);
+            }
+        });
+
+        // 3) 재귀 렌더링
+        let html = "";
+
+        function renderTree(reply){
+            html += renderReply(reply); // 기존 렌더 함수 그대로 사용
+            // 자식 댓글 재귀 호출
+            reply.children.forEach(child => renderTree(child));
+        }
+        // 4) 최상위 댓글부터 시작
+        rootList.forEach(r => renderTree(r));
+        replyList.innerHTML = html;
+    }
+
+////////////// 댓글 페이징(Pagination, 페이지 이동 버튼)을 화면에 만들어주는 함수
+    function printPages(data){
+        if(!data.dtoList || data.dtoList.length === 0){
+            replyPaging.innerHTML = ''
+            return
+        }
+        let pageStr=''
+        if(data.prev){
+            pageStr += `<li class="page-item"><a class="page-link" data-page="${data.start -1}"><i class="fa-solid fa-chevron-left"></i></a></li>`
+        }
+        for(let i = data.start; i <= data.end; i++){
+            pageStr += `<li class="page-item ${Number(i) === Number(data.page)?"active":""}"><a class="page-link" data-page="${i}">${i}</a></li>`
+        }
+        if(data.next){
+            pageStr += `<li class="page-item"><a class="page-link" data-page="${data.end +1}"><i class="fa-solid fa-chevron-right"></i></a></li>`
+        }
+        replyPaging.innerHTML = pageStr
+    }
+
+
+    /////////// 특정 게시글(bno)의 댓글을 서버에서 가져와 화면에 표시하고, 페이징까지 처리하는 전체 흐름을 구현
+    let page=1
+    let size=10
+
+    async function printReplies(bno, page, size, goLast){
+
+        const response = await axios.get(`/freeReplies/list/${bno}`, {params:{page, size: Number(size)}})
+        let data = response.data;
+
+        if(goLast){
+            const total = response.data.total;
+            const lastPage = Math.ceil(total / size);
+            return printReplies(bno, lastPage, size, false);
+        }
+        printList(data.dtoList)
+        printPages(data);
+    }
+    printReplies(bno, page, size, false)
+
+    ////////// 댓글 작성과 페이징 클릭 이벤트를 처리하는 UI 로직
+    const registerModal = new bootstrap.Modal(document.querySelector(".replyModal"))
+    const registerBtn = document.querySelector(".btnReplyRegister")
+    const replyText = document.querySelector(".replyText")
+
+    replyPaging.addEventListener("click", function (e){
+        e.preventDefault()
+        e.stopPropagation()
+
+        const target = e.target.closest('a')
+        if(!target){
+            return
+        }
+        const pageNum = Number(target.getAttribute("data-page"));
+        page = pageNum
+        printReplies(bno, page, size, false)
+    },false)
+
+    registerBtn.addEventListener("click", async function (e){
+        const replyObj = {
+            bno : bno,
+            content : replyText.value,
+            deleted : false
+        }
+        if(replyText.value === ""){
+            alert("댓글 내용을 입력해주세요")
+            replyText.focus();
+            return
+        }
+        try{
+            const response = await axios.post(`/freeReplies/`, replyObj);
+            const result = response.data;
+
+            replyText.value = '';
+
+            printReplies(bno, 1, 10, false);
+        }catch (error){
+            alert("댓글 입력 오류");
+            console.log(error);
+        }
+    },false)
+
+
+/////////////// 댓글 리스트에서 “대댓글 작성, 댓글 수정” 같은 인터랙션을 처리하는 이벤트 로직
+    const modifyModal = new bootstrap.Modal(document.querySelector(".modifyModal"))
+    const modifyText = document.querySelector(".modifyText")
+    const modifyCloseBtn = document.querySelector(".modifyCloseBtn")
+
+    // 댓글을 드롭박스 클릭 이벤트
+    replyList.addEventListener("click", async function (e) {
+
+        const target = e.target.closest("a, button");
+        if(target){
+            e.preventDefault()
+            e.stopPropagation()
+        }
+        if (!target) {
+            return
+        }
+        const li = target.closest("li.reply_list")
+        const rno = li.getAttribute("data-rno")
+
+        // 대댓글 달기 버튼을 눌렀을 때 창이 열려있으면 닫고 열려있지 않다면 키게함
+        if(target.classList.contains("btnReReplyWriteView")){
+            const exist = li.querySelector(".reReplyWriteArea")
+            if(exist){
+                exist.remove()
+                return
+            }
+            li.insertAdjacentHTML("beforeend",reReplyStr())
+            return
+        }
+
+        // 대댓글 작성 버튼을 누를 때
+        if(target.classList.contains("btnReReplyRegister")){
+            const box = target.closest(".reReplyWriteArea")
+            const reReplyText = box.querySelector("#reReplyText")
+
+            if(reReplyText.value === ""){
+                alert("대댓글 내용을 입력해주세요")
+                reReplyText.focus();
+                return
+            }
+            try{
+                await axios.post(`/freeReplies/`,{
+                    bno : bno,
+                    content: reReplyText.value,
+                    deleted: false,
+                    parentRno: rno
+                })
+                box.remove()
+                printReplies(bno, page, size, false)
+            }catch (err){
+                console.log(err);
+            }
+            return
+        }
+
+        const modifyBtn2 = document.querySelector(".modifyBtn2")
+        modifyBtn2.onclick = async function () {
+            const updatedContent = modifyText.value
+
+            await axios.put(`/freeReplies/${rno}`, {
+                rno: rno,
+                content: updatedContent
+            })
+
+            modifyModal.hide();
+
+            printReplies(bno, page, size, false);
+        }
+        modifyCloseBtn.onclick = function () {
+            modifyModal.hide();
+        }
+
+    })
+
+    replyList.addEventListener("click", function(e){
+        const target = e.target.closest(".btnReReplyWriteClose");
+        if(!target) return;
+        const box = target.closest(".reReplyWriteArea");
+        box.remove();
+    });
+
+
+    ///////////// 대댓글 입력창(토글 영역)을 HTML 문자열로 만들어 반환하는 역할
+
+    function reReplyStr() {
+        return `<div class="reReplyWriteArea">
+                <div class="d-flex justify-content-start align-items-start gap-2 py-2">
+                  <div class="flex-grow-1">
+                    <div class="mb-2">
+                      <textarea name="reReplyText" id="reReplyText" class="form-control" placeholder="대댓글 내용을 입력해주세요(최대 1000자)"></textarea>
+                    </div>
+                    <div class="d-flex">
+                      <button class="btnReReplyRegister ms-auto btn btn-main">대댓글 쓰기</button>
+                    </div>
+                  </div>
+                  <div class="flex-shrink-1">
+                    <button class="btnReReplyWriteClose btn btn-xs btn-outline-danger">
+                      <i class="fa-solid fa-xmark"></i>
+                    </button>
+                  </div>
+                </div>
+              </div>`
     }
 
 </script>

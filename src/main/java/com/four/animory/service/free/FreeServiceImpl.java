@@ -63,7 +63,7 @@ public class FreeServiceImpl implements FreeService{
     @Override // 게시글 업데이트
     public void updateFreeBoard(FreeBoardDTO freeBoardDTO) {
         FreeBoard freeBoard = freeBoardRepository.findById(freeBoardDTO.getBno()).orElse(null); // 기존의 board 데이터 가져오기
-        freeBoard.change(freeBoardDTO.getContent(), freeBoardDTO.getContent(), freeBoardDTO.getBtype());
+        freeBoard.change(freeBoardDTO.getTitle(), freeBoardDTO.getContent(), freeBoardDTO.getBtype());
 
         if(freeBoardDTO.getFreeFileDTOS() != null){
             freeBoard.removeFile();
@@ -124,9 +124,11 @@ public class FreeServiceImpl implements FreeService{
     }
 
     @Override
-    public List<FreeBoard> getTop10FreeBoardList() {
-        return freeBoardRepository.findTop10ByOrderByBnoDesc();
+    public List<FreeBoardDTO> getTop10FreeBoardList() {
+        List<FreeBoard> freeBoards = freeBoardRepository.findTop10ByOrderByBnoDesc();
+        return freeBoards.stream()
+                .map(this::entityToDTO)
+                .collect(Collectors.toList());
     }
-
 
 }
