@@ -39,7 +39,7 @@ public class SprBoardSearchImpl extends QuerydslRepositorySupport implements Spr
     }
 
     @Override
-    public Page<SprBoardDTO> searchAll(String[] types, String keyword, Pageable pageable) {
+    public Page<SprBoardDTO> searchAll(String[] types, String keyword, Pageable pageable, String category, String sort) {
         QSprBoard qsprboard = QSprBoard.sprBoard;
         QSprReply qsprreply = QSprReply.sprReply;
         JPQLQuery<SprBoard> query = from(qsprboard);
@@ -65,6 +65,21 @@ public class SprBoardSearchImpl extends QuerydslRepositorySupport implements Spr
                 }
             }
             query.where(builder);
+        }
+        if(category != null && !category.isEmpty()){
+            query.where(qsprboard.category.eq(category));
+        }
+        if(sort != null){
+            switch (sort) {
+                case "read":
+                    query.orderBy(qsprboard.readcount.desc());
+                    break;
+                case "recommend":
+                    query.orderBy(qsprboard.recommend.desc());
+                    break;
+                default:
+                    query.orderBy(qsprboard.bno.desc());
+            }
         }
         query.where(qsprboard.bno.gt(0));
         JPQLQuery<SprBoardDTO> dtoQuery = query.select(

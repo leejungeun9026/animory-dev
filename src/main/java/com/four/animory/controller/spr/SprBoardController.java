@@ -50,17 +50,14 @@ public class SprBoardController {
 
 
     @GetMapping("/list")
-    public void list(PageRequestDTO pageRequestDTO, Model model){
-        PageResponseDTO<SprBoardDTO> responseDTO = sprService.getList(pageRequestDTO);
+    public void list(PageRequestDTO pageRequestDTO, @RequestParam(value = "category", required = false) String category ,@RequestParam(required = false, defaultValue = "recent")String sort, Model model){
+        PageResponseDTO<SprBoardDTO> responseDTO = sprService.getListByCategory(pageRequestDTO, category, sort);
         model.addAttribute("responseDTO",responseDTO);
         model.addAttribute("pageRequestDTO",pageRequestDTO);
+        model.addAttribute("category",category);
+        model.addAttribute("sort",sort);
     }
 
-    @GetMapping("/list/category")
-    @ResponseBody
-    public PageResponseDTO<SprBoardDTO> listCategory(PageRequestDTO pageRequestDTO, @RequestParam(value = "category", required = false)String category){
-        return sprService.getList(pageRequestDTO);
-    }
 
     @GetMapping("/register")
     public void registerGet(@AuthenticationPrincipal PrincipalDetails principal, Model model) {
@@ -110,18 +107,28 @@ public class SprBoardController {
         model.addAttribute("board",sprService.findBoardById(bno, mode));
     }
     @PostMapping("/modify")
-    public String modifyPost(SprBoardDTO sprBoardDTO, RedirectAttributes redirectAttributes, SprUploadFileDTO sprUploadFileDTO) {
-        List<SprFileDTO> sprFileDTOS = null;
-        if(sprUploadFileDTO.getFiles() != null && !sprUploadFileDTO.getFiles().get(0).getOriginalFilename().equals("")){
-            SprBoardDTO sprBoardDTO1 = sprBoardService.findBoardById(sprBoardDTO.getBno(), 2);
-            List<SprFileDTO> sprFileDTOS1 = sprBoardDTO1.getSprFileDTOs();
-            if(sprFileDTOS1 != null && !sprFileDTOS1.isEmpty()){
-                removeFile(sprFileDTOS1);
-            }
-            sprFileDTOS = fileUpload(sprUploadFileDTO);
+    public String modifyPost(SprBoardDTO sprBoardDTO, RedirectAttributes redirectAttributes, SprUploadFileDTO sprUploadFileDTO, @RequestParam(value = "deleteFiles", required = false)List<String> deleteFiles) {
+        SprBoardDTO originalBoard = sprBoardService.findBoardById(sprBoardDTO.getBno(), 2);
+        List<SprFileDTO> originalFiles = originalBoard.getSprFileDTOs();
+
+        if(deleteFiles != null && !deleteFiles.isEmpty()){
+            List<SprFileDTO> deleteTarget =originalFiles.stream()
+                    .filter(f -> deleteFiles.contains(f.getUuid()))
+                    .toList();
+            removeFile(deleteTarget);
+
+            originalFiles.removeAll(deleteTarget);
         }
-        sprBoardDTO.setSprFileDTOs(sprFileDTOS);
+
+        if(sprUploadFileDTO.getFiles() != null && !sprUploadFileDTO.getFiles().get(0).getOriginalFilename().equals("")){
+            List<SprFileDTO> newFiles = fileUpload(sprUploadFileDTO);
+            originalFiles.addAll(newFiles);
+        }
+
+        sprBoardDTO.setSprFileDTOs(originalFiles);
+
         sprService.updateBoard(sprBoardDTO);
+
         redirectAttributes.addAttribute("bno",sprBoardDTO.getBno());
         redirectAttributes.addAttribute("mode",2);
         return "redirect:/spr/view";
@@ -180,17 +187,5 @@ public class SprBoardController {
             }
         }
     }
-
-
-//    @GetMapping("/top10")
-//    public String showTop10Boards(PageRequestDTO pageRequestDTO, Model model){
-//        List<SprBoardDTO> sprBoardDTOS = sprService.getTop10SprBoards();
-//        PageResponseDTO<SprBoardDTO> responseDTO = sprService.getList(pageRequestDTO);
-//        model.addAttribute("responseDTO",responseDTO);
-//        model.addAttribute("pageRequestDTO",pageRequestDTO);
-//        model.addAttribute("board",sprBoardDTOS);
-//        return "spr/top10";
-//    }
-    
 
 }

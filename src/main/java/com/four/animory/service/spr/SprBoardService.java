@@ -13,11 +13,17 @@ import java.util.stream.Collectors;
 
 public interface SprBoardService {
     void registerSprBoard(SprBoardDTO sprBoardDTO);
-    PageResponseDTO<SprBoardDTO> getList(PageRequestDTO pageRequestDTO);
+
+    PageResponseDTO<SprBoardDTO> getListByCategory(PageRequestDTO pageRequestDTO, String category, String sort);
+
     SprBoardDTO findBoardById(Long bno, int mode);
+
     void updateBoard(SprBoardDTO sprBoardDTO);
+
     void deleteBoardById(Long bno);
+
     SprBoardDTO updateRecommend(Long bno);
+
     List<SprBoardDTO> getTop10SprBoards();
 
 
@@ -32,7 +38,7 @@ public interface SprBoardService {
                 .complete(sprBoardDTO.isComplete())
                 .dueDate(sprBoardDTO.getDueDate())
                 .build();
-        if(sprBoardDTO.getSprFileDTOs() != null){
+        if (sprBoardDTO.getSprFileDTOs() != null) {
             sprBoardDTO.getSprFileDTOs().forEach(file -> {
                 sprBoard.addFile(file.getUuid(), file.getFileName(), file.isImage());
             });
@@ -56,14 +62,14 @@ public interface SprBoardService {
                 .recommend(sprBoard.getRecommend())
                 .complete(sprBoard.isComplete())
                 .username(sprBoard.getMember().getUsername())
-                .replyCount((long)sprBoard.getReplies().size())
+                .replyCount((long) sprBoard.getReplies().size())
                 .build();
         List<SprFileDTO> sprFileDTOList = sprBoard.getFileSet().stream()
                 .sorted()
                 .map(file -> fileEntityToDTO(file))
                 .collect(Collectors.toList());
         sprBoardDTO.setSprFileDTOs(sprFileDTOList);
-        return  sprBoardDTO;
+        return sprBoardDTO;
     }
 
     default SprFileDTO fileEntityToDTO(SprFile sprFile) {
