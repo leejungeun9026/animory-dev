@@ -60,7 +60,8 @@ public class CustomSecurityConfig {
   // 정적 리소스(css, js, images 등)을 인증 절차에서 제외
   @Bean
   public WebSecurityCustomizer configurer() {
-    return (web->web.ignoring()
-        .requestMatchers(PathRequest.toStaticResources().atCommonLocations()));
+    return(web->web.ignoring()
+        .requestMatchers(PathRequest.toStaticResources().atCommonLocations())
+        .requestMatchers("/fonts/**", "/favicon.ico", "/robots.txt"));
   }
 }
