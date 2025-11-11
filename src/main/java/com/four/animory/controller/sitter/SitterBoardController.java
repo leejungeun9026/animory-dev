@@ -108,6 +108,12 @@ public class SitterBoardController {
     return "redirect:/sitter/view?bno=" + bno + "&mode=0";
   }
 
+  @GetMapping("/modify/{bno}")
+  public String modifyState(@PathVariable("bno") Long bno) {
+    sitterBoardService.updateState(bno);
+    return "redirect:/sitter/view?bno=" + bno + "&mode=0";
+  }
+
   @GetMapping("/remove")
   public String remove(@RequestParam("bno") Long bno, RedirectAttributes redirectAttributes){
     int result = sitterBoardService.deleteBoard(bno);

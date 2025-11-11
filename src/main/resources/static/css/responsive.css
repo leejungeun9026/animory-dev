@@ -25,10 +25,6 @@
         margin: 24px 12px;
     }
 
-    .main_page .section_content > ul > li:nth-child(n+6) {
-        display: none;
-    }
-
 }
 /* breakpoints-lg 992 끝 */
 

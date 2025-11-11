@@ -14,7 +14,8 @@ public interface SitterBoardService {
   SitterBoardDTO getSitterBoardById(Long bno, String mode);
   SitterBoardPageResponseDTO<SitterBoardListDTO> getSitterBoardListSearchPage(SitterBoardPageRequestDTO sitterBoardPageRequestDTO);
   void updateBoard(SitterBoardDTO sitterBoardDTO);
-    int deleteBoard(Long bno);
+  void updateState(Long bno);
+  int deleteBoard(Long bno);
   List<SitterBoardListDTO> getRecent(int count);
 
   default SitterBoard dtoToEntity(SitterBoardDTO sitterBoardDTO){

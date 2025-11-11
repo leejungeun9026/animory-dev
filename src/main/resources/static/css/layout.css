@@ -47,7 +47,7 @@ body {
 
 .header .logo {
     position: absolute;
-    left: calc(var(--bs-gutter-x)* 1);
+    left: calc(var(--bs-gutter-x)* 0.5);
     top: 50%;
     transform: translateY(-50%);
     max-width: 177px;
@@ -103,7 +103,7 @@ body {
 /* sign */
 .header .sign {
     position: absolute;
-    right: calc(var(--bs-gutter-x)* 1);
+    right: calc(var(--bs-gutter-x)* 0.5);
     top: 26.5px;
     display: flex;
     gap: 8px;
@@ -222,11 +222,19 @@ body {
     min-height: calc(100vh - var(--footer-height));
     padding-top: var(--header-height);
 }
-#main_container > .inner,
-.main_page section > .inner {
+#main_container > .inner {
     width: 100%;
     max-width: 1200px;
     margin: 0 auto;
+}
+
+.main_board_list .section_content > ul > li:nth-child(n+5) {
+    display: none;
+}
+
+td > img {
+    max-width: 800px;
+    width: 100%;
 }
 
 .thumb_40x40 {

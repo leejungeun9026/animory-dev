@@ -40,7 +40,6 @@
                 <p>[[${board.nickname}]]</p>
                 <p>[[${#temporals.format(board.regDate, 'yyyy-MM-dd')}]]</p>
                 <p class="ms-auto"><i class="fa-regular fa-eye me-1"></i>[[${board.readCount}]]</p>
-                <p><i class="fa-regular fa-heart me-1 text-danger"></i>56</p>
                 <p><i class="fa-regular fa-comment-dots me-1"></i><span class="countReplies"></span></p>
               </div>
             </td>
@@ -53,7 +52,7 @@
               <ul>
                 <li class="mb-2" th:each="file:${board.fileDTOs}">
                   <div class="img_wrap">
-                    <img alt="" th:src="|/sitter/view/s_${file.uuid}_${file.filename}|" >
+                    <img alt="" th:src="|/sitter/view/${file.uuid}_${file.filename}|" >
                   </div>
                 </li>
               </ul>
@@ -125,9 +124,31 @@
           <button aria-label="Close" class="btn-close" data-bs-dismiss="modal" type="button"></button>
         </div>
         <div class="modal-body py-0">
-          <p></p>
+          [[${board.category}]]
+          <p>삭제한 게시글과 댓글은 복구할 수 없어요. <br>그래도 삭제하시겠어요?</p>
         </div>
         <div class="modal-footer border-top-0">
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <div class="modal" id="changeHiringModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered modal-sm modal-360">
+      <div class="modal-content">
+        <div class="modal-header border-bottom-0">
+          <h5 class="modal-title">완료 처리</h5>
+          <button aria-label="Close" class="btn-close" data-bs-dismiss="modal" type="button"></button>
+        </div>
+        <div class="modal-body py-0">
+          <p>게시글을 [[${board.category == "구해요" ? "구인" : "구직"}]]완료로 처리할까요?</p>
+        </div>
+        <div class="modal-footer border-top-0">
+          <div class="d-flex justify-content-center gap-2 flex-nowrap w-100">
+            <button class="btn btn-lg btn-gray w-100" data-bs-dismiss="modal" type="button">그만두기</button>
+            <a class="btn btn-lg btn-success w-100" th:href="@{/sitter/modify/{bno}(bno=${board.bno})}">완료하기</a>
+          </div>
         </div>
       </div>
     </div>
@@ -161,19 +182,16 @@
     const boardNickname = [[${board.nickname}]]
     const category = [[${board.category}]]
     const isLogin = [[${loginUser}]]
-    const loginNickname = [[${loginUser != null ? loginUser.nickname : null
-    }]]
-    const isSitter = [[${loginUser != null ? loginUser.isSitter : null
-    }]]
-    const hasPet = [[${loginUser != null ? loginUser.petCount : null
-    }]]
-    console.log(boardNickname)
-    console.log(loginNickname)
-
+    const loginNickname = [[${loginUser != null ? loginUser.nickname : null}]]
+    const isSitter = [[${loginUser != null ? loginUser.isSitter : null}]]
+    const hasPet = [[${loginUser != null ? loginUser.petCount : null}]]
+    
     const alertModal = new bootstrap.Modal(document.getElementById('alertModal'))
     const alertModalTitle = document.querySelector("#alertModal .modal-title")
     const alertModalBody = document.querySelector("#alertModal .modal-body")
     const alertModalFooter = document.querySelector("#alertModal .modal-footer")
+
+    const changeHiringModal = new bootstrap.Modal(document.getElementById('changeHiringModal'))
 
     const countReplies = document.querySelectorAll(".countReplies")
     const replyList = document.getElementById("replyList")
@@ -235,9 +253,9 @@
                             <div class="d-flex flex-nowrap gap-2">
                               <a href="/sitter/${reply.rno}" class="btn btn-gray w-100 text-nowrap">프로필 보기</a>`
                     if(category === "구해요") {
-                        str += `<button class="btn btn-success w-100 text-nowrap">구인하기</button>`
+                        str += `<button class="btnHiring btn btn-success w-100 text-nowrap">구인하기</button>`
                     } else if (category === "일해요") {
-                        str += `<button class="btn btn-success w-100 text-nowrap">구직하기</button>`
+                        str += `<button class="btnHiring btn btn-success w-100 text-nowrap">구직하기</button>`
                     }
                     str += `</div>
                           </div>`
@@ -267,27 +285,6 @@
                 printReplyList(result)
             }).catch(err => console.error(err))
     }
-
-    /////// 대댓글 textarea toggle ///////
-    // function reReplyStr() {
-    //     return `<div class="reReplyWriteArea">
-    //             <div class="d-flex justify-content-start align-items-start gap-2 py-2">
-    //               <div class="flex-grow-1">
-    //                 <div class="mb-2">
-    //                   <textarea name="reReplyText" id="reReplyText" class="form-control" placeholder="대댓글 내용을 입력해주세요(최대 1000자)"></textarea>
-    //                 </div>
-    //                 <div class="d-flex">
-    //                   <button class="btnReReplyRegister ms-auto btn btn-main">대댓글 쓰기</button>
-    //                 </div>
-    //               </div>
-    //               <div class="flex-shrink-1">
-    //                 <button class="btnReReplyWriteClose btn btn-xs btn-outline-danger">
-    //                   <i class="fa-solid fa-xmark"></i>
-    //                 </button>
-    //               </div>
-    //             </div>
-    //           </div>`
-    // }
 
 
     loadReplyList()
@@ -351,12 +348,12 @@
 
 
 
-    const modalEl = document.getElementById('modifyReplyModal');
-    const modifyReplyModal = bootstrap.Modal.getOrCreateInstance(modalEl);
-    const modifyReplyBody = modalEl.querySelector(".modal-body");
+    const replyModalEl = document.getElementById('modifyReplyModal');
+    const modifyReplyModal = bootstrap.Modal.getOrCreateInstance(replyModalEl);
+    const modifyReplyBody = replyModalEl.querySelector(".modal-body");
 
     // 댓글 수정 모달에서 수정처리
-    modalEl.addEventListener("click", function(e){
+    replyModalEl.addEventListener("click", function(e){
         if (!e.target.matches(".btnModifyRegisterReply")) return;
         e.preventDefault();
 
@@ -379,9 +376,15 @@
     replyList.addEventListener("click", function(e){
         const btnModify = e.target.closest(".btnModifyReply");
         const btnDelete = e.target.closest(".btnDeleteReply");
+        const btnHiring = e.target.closest(".btnHiring");
 
-        if (!btnModify && !btnDelete) return;
+        if (!btnModify && !btnDelete && !btnHiring) return;
         e.preventDefault();
+
+        // 구인/구직 완료하기
+        if (btnHiring) {
+            changeHiringModal.show();
+        }
 
         // 공통 rno 추출: 클릭한 버튼에서 data-num 가져오기
         const clickedBtn = btnModify || btnDelete;
@@ -413,35 +416,10 @@
                 console.error(result)
             })
         }
+
     });
 
 
-
-
-
-    // 대댓글 작성창 표시
-    btnReReplyWriteViews.forEach(btn => {
-        btn.addEventListener("click", function (e) {
-            e.preventDefault()
-            const li = e.target.closest("li.reply_list")
-            // 대댓글 영역이 없으면 만들고 변수 초기화
-            if (li.querySelector(".reply_depth2") == null) {
-                li.insertAdjacentHTML("beforeend", `<div class="reply_depth2 ps-4"></div>`)
-            }
-            const depth2 = li.querySelector(".reply_depth2")
-
-            // 대댓글창이 이미 열려있으면 return, 아니면 추가하기
-            if (depth2.querySelector(".reReplyWriteArea") != null) {
-                return
-            }
-            depth2.insertAdjacentHTML("beforeend", reReplyStr())
-
-            const btnReReplyWriteClose = depth2.querySelector(".btnReReplyWriteClose")
-            btnReReplyWriteClose.addEventListener("click", () => {
-                btnReReplyWriteClose.closest(".reReplyWriteArea").remove()
-            })
-        })
-    })
 
 
 </script>

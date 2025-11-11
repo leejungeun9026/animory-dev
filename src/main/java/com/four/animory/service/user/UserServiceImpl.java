@@ -5,6 +5,7 @@ import com.four.animory.domain.user.Pet;
 import com.four.animory.dto.user.*;
 import com.four.animory.repository.user.MemberRepository;
 import com.four.animory.repository.user.PetRepository;
+import com.four.animory.service.sitter.SitterBoardService;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -24,6 +25,8 @@ public class UserServiceImpl implements UserService {
   private PetRepository petRepository;
   @Autowired
   private BCryptPasswordEncoder bCryptPasswordEncoder;
+  @Autowired
+  private SitterBoardService sitterBoardService;
 
   @Transactional
   public int register(UserRegisterDTO userRegisterDTO){
