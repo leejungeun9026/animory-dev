@@ -4,6 +4,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
-public class MateUploadFileDTO {
+public class UploadFileDTO {
     private List<MultipartFile> files;
+
 }

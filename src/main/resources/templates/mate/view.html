@@ -83,21 +83,30 @@
                     </tr>
                     <tr>
                         <td class="px-0 pt-3">
-
-
-
-                            <div th:align="center">
-                                <button type="button" class="btn btn-outline-danger" id="likeBtn">좋아요!</button>
+                            <!-- 좋아요 버튼 -->
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <div>
+                                    <button type="button" class="btn btn-outline-danger" id="likeBtn">좋아요!</button>
+                                </div>
+                                <!-- 댓글 수 -->
+                                <div class="text-secondary">
+                                    <i class="fa-regular fa-comment-dots me-1"></i>
+                                    댓글 <b class="text-danger reply-count">[[${board.replyCount} ?: 0]]</b>
+                                </div>
                             </div>
-                            <div class="mt-1 tb_content"
-                                 th:if="${board.dueDate != null}" th:align="right">
-                                신청마감일 :<span th:text="${#strings.replace(board.dueDate, 'T', ' ')}"></span>
+
+                            <!--마감일 -->
+                            <div class="mt-1 tb_content text-end" th:if="${board.dueDate != null}">
+                                신청마감일 :
+                                <span th:text="${#strings.replace(board.dueDate, 'T', ' ')}"></span>
                             </div>
                         </td>
                     </tr>
 
                     <tr>
                         <td class="px-0 pt-3">
+                            <i class="fa-regular fa-comment-dots me-1"></i>
+                            <span class="reply-count">[[${board.replyCount} ?: 0]]</span>
                             <p><i class="fa-regular fa-comment-dots me-1"></i>댓글 <b class="text-dange">[[${board.replyCount}]]</b>
                             </p>
 
@@ -151,273 +160,277 @@
     <!-- /* //view 화면 html 코드 작성 끝 */ -->
 </div>
 
-
 <script layout:fragment="pagescript" th:inline="javascript">
     const bno = [[${board.bno}]];
     const boardUsername = [[${board.username}]];
     const loginUser = [[${#authentication.principal.username}]];
 
-    const replyList = document.querySelector(".replyList")
-    const replyPaging = document.querySelector(".replyPaging")
+    const replyList = document.querySelector(".replyList");
+    let page = 1;
+    let size = 10;
 
-
+    /* ============================
+       1. 댓글 리스트 렌더링
+    ============================ */
     function printList(dtoList) {
         let str = '';
         if (dtoList && dtoList.length > 0) {
             for (let dto of dtoList) {
-                str += `<li class="reply_list border-bottom" data-rno="${dto.rno}">
-                                            <div class="d-flex justify-content-start align-items-start gap-2 py-2">
-                                                <div class="flex-grow-1">`
-                if (dto.deleted === true) {
-                    str += `<div class="replyContent">삭제된 댓글입니다.</div>`
-                } else if (dto.secret === true) {
-                    if (dto.username === loginUser || boardUsername === loginUser) {
-                        str += `<b>${dto.nickname}</b><div class="replyContent">${dto.content}</div>`
-                    } else {
-                        str += `<div class="replyContent">비밀 댓글입니다.</div>`
-                    }
-                } else if (dto.secret === false) {
-                    str += `<b>${dto.nickname}</b><div class="replyContent">${dto.content}</div>`
+                str += `
+        <li class="reply_list border-bottom" data-rno="${dto.rno}">
+          <div class="d-flex justify-content-start align-items-start gap-2 py-2">
+            <div class="flex-grow-1">
+      `;
+                if (dto.deleted) {
+                    str += `<div class="replyContent text-secondary">삭제된 댓글입니다.</div>`;
+                } else if (dto.secret && !(dto.username === loginUser || boardUsername === loginUser)) {
+                    str += `<div class="replyContent text-muted">비밀 댓글입니다.</div>`;
+                } else {
+                    str += `<b>${dto.nickname}</b><div class="replyContent">${dto.content}</div>`;
                 }
-                str += `   </div>
-                        <div class="flex-shrink-1">
-                            <div class="btn-group">
-                                ${dto.deleted === false ? `
-                                <button type="button" class="btn btn-xs rounded-2 btn-outline-gray" data-bs-toggle="dropdown" aria-expanded="false">
-                                    <i class="fa-solid fa-ellipsis"></i>
-                                </button>
-                                <ul class="dropdown-menu">
-                                    <li><a class="dropdown-item modifyBtn" href="">수정</a></li>
-                                    <li><a class="dropdown-item deleteBtn" href="">삭제</a></li>
-                                    <li><a class="btnReReplyWriteView dropdown-item">대댓글 달기</a></li>
-                                </ul>` : ''}
-                            </div>
-                        </div>
-                    </div>
-                </li>`;
+                str += `
+            </div>
+            <div class="flex-shrink-1">
+              ${dto.deleted ? '' : `
+              <div class="btn-group">
+                <button type="button" class="btn btn-xs rounded-2 btn-outline-gray" data-bs-toggle="dropdown" aria-expanded="false">
+                  <i class="fa-solid fa-ellipsis"></i>
+                </button>
+                <ul class="dropdown-menu">
+                  <li><a class="dropdown-item modifyBtn" href="#">수정</a></li>
+                  <li><a class="dropdown-item deleteBtn" href="#">삭제</a></li>
+                  <li><a class="btnReReplyWriteView dropdown-item" href="#">대댓글 달기</a></li>
+                </ul>
+              </div>`}
+            </div>
+          </div>
+        </li>`;
             }
         }
-        replyList.innerHTML = str
+        replyList.innerHTML = str;
     }
 
+    /* ============================
+       2. 페이지네이션 렌더링
+    ============================ */
     function printPages(data) {
+        const replyPaging = document.querySelector(".replyPaging");
         if (!data.dtoList || data.dtoList.length === 0) {
-            replyPaging.innerHTML = ''
-            return
+            replyPaging.innerHTML = '';
+            return;
         }
-        let pageStr = ''
+        let pageStr = '';
         if (data.prev) {
-            pageStr += `<li class="page-item"><a class="page-link" data-page="${data.start - 1}"><i class="fa-solid fa-chevron-left"></i></a></li>`
+            pageStr += `<li class="page-item"><a class="page-link" data-page="${data.start - 1}"><i class="fa-solid fa-chevron-left"></i></a></li>`;
         }
         for (let i = data.start; i <= data.end; i++) {
-            pageStr += `<li class="page-item ${Number(i) === Number(data.page) ? "active" : ""}"><a class="page-link" data-page="${i}">${i}</a></li>`
+            pageStr += `<li class="page-item ${Number(i) === Number(data.page) ? "active" : ""}"><a class="page-link" data-page="${i}">${i}</a></li>`;
         }
         if (data.next) {
-            pageStr += `<li class="page-item"><a class="page-link" data-page="${data.end + 1}"><i class="fa-solid fa-chevron-right"></i></a></li>`
+            pageStr += `<li class="page-item"><a class="page-link" data-page="${data.end + 1}"><i class="fa-solid fa-chevron-right"></i></a></li>`;
         }
-        replyPaging.innerHTML = pageStr
+        replyPaging.innerHTML = pageStr;
     }
 
-    let page = 1
-    let size = 10
-
-
-
+    /* ============================
+       3. 댓글 불러오기 + 카운트 갱신
+    ============================ */
     async function printReplies(bno, page, size, goLast) {
-
-        const response = await axios.get(`/matereplies/list/${bno}`, {params: {page, size: Number(size)}})
-        let data = response.data;
+        const response = await axios.get(`/matereplies/list/${bno}`, { params: { page, size } });
+        const data = response.data;
 
         if (goLast) {
-            const total = response.data.total;
+            const total = data.total;
             const lastPage = Math.ceil(total / size);
             return printReplies(bno, lastPage, size, false);
         }
-        printList(data.dtoList)
+
+        printList(data.dtoList);
         printPages(data);
-    }
 
-    printReplies(bno, page, size, false)
-
-    const registerModal = new bootstrap.Modal(document.querySelector(".replyModal"))
-    const registerBtn = document.querySelector(".btnReplyRegister")
-    const replyText = document.querySelector(".replyText")
-
-
-    replyPaging.addEventListener("click", function (e) {
-        e.preventDefault()
-        e.stopPropagation()
-
-        const target = e.target.closest('a')
-        if (!target) {
-            return
+        if (typeof data.total === 'number') {
+            document.querySelector('.reply-count')?.replaceChildren(document.createTextNode(data.total));
         }
-        const pageNum = Number(target.getAttribute("data-page"));
-        page = pageNum
-        printReplies(bno, page, size, false)
-    }, false)
+    }
+    printReplies(bno, page, size, false);
 
-    registerBtn.addEventListener("click", async function (e) {
-        const isSecret = document.querySelector(".secretCheck").checked
+    /* ============================
+       4. 댓글 등록/수정/삭제
+    ============================ */
+    const registerBtn = document.querySelector(".btnReplyRegister");
+    const replyText = document.querySelector(".replyText");
+    const modifyModal = new bootstrap.Modal(document.querySelector(".modifyModal"));
+    const modifyText = document.querySelector(".modifyText");
+    const modifyCloseBtn = document.querySelector(".modifyCloseBtn");
 
+    // 댓글 등록
+    registerBtn.addEventListener("click", async () => {
+        const isSecret = document.querySelector(".secretCheck").checked;
         const replyObj = {
-            bno: bno,
+            bno,
             content: replyText.value,
             secret: isSecret ? 1 : 0,
             deleted: false
-        }
+        };
         try {
-            const response = await axios.post(`/matereplies/`, replyObj);
-            const result = response.data;
-
+            await axios.post(`/matereplies/`, replyObj);
             replyText.value = '';
             document.querySelector(".secretCheck").checked = false;
-
             printReplies(bno, 1, 10, false);
-        } catch (error) {
+        } catch (err) {
             alert("댓글 입력 오류");
-            console.log(error);
+            console.error(err);
         }
-    }, false)
+    });
 
-    const modifyModal = new bootstrap.Modal(document.querySelector(".modifyModal"))
-    const modifyText = document.querySelector(".modifyText")
+    // 댓글 수정/삭제/대댓글 토글
+    $(document).on('click', '.reply_list a', async function (e) {
+        e.preventDefault();
+        const $target = $(this);
+        const $li = $target.closest("li.reply_list");
+        const rno = $li.data('rno');
 
-    const modifyCloseBtn = document.querySelector(".modifyCloseBtn")
+        if ($target.hasClass('modifyBtn')) {
+            const res = await axios.get(`/matereplies/${rno}`);
+            modifyText.value = res.data.content;
+            modifyModal.show();
 
-    replyList.addEventListener("click", async function (e) {
-        e.preventDefault()
-        e.stopPropagation()
-
-        const target = e.target.closest("a");
-        if (!target) {
-            return
-        }
-        const li = target.closest("li.reply_list")
-        const rno = li.getAttribute("data-rno")
-        if (target.classList.contains("modifyBtn")) {
-            try {
-                const response = await axios.get(`/matereplies/${rno}`)
-                const reply = response.data
-                modifyText.value = reply.content
-                modifyModal.show()
-            } catch (err) {
-                console.log(err)
-            }
+            document.querySelector(".modifyBtn2").onclick = async function () {
+                await axios.put(`/matereplies/${rno}`, { rno, content: modifyText.value });
+                modifyModal.hide();
+                printReplies(bno, page, size, false);
+            };
+            modifyCloseBtn.onclick = () => modifyModal.hide();
         }
 
-        if (target.classList.contains("deleteBtn")) {
-            try {
-                await axios.post(`/matereplies/delete/${rno}`)
-                printReplies(bno, page, size, false)
-            } catch (err) {
-                console.log(err)
-            }
-        }
-
-
-        const modifyBtn2 = document.querySelector(".modifyBtn2")
-        modifyBtn2.onclick = async function () {
-            const updatedContent = modifyText.value
-
-            await axios.put(`/matereplies/${rno}`, {
-                rno: rno,
-                content: updatedContent
-            })
-
-            modifyModal.hide();
-
+        if ($target.hasClass('deleteBtn')) {
+            await axios.post(`/matereplies/delete/${rno}`);
             printReplies(bno, page, size, false);
         }
-        modifyCloseBtn.onclick = function () {
-            modifyModal.hide();
-        }
+    });
 
-    })
-
-
-    /////// 대댓글 textarea toggle ///////
+    /* ============================
+       5. 대댓글 토글 + 등록
+    ============================ */
     function reReplyStr() {
-        return `<div class="reReplyWriteArea">
-                <div class="d-flex justify-content-start align-items-start gap-2 py-2">
-                  <div class="flex-grow-1">
-                    <div class="mb-2">
-                      <textarea name="reReplyText" id="reReplyText" class="form-control" placeholder="대댓글 내용을 입력해주세요(최대 1000자)"></textarea>
-                    </div>
-                    <div class="d-flex">
-                      <label class="form-check-label" for="secret1">비밀대댓글</label>
-                      <input class="form-check-input secretCheck" name="secret" type="checkbox" id="secret1">
-                      <button class="btnReReplyRegister ms-auto btn btn-main">대댓글 쓰기</button>
-                    </div>
-                  </div>
-                  <div class="flex-shrink-1">
-                    <button class="btnReReplyWriteClose btn btn-xs btn-outline-danger">
-                      <i class="fa-solid fa-xmark"></i>
-                    </button>
-                  </div>
-                </div>
-              </div>`
+        return `
+    <div class="reReplyWriteArea mt-2">
+      <div class="d-flex justify-content-start align-items-start gap-2 py-2">
+        <div class="flex-grow-1">
+          <div class="mb-2">
+            <textarea class="form-control reReplyText" placeholder="대댓글 내용을 입력해주세요(최대 1000자)"></textarea>
+          </div>
+          <div class="d-flex">
+            <label class="form-check-label me-2">비밀대댓글</label>
+            <input class="form-check-input reSecretCheck" type="checkbox">
+            <button class="btnReReplyRegister ms-auto btn btn-main">대댓글 쓰기</button>
+          </div>
+        </div>
+        <div class="flex-shrink-1">
+          <button class="btnReReplyWriteClose btn btn-xs btn-outline-danger">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </div>
+      </div>
+    </div>`;
     }
 
+    $(document).on('click', '.btnReReplyWriteView', function (e) {
+        e.preventDefault();
+        const $li = $(this).closest('li.reply_list');
+        const $exist = $li.find('.reReplyWriteArea');
+        if ($exist.length) { $exist.remove(); return; }
+        $li.append(reReplyStr());
+    });
 
-    // 좋아요 버튼 누르면 recommend 수 증가
-    $(document).ready(function(){
-        // likeBtn을 누르면 함수
-        $('#likeBtn').on('click', function (){
-            const bno = [[${board.bno}]]
+    $(document).on('click', '.btnReReplyWriteClose', function () {
+        $(this).closest('.reReplyWriteArea').remove();
+    });
 
-            $.ajax({
-                url : "/mate/like",
-                type : "GET",
-                data : { bno : bno},
-                success : function(response){
-                    console.log(response);
-                    // 업데이트 된 레코맨드 수 가져오기
-                    var likecount = response.likecount;
-                    $('#likeCount').text(likecount);
+    $(document).on('click', '.btnReReplyRegister', async function () {
+        const $area = $(this).closest('.reReplyWriteArea');
+        const $li   = $(this).closest('li.reply_list');
+        const parentRno = $li.data('rno');
+        const content   = $area.find('.reReplyText').val().trim();
+        const secret    = $area.find('.reSecretCheck').is(':checked') ? 1 : 0;
 
-                    //추천 수가 0에서 1이 되면 하트 아이콘이 빈하트 -> 꽉 찬 하트로 변화
-                    if(likecount > 0){
-                        $('#likeIcon').removeClass('fa-regular').addClass('fa-solid');
+        if (!content) { alert('내용을 입력해주세요'); return; }
+
+        try {
+            await axios.post('/matereplies/', { bno, content, secret, parentRno });
+            $area.remove();
+            printReplies(bno, page, size, false);
+        } catch (err) {
+            console.error(err);
+            alert('대댓글 등록 실패');
+        }
+    });
+
+    /* ============================
+       6. 페이지네이션 클릭
+    ============================ */
+    $(document).on('click', '.replyPaging .page-link', function (e) {
+        e.preventDefault();
+        const pageNum = Number($(this).data('page'));
+        page = pageNum;
+        printReplies(bno, page, size, false);
+    });
+
+    /* ============================
+       7. 좋아요 (공통함수 + 버튼)
+    ============================ */
+    function sendLike(bno, $icon, $count) {
+        let current = parseInt($count.text() || '0', 10);
+        $count.text(current + 1);
+        if ($icon && $icon.length) $icon.removeClass('fa-regular').addClass('fa-solid');
+
+        const token  = $('meta[name="_csrf"]').attr('content');
+        const header = $('meta[name="_csrf_header"]').attr('content');
+
+        $.ajax({
+            url: '/mate/like',
+            type: 'POST',
+            contentType: 'application/json',
+            dataType: 'json',
+            cache: false,
+            data: JSON.stringify({ bno }),
+            beforeSend: function (xhr) {
+                if (token && header) xhr.setRequestHeader(header, token);
+            },
+            success: function (res) {
+                if (res && typeof res.likecount === 'number') {
+                    $count.text(res.likecount);
+                    if (res.likecount > 0) {
+                        $icon.removeClass('fa-regular').addClass('fa-solid');
                     } else {
-                        $('#likeIcon').removeClass('fa-solid').addClass('fa-regular');
+                        $icon.removeClass('fa-solid').addClass('fa-regular');
                     }
                 }
-            })
+            },
+            error: function (xhr) {
+                $count.text(current);
+                if ($icon && $icon.length && current === 0) {
+                    $icon.removeClass('fa-solid').addClass('fa-regular');
+                }
+                alert('좋아요 처리 실패 ㅠㅠ\nstatus: ' + xhr.status);
+            }
+        });
+    }
 
-        })
-    })
+    $(document).on('click', '.like-btn', function () {
+        const $icon  = $(this);
+        const bno    = $icon.data('bno');
+        const $row   = $icon.closest('p');
+        const $count = $row.find('.like-count[data-bno="' + bno + '"]');
+        sendLike(bno, $icon, $count);
+    });
 
-
-
-    // $(document).ready(function () {
-    //     // likeBtn을 누르면 함수
-    //     $('#likeBtn').on('click', function () {
-    //         const bno = [[${board.bno}]]
-    //
-    //         $.ajax({
-    //             url: "/spr/like",
-    //             type: "GET",
-    //             data: {bno: bno},
-    //             success: function (response) {
-    //                 console.log(response);
-    //                 // 업데이트 된 레코맨드 수 가져오기
-    //                 var recommend = response.recommend;
-    //                 $('#likeCount').text(recommend);
-    //
-    //                 //추천 수가 0에서 1이 되면 하트 아이콘이 빈하트 -> 꽉 찬 하트로 변화
-    //                 if (recommend > 0) {
-    //                     $('#likeIcon').removeClass('fa-regular').addClass('fa-solid');
-    //                 } else {
-    //                     $('#likeIcon').removeClass('fa-solid').addClass('fa-regular');
-    //                 }
-    //             }
-    //         })
-    //
-    //     })
-    // })
-
-
+    $(document).on('click', '#likeBtn', function () {
+        const $count = $('.like-count[data-bno="' + bno + '"]');
+        const $icon  = $('.like-btn[data-bno="' + bno + '"]');
+        sendLike(bno, $icon, $count);
+    });
 </script>
+
 
 </html>

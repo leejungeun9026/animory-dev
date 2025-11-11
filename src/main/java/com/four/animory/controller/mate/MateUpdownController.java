@@ -1,13 +1,17 @@
-package com.four.animory.controller.mate;
-
+//package com.four.animory.controller.mate;
+//
 //import com.four.animory.dto.mate.MateBoardDTO;
 //import com.four.animory.dto.mate.MateFileDTO;
 //import com.four.animory.dto.mate.upload.MateUploadFileDTO;
 //import com.four.animory.dto.spr.SprFileDTO;
+//import jakarta.validation.Valid;
+//import lombok.extern.log4j.Log4j2;
 //import net.coobird.thumbnailator.Thumbnailator;
 //import org.springframework.core.io.FileSystemResource;
 //import org.springframework.core.io.Resource;
+//import org.springframework.stereotype.Controller;
 //import org.springframework.web.bind.annotation.GetMapping;
+//import org.springframework.web.bind.annotation.RequestMapping;
 //
 //import java.io.File;
 //import java.nio.file.Files;
@@ -16,10 +20,14 @@ package com.four.animory.controller.mate;
 //import java.util.ArrayList;
 //import java.util.List;
 //import java.util.UUID;
-
-public class MateUpdownController {
-
-
+//
+//@Controller
+//@Log4j2
+//@RequestMapping("/upload")
+//public class MateUpdownController {
+//    @Value("c:")
+//
+//
 //
 //    private List<MateFileDTO> fileUpload(MateUploadFileDTO mateUploadFileDTO){
 //        String matePath = Paths.get(uploadPath, "mate").toString();
@@ -91,8 +99,8 @@ public class MateUpdownController {
 //
 //
 //}
-
-
-
-
-}
+//
+//
+//
+//
+//}
