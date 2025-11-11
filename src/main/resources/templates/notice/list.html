@@ -61,8 +61,11 @@
                                         <p>관리자</p>
                                         <p th:text="${#temporals.format(notice.regDate, 'yyyy-MM-dd')}">2000-01-01</p>
                                         <p class="ms-auto"><i class="fa-regular fa-eye me-1"></i><span th:text="${notice.readCount}">1</span></p>
-                                        <p><i class="fa-regular fa-heart me-1 text-danger"></i>56</p>
-                                        <p><i class="fa-regular fa-comment-dots me-1"></i>5</p>
+                                        <p>
+                                            <i class="fa-regular fa-comment-dots me-1"></i>
+                                            <span th:text="${notice.replyCount}">0</span>
+                                        </p>
+
                                     </div>
                                 </div>
                             </td>

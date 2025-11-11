@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -50,48 +51,52 @@ public class NoticeReplyServiceImpl implements NoticeReplyService{
 
     @Override
     public void modify(NoticeReplyDTO noticeReplyDTO) {
-        NoticeReply noticeReply = noticeReplyRepository.findById(noticeReplyDTO.getRno()).get();
-        noticeReply.setContent(noticeReplyDTO.getContent());
-        noticeReplyRepository.save(noticeReply);
+        NoticeReply reply = noticeReplyRepository.findById(noticeReplyDTO.getRno())
+                .orElseThrow(() -> new IllegalArgumentException("댓글이 존재하지 않습니다."));
+
+        // 현재 로그인 사용자 이름 가져오기
+        String currentUser = SecurityContextHolder.getContext().getAuthentication().getName();
+
+        Member me = memberRepository.findByUsername(currentUser);
+        if (me == null) {
+            throw new AccessDeniedException("사용자 정보를 찾을 수 없습니다.");
+        }
+
+        boolean isAdmin = me.getRole() != null &&
+                ("ROLE_ADMIN".equalsIgnoreCase(me.getRole()) || "ADMIN".equalsIgnoreCase(me.getRole()));
+        boolean isOwner = reply.getMember() != null &&
+                currentUser.equals(reply.getMember().getUsername());
+
+        if (!isOwner && !isAdmin) {
+            throw new AccessDeniedException("수정 권한이 없습니다.");
+        }
+
+        reply.setContent(noticeReplyDTO.getContent());
+        noticeReplyRepository.save(reply);
+
 
     }
 
     @Override
     public void remove(Long rno, String currentUser) {
-        // 1) 댓글 조회
         NoticeReply reply = noticeReplyRepository.findById(rno)
                 .orElseThrow(() -> new IllegalArgumentException("댓글이 없습니다. rno=" + rno));
 
-        // 2) 현재 사용자 조회 (DB 기준으로 역할 판단)
         Member me = memberRepository.findByUsername(currentUser);
-        if (me == null) {
-            throw new AccessDeniedException("사용자 정보가 없습니다.");
-        }
+        if (me == null) throw new AccessDeniedException("사용자 정보가 없습니다.");
 
-        // 3) 관리자 여부: ROLE_ADMIN / ADMIN 둘 다 허용
-        String role = me.getRole(); // 예: "ROLE_ADMIN" 또는 "ADMIN"
-        boolean isAdmin = role != null && (
-                "ROLE_ADMIN".equalsIgnoreCase(role) || "ADMIN".equalsIgnoreCase(role)
-        );
+        boolean isAdmin = me.getRole() != null &&
+                ("ROLE_ADMIN".equalsIgnoreCase(me.getRole()) || "ADMIN".equalsIgnoreCase(me.getRole()));
 
-        // 4) 본인 댓글이거나 관리자면 삭제 허용
-        boolean isOwner = reply.getMember() != null
-                && currentUser.equals(reply.getMember().getUsername());
+        boolean isOwner = reply.getMember() != null &&
+                reply.getMember().getId() != null &&
+                me.getId() != null &&
+                reply.getMember().getId().equals(me.getId());
 
+        if (!isOwner && !isAdmin) throw new AccessDeniedException("삭제 권한이 없습니다.");
 
-
-        if (!isOwner && !isAdmin) {
-            throw new AccessDeniedException("삭제 권한이 없습니다.");
-        }
-
-        // 5) 소프트 삭제
         reply.setDeleted(true);
-        if(isAdmin) {
-            reply.setContent("관리자가 삭제한 댓글입니다.");
-        }else{
-            reply.setContent("삭제된 댓글입니다.");
-        }
-
+        reply.setContent(isAdmin ? "관리자가 삭제한 댓글입니다." : "삭제된 댓글입니다.");
         noticeReplyRepository.save(reply);
     }
 
@@ -111,16 +116,33 @@ public class NoticeReplyServiceImpl implements NoticeReplyService{
     @Override
     public PageResponseDTO<NoticeReplyDTO> getListOfBoard(Long bno, PageRequestDTO pageRequestDTO) {
         Pageable pageable = pageRequestDTO.getPageable("rno");
-        Page<NoticeReply> result=noticeReplyRepository.listOfBoard(bno,pageable);
-        List<NoticeReplyDTO>dtoList = result.getContent().stream()
-                .map(noticeReply -> entityToDTO(noticeReply))
+        Page<NoticeReply> result = noticeReplyRepository.listOfBoard(bno, pageable);
+
+        String currentUser = SecurityContextHolder.getContext().getAuthentication().getName();
+        Member me = memberRepository.findByUsername(currentUser);
+
+        List<NoticeReplyDTO> dtoList = result.getContent().stream()
+                .map(entity -> {
+                    NoticeReplyDTO dto = entityToDTO(entity);
+
+                    dto.setOwner(entity.getMember() != null &&
+                            entity.getMember().getUsername().equals(currentUser));
+
+                    dto.setAdmin(me != null && me.getRole() != null &&
+                            (me.getRole().equalsIgnoreCase("ADMIN") ||
+                                    me.getRole().equalsIgnoreCase("ROLE_ADMIN")));
+
+                    return dto;
+                })
                 .collect(Collectors.toList());
+
         return PageResponseDTO.<NoticeReplyDTO>withAll()
                 .pageRequestDTO(pageRequestDTO)
                 .dtoList(dtoList)
                 .total((int)result.getTotalElements())
                 .build();
     }
+
 
 
 }
