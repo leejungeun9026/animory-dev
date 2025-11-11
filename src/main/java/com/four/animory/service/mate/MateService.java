@@ -6,26 +6,23 @@ import com.four.animory.domain.user.Member;
 import com.four.animory.dto.common.PageRequestDTO;
 import com.four.animory.dto.common.PageResponseDTO;
 import com.four.animory.dto.free.FreeBoardDTO;
-import com.four.animory.dto.mate.MateBoardDTO;
-import com.four.animory.dto.mate.MateFileDTO;
+import com.four.animory.dto.mate.*;
 import org.springframework.data.domain.Page;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
 public interface MateService {
-    void registerMateBoard(MateBoardDTO mateBoardDTO, Member member);
+    Long registerMateBoard(MateBoardDTO mateBoardDTO);
     List<MateBoardDTO> findAllMateBoards();
     MateBoardDTO findMateBoardById(Long bno, Integer mode);
     void updateMateBoard(MateBoardDTO mateBoardDTO);
     void deleteMateBoardById(Long bno);
-    MateBoardDTO updateLikecount(Long bno);
-    List<MateBoard> getTop10MateBoardList();
+    List<MateBoardDTO> getTop10MateBoardList();
+    int increaseLikeCountAndGet(Long bno);
+    MatePageResponseDTO<MateBoardDTO> getList(MatePageRequestDTO matePageRequestDTO);
+    MatePageResponseDTO<MateReplyCountDTO> getListReplyCount(MatePageRequestDTO matePageRequestDTO);
 
-
-
-    PageResponseDTO<MateBoardDTO> getList(PageRequestDTO pageRequestDTO);
-//    PageResponseDTO<BoardListReplyCountDTO> getListReplyCount(PageRequestDTO pageRequestDTO);
 
     default MateBoard dtoToEntity(MateBoardDTO mateBoardDTO) {
         MateBoard mateBoard = MateBoard.builder()
@@ -68,20 +65,16 @@ public interface MateService {
                 .map(image->fileEntityToDTO(image))
                 .collect(Collectors.toList()); //리스트 만들어
         mateBoardDTO.setMateFileDTOs(mateFileDTOList);
-
-
-
-
         return mateBoardDTO;
     }
     default MateFileDTO fileEntityToDTO(MateFile mateFile) {
-        MateFileDTO mateFileDTO = MateFileDTO.builder()
+        MateFileDTO dto = MateFileDTO.builder()
                 .uuid(mateFile.getUuid())
                 .fileName(mateFile.getFileName())
                 .image(mateFile.isImage())
                 .ord(mateFile.getOrd())
                 .build();
-        return mateFileDTO;
+        return dto;
     }
 
 }

@@ -10,9 +10,10 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Builder
 
-public class MateUploadResultDTO {
+public class UploadResultDTO {
     private String uuid;
     private String fileName;
+
     private boolean image;
 
     public String getLink(){
