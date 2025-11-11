@@ -1,12 +1,14 @@
 package com.four.animory.service.notice;
 
 import com.four.animory.domain.notice.NoticeBoard;
+import com.four.animory.domain.notice.NoticeFile;
 import com.four.animory.dto.common.PageRequestDTO;
 import com.four.animory.dto.common.PageResponseDTO;
 import com.four.animory.dto.notice.NoticeBoardDTO;
-import org.springframework.data.domain.Page;
+import com.four.animory.dto.notice.NoticeFileDTO;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 public interface NoticeService {
 
@@ -15,22 +17,31 @@ public interface NoticeService {
     NoticeBoardDTO findNoticeById(Long bno, int mode);
     void updateNotice(NoticeBoardDTO dto);
     void removeNotice(Long bno);
-    List<NoticeBoard> getTop10FreeBoardList();
-
+    List<NoticeBoardDTO> getTop10NoticeBoardList();
 
     PageResponseDTO<NoticeBoardDTO> getList(PageRequestDTO pageRequestDTO);
 
-    default NoticeBoard dtoToEntity(NoticeBoardDTO dto){
-        return NoticeBoard.builder()
+
+    default NoticeBoard dtoToEntity(NoticeBoardDTO dto) {
+        NoticeBoard noticeBoard = NoticeBoard.builder()
                 .title(dto.getTitle())
                 .content(dto.getContent())
                 .readCount(dto.getReadCount())
                 .isPinned(dto.isPinned())
                 .build();
+
+        if (dto.getNoticeFileDTOs() != null) {
+            dto.getNoticeFileDTOs().forEach(file ->
+                    noticeBoard.addFile(file.getUuid(), file.getFileName(), file.isImage())
+            );
+        }
+
+        return noticeBoard;
     }
 
-    default NoticeBoardDTO entityToDTO(NoticeBoard entity){
-        return NoticeBoardDTO.builder()
+    // ✅ entityToDTO - return 뒤 코드 정리, 변수명 수정
+    default NoticeBoardDTO entityToDTO(NoticeBoard entity) {
+        NoticeBoardDTO noticeBoardDTO = NoticeBoardDTO.builder()
                 .bno(entity.getBno())
                 .title(entity.getTitle())
                 .content(entity.getContent())
@@ -39,6 +50,26 @@ public interface NoticeService {
                 .isPinned(entity.isPinned())
                 .regDate(entity.getRegDate())
                 .updateDate(entity.getUpdateDate())
+                .build();
+
+        if (entity.getFileSet() != null) {
+            List<NoticeFileDTO> fileDTOs = entity.getFileSet().stream()
+                    .sorted()
+                    .map(this::fileEntityToDTO)
+                    .collect(Collectors.toList());
+            noticeBoardDTO.setNoticeFileDTOs(fileDTOs);
+        }
+
+        return noticeBoardDTO;
+    }
+
+
+    default NoticeFileDTO fileEntityToDTO(NoticeFile noticeFile) {
+        return NoticeFileDTO.builder()
+                .uuid(noticeFile.getUuid())
+                .fileName(noticeFile.getFilename())
+                .image(noticeFile.isImage())
+                .ord(noticeFile.getOrd())
                 .build();
     }
 }

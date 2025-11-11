@@ -18,7 +18,6 @@
                                     <option value="tc">제목+내용</option>
                                     <option value="t">제목</option>
                                     <option value="c">내용</option>
-                                    <option value="w">작성자</option>
                                 </select>
                                 <input class="form-control" name="keyword" placeholder="검색어를 입력하세요" type="text" th:value="${pageRequestDTO.keyword}">
                                 <button class="btn btn-secondary text-nowrap" type="submit"><i
@@ -34,9 +33,6 @@
         <div class="col-12">
             <div class="card">
                 <div class="card-body">
-                    <div class="d-flex align-items-end mb-2">
-                        <small>총 12개 (1/2페이지)</small>
-                    </div>
                     <table class="table border-top align-middle">
                         <colgroup>
                             <col style="width:80px;">

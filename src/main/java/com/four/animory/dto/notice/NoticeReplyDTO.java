@@ -25,4 +25,8 @@ public class NoticeReplyDTO {
     private LocalDateTime regDate;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime updateDate;
+    private boolean owner;
+    private boolean admin;
+
+
 }

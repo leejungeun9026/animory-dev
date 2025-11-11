@@ -25,8 +25,10 @@ public class NoticeBoardDTO {
     private boolean isPinned;
     private LocalDateTime regDate;
     private LocalDateTime updateDate;
-    private List<NoticeFile> fileDTOs;
+    private List<NoticeFileDTO> noticeFileDTOs;
     private String nickname;
+    private int replyCount;
+
 
 
 

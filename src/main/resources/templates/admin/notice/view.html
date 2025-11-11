@@ -29,8 +29,11 @@
                 <p>작성자</p>
                 <p th:text="${#temporals.format(notice.regDate, 'yyyy-MM-dd')}">2025-10-10</p>
                 <p class="ms-auto"><i class="fa-regular fa-eye me-1"></i><span th:text="${notice.readCount}">1</span></p>
-                <p><i class="fa-regular fa-heart me-1 text-danger"></i>56</p>
-                <p><i class="fa-regular fa-comment-dots me-1"></i>8</p>
+                  <p>
+                      <i class="fa-regular fa-comment-dots me-1"></i>
+                      <span th:text="${notice.replyCount}">0</span>
+                  </p>
+
               </div>
             </td>
           </tr>
@@ -56,8 +59,12 @@
           </tr>
           <tr>
             <td class="px-0 pt-3">
-              <p><i class="fa-regular fa-comment-dots me-1"></i>댓글 <b class="text-danger">8</b></p>
-              <div class="reply_list_area">
+                <p>
+                    <i class="fa-regular fa-comment-dots me-1"></i>
+                    <span th:text="${notice.replyCount}">0</span>
+                </p>
+
+                <div class="reply_list_area">
                 <ul>
                   <li class="reply_list border-bottom">
                     <div class="d-flex justify-content-start align-items-start gap-2 py-2">
@@ -187,40 +194,33 @@
 </div>
 
 <script layout:fragment="pagescript" th:inline="javascript">
-    // ===== 최소 옵션: 공지글 번호 =====
+    // ===== 기본 값 =====
     const bno = [[${notice.bno}]];
+    const listEl   = document.querySelector(".reply_list_area ul");
+    const btnWrite = document.querySelector(".btnReplyRegister");
+    const taWrite  = document.querySelector("#replyText");
 
-    // ===== 필요한 엘리먼트 =====
-    const listEl   = document.querySelector(".reply_list_area ul");   // 댓글 목록 UL
-    const btnWrite = document.querySelector(".btnReplyRegister");     // 댓글 쓰기 버튼
-    const taWrite  = document.querySelector("#replyText");            // 댓글 입력 textarea
-
-    // (선택) CSRF 사용 중이면 meta에서 읽어서 헤더에 넣어줌. 없으면 무시됨.
+    // (선택) CSRF
     const csrfToken  = document.querySelector('meta[name="_csrf"]')?.content;
     const csrfHeader = document.querySelector('meta[name="_csrf_header"]')?.content;
 
-    // 공통 fetch 헬퍼(심플)
+    // 공통 fetch
     async function call(url, method = "GET", data) {
         const headers = {"Content-Type":"application/json"};
         if (csrfToken && csrfHeader) headers[csrfHeader] = csrfToken;
-        const res = await fetch(url, {
-            method,
-            headers,
-            body: data ? JSON.stringify(data) : null
-        });
+        const res = await fetch(url, { method, headers, body: data ? JSON.stringify(data) : null });
         if (res.status === 401) { alert("로그인이 필요합니다."); throw new Error("401"); }
         if (!res.ok) { throw new Error("HTTP " + res.status); }
         const ct = res.headers.get("content-type") || "";
         return ct.includes("application/json") ? res.json() : res.text();
     }
 
-    // 목록 그리기 (아주 단순)
-    function render(list) {
-        if (!list || list.length === 0) {
-            listEl.innerHTML = `<li class="border-bottom py-3 text-secondary">등록된 댓글이 없습니다.</li>`;
-            return;
-        }
-        listEl.innerHTML = list.map(d => `
+    // 이스케이프
+    function escapeHtml(s){ return String(s ?? "").replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;"); }
+
+    // 한 항목 템플릿
+    function itemTpl(d){
+        return `
       <li class="reply_list border-bottom" data-rno="${d.rno}">
         <div class="d-flex justify-content-start align-items-start gap-2 py-2">
           <div class="flex-grow-1">
@@ -234,27 +234,56 @@
                 <i class="fa-solid fa-ellipsis"></i>
               </button>
               <ul class="dropdown-menu">
-                <!-- 관리자: 누구 댓글이든 삭제 가능 -->
+                <li><a class="dropdown-item btnEdit" href="">수정</a></li>
                 <li><a class="dropdown-item btnDel" href="">삭제</a></li>
               </ul>
             </div>`}
           </div>
         </div>
-      </li>
-    `).join("");
+      </li>`;
     }
 
-    // HTML 이스케이프 (간단)
-    function escapeHtml(s){ return String(s ?? "").replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;"); }
+    // 전체 렌더
+    function render(list){
+        if (!list || list.length === 0) {
+            listEl.innerHTML = `<li class="border-bottom py-3 text-secondary">등록된 댓글이 없습니다.</li>`;
+            return;
+        }
+        listEl.innerHTML = list.map(itemTpl).join("");
+    }
 
-    // 댓글 목록 불러오기
-    async function load() {
-        try {
-            // 페이징 간단히: 1페이지 100개
-            const data = await call(`/noticereplies/list/${bno}?page=1&size=100`);
-            render(Array.isArray(data.dtoList) ? data.dtoList : []);
-        } catch(e) {
-            console.error(e); render([]);
+    // 페이지 상태
+    if (typeof window.page === 'undefined') window.page = 1;
+    const size = 5;
+    let loading = false;
+    let last = false;
+
+    // 목록 로드 (첫 페이지 or 다음 페이지)
+    async function load(next = false){
+        if (loading || (next && last)) return;
+        loading = true;
+        try{
+            if (next) window.page++; else { window.page = 1; last = false; }
+
+            const data = await call(`/noticereplies/list/${bno}?page=${window.page}&size=${size}`);
+            console.log('replies:', data);
+
+            updateReplyCount(typeof data.total === 'number' ? data.total : 0);
+            const list = Array.isArray(data.dtoList) ? data.dtoList : [];
+
+            if (next){
+                if (!list.length){ last = true; return; }
+                listEl.insertAdjacentHTML("beforeend", list.map(itemTpl).join(""));
+            }else{
+                render(list);
+                // 첫 페이지가 size보다 작으면 다음 없음
+                if (!list.length || list.length < size) last = true;
+            }
+        }catch(e){
+            console.error(e);
+            if (!next) render([]);
+        }finally{
+            loading = false;
         }
     }
 
@@ -265,29 +294,51 @@
         try {
             await call(`/noticereplies/`, "POST", { bno, content, deleted:false });
             taWrite.value = "";
-            await load();
+            await load(false); // 첫 페이지 새로 고침
         } catch(e) {
             console.error(e); alert("댓글 등록 중 오류가 발생했습니다.");
         }
     });
 
-    // 삭제(관리자: 남의 댓글도 가능) – 이벤트 위임
+    // 수정/삭제 (이벤트 위임)
     listEl?.addEventListener("click", async (e) => {
-        const a = e.target.closest(".btnDel");
-        if (!a) return;
-        e.preventDefault();
-        const li  = e.target.closest("li.reply_list");
-        const rno = li?.getAttribute("data-rno");
-        if (!rno) return;
-        if (!confirm("이 댓글을 삭제하시겠어요?")) return;
-        try {
-            await call(`/noticereplies/delete/${rno}`, "POST");
-            await load();
-        } catch(e) {
-            console.error(e); alert("삭제 중 오류가 발생했습니다.");
+        // 수정
+        const edit = e.target.closest(".btnEdit");
+        if (edit){
+            e.preventDefault();
+            const li = edit.closest("li.reply_list");
+            const rno = li.dataset.rno;
+            const oldContent = li.querySelector(".replyContent").textContent.trim();
+            const content = prompt("새 댓글 내용:", oldContent);
+            if (!content || content === oldContent) return;
+            await call(`/noticereplies/${rno}`, "PUT", { content });
+            return load(false);
+        }
+
+        // 삭제
+        const del = e.target.closest(".btnDel");
+        if (del){
+            e.preventDefault();
+            const li  = del.closest("li.reply_list");
+            const rno = li?.getAttribute("data-rno");
+            if (!rno) return;
+            if (!confirm("이 댓글을 삭제하시겠어요?")) return;
+            try {
+                await call(`/noticereplies/delete/${rno}`, "POST");
+                await load(false);
+            } catch(e) {
+                console.error(e); alert("삭제 중 오류가 발생했습니다.");
+            }
         }
     });
 
     // 첫 로딩
-    document.addEventListener("DOMContentLoaded", load);
+    document.addEventListener("DOMContentLoaded", () => load(false));
+
+    // 스크롤 끝 근처에서 다음 페이지 자동 로드
+    // window.addEventListener('scroll', () => {
+    //     if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 150) {
+    //         load(true);
+    //     }
+    // });
 </script>

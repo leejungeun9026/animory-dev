@@ -11,7 +11,9 @@ import java.util.List;
 public interface NoticeReplyRepository extends JpaRepository<NoticeReply, Long> {
 
     //  페이징 목록 (게시글 bno 기준)
-    @Query("select r from NoticeReply r where r.noticeBoard.bno = :bno")
+    @Query(""" 
+        select r from NoticeReply r where r.noticeBoard.bno = :bno and r.deleted = false order by r.rno desc
+        """)
     Page<NoticeReply> listOfBoard(Long bno, Pageable pageable);
 
     // 삭제되지 않은 댓글만 전체 조회
@@ -19,4 +21,7 @@ public interface NoticeReplyRepository extends JpaRepository<NoticeReply, Long> 
 
     //  해당 글의 댓글 일괄 삭제
     void deleteByNoticeBoard_Bno(Long bno);
+
+    int countByNoticeBoardBnoAndDeletedIsFalse(Long bno);
+
 }

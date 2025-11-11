@@ -1,6 +1,6 @@
 package com.four.animory.domain.notice;
 
-import com.four.animory.domain.BaseEntity;
+
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -12,24 +12,26 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class NoticeFile extends BaseEntity {
+public class NoticeFile implements Comparable<NoticeFile> {
 
     @Id
-    @Column(length = 30, nullable = false)
     private String uuid;
-
-    @Column(nullable = false, length = 300)
-    private String fileName;
-
-    @Column(nullable = false)
+    private String filename;
+    private int ord;
     private boolean image;
 
-    @Column(nullable = false)
-    private int ord;
-
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "bno", nullable = false)
+    @JoinColumn(name="bno")
     private NoticeBoard noticeBoard;
+
+    @Override
+    public int compareTo(NoticeFile other) {
+        return this.ord - other.ord;
+    }
+
+    public void changeNoticeBoard(NoticeBoard noticeBoard) {
+        this.noticeBoard = noticeBoard;
+    }
 }
 
 
