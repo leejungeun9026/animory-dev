@@ -29,10 +29,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 @Controller
 @Log4j2
@@ -93,37 +90,34 @@ public class SitterBoardController {
   }
 
   @PostMapping("/modify")
-  public String modify(@AuthenticationPrincipal PrincipalDetails principal, SitterBoardDTO sitterBoardDTO, SitterUploadFileDTO sitterUploadFileDTO, @RequestParam("deleteFileUuid") String deleteFileUuid){
-    String boardUsername = sitterBoardDTO.getUsername();
-    String loginUsername = principal.getMember().getUsername();
-    // 글 작성자와 로그인한 유저 일치여부 확인
-    if(boardUsername.equals(loginUsername)) {
-      sitterBoardService.updateBoard(sitterBoardDTO);
+  public String modify(SitterBoardDTO sitterBoardDTO, SitterUploadFileDTO sitterUploadFileDTO){
+    List<SitterFileDTO> sitterFileDTO = null;
+    if(sitterUploadFileDTO.getFiles() != null && !sitterUploadFileDTO.getFiles().get(0).getOriginalFilename().equals("")) {
+      // 기존 파일 가져와서 삭제
+      SitterBoardDTO oldDTO = sitterBoardService.getSitterBoardById(sitterBoardDTO.getBno(), "0");
+      List<SitterFileDTO> oldDTOList = oldDTO.getFileDTOs();
+      if(oldDTOList != null && !oldDTOList.isEmpty()) {
+        removeFile(oldDTOList);
+      }
+      // 새로운 파일 업로드
+      sitterFileDTO = uploadFile(sitterUploadFileDTO);
     }
+    sitterBoardDTO.setFileDTOs(sitterFileDTO);
+    sitterBoardService.updateBoard(sitterBoardDTO);
     Long bno = sitterBoardDTO.getBno();
     return "redirect:/sitter/view?bno=" + bno + "&mode=0";
   }
 
   @GetMapping("/remove")
-  public String remove(@AuthenticationPrincipal PrincipalDetails principal, @RequestParam("bno") Long bno, RedirectAttributes redirectAttributes){
-    String boardUsername = sitterBoardService.getSitterBoardById(bno, "0").getUsername();
-    String loginUsername = principal.getMember().getUsername();
-    boolean flag = false;
-    // 글 작성자와 로그인한 유저 일치여부 확인
-    if(boardUsername.equals(loginUsername)) {
-      int result = sitterBoardService.deleteBoard(bno);
-      if (result == 1) {
-        flag = true;
-        redirectAttributes.addFlashAttribute("deleteResult", "success");
-      } else {
-        flag = false;
-        redirectAttributes.addFlashAttribute("deleteResult", "fail");
-      }
-    }
-    if (flag){
+  public String remove(@RequestParam("bno") Long bno, RedirectAttributes redirectAttributes){
+    int result = sitterBoardService.deleteBoard(bno);
+    if (result == 1) {
+      redirectAttributes.addFlashAttribute("deleteResult", "success");
       return "redirect:/sitter/list";
-    }
+    } else {
+      redirectAttributes.addFlashAttribute("deleteResult", "fail");
     return "redirect:/sitter/view?bno=" + bno + "&mode=0";
+    }
   }
 
 
@@ -182,4 +176,6 @@ public class SitterBoardController {
       }
     }
   }
+
+
 }

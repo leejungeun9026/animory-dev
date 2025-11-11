@@ -44,7 +44,7 @@ public class SitterBoardServiceImpl implements SitterBoardService {
 
   @Override
   public SitterBoardDTO getSitterBoardById(Long bno, String mode) {
-    SitterBoard board = sitterBoardRepository.findByIdWithImages(bno).orElse(null);
+    SitterBoard board = sitterBoardRepository.findByIdWithFiles(bno).orElse(null);
     if(mode.equals("1")){
       board.updateReadCount();
       sitterBoardRepository.save(board);
@@ -78,6 +78,12 @@ public class SitterBoardServiceImpl implements SitterBoardService {
   public void updateBoard(SitterBoardDTO sitterBoardDTO) {
     SitterBoard board = sitterBoardRepository.findById(sitterBoardDTO.getBno()).orElse(null);
     board.changeBoard(sitterBoardDTO);
+    if(sitterBoardDTO.getFileDTOs() != null){
+      board.removeFiles();
+      for(SitterFileDTO sitterFileDTO : sitterBoardDTO.getFileDTOs()){
+        board.addFiles(sitterFileDTO.getUuid(), sitterFileDTO.getFilename(), sitterFileDTO.isImage());
+      }
+    }
     log.info(board);
     sitterBoardRepository.save(board);
   }

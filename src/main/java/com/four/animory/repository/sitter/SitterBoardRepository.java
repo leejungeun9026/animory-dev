@@ -15,7 +15,7 @@ import java.util.Optional;
 public interface SitterBoardRepository extends JpaRepository<SitterBoard, Long>, SitterSearch {
   @EntityGraph(attributePaths = {"fileSet"})
   @Query("select b from SitterBoard b where b.bno = :bno")
-  Optional<SitterBoard> findByIdWithImages(long bno);
+  Optional<SitterBoard> findByIdWithFiles(long bno);
 
   @Query("""
     select new com.four.animory.dto.sitter.SitterBoardListDTO(
