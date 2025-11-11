@@ -7,7 +7,7 @@ import com.four.animory.dto.user.*;
 import java.util.List;
 
 public interface UserService {
-  int register(UserRegisterDTO userRegisterDTO);
+  int register(MemberWithPetDTO memberWithPetDTO);
   MemberDTO getMemberById(Long mid);
   MemberDTO getMemberByUsername(String username);
   List<MemberWithPetCountDTO>  getMemberListPetCount();

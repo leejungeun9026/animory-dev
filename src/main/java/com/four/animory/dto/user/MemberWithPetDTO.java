@@ -12,7 +12,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class UserRegisterDTO {
+public class MemberWithPetDTO {
   private MemberDTO member;
   @Builder.Default
   private List<PetDTO> pets = new ArrayList<>();

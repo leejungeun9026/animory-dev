@@ -232,8 +232,12 @@ body {
     display: none;
 }
 
-td > img {
+.img_wrap {
     max-width: 800px;
+    width: 100%;
+}
+td img {
+    display: block;
     width: 100%;
 }
 

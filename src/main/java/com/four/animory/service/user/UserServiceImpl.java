@@ -29,15 +29,15 @@ public class UserServiceImpl implements UserService {
   private SitterBoardService sitterBoardService;
 
   @Transactional
-  public int register(UserRegisterDTO userRegisterDTO){
-    MemberDTO memberDTO = userRegisterDTO.getMember();
+  public int register(MemberWithPetDTO memberWithPetDTO){
+    MemberDTO memberDTO = memberWithPetDTO.getMember();
     Member member = dtoToEntity(memberDTO);
     member.setPassword(bCryptPasswordEncoder.encode(memberDTO.getPassword()));
     memberRepository.save(member);
 
     // 펫 정보 있는 경우
-    if (userRegisterDTO.getPets() != null){
-      for (PetDTO petDTO : userRegisterDTO.getPets()) {
+    if (memberWithPetDTO.getPets() != null){
+      for (PetDTO petDTO : memberWithPetDTO.getPets()) {
         Pet pet = dtoToEntity(petDTO);
         pet.setMember(member);
         petRepository.save(pet);
@@ -63,7 +63,6 @@ public class UserServiceImpl implements UserService {
   public MemberDTO getMemberByUsername(String username) {
       return entityToDTO(memberRepository.findByUsername(username));
   }
-
 
   @Override
   public List<MemberWithPetCountDTO> getMemberListPetCount() {

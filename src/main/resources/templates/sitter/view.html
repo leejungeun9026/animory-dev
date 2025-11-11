@@ -133,6 +133,24 @@
     </div>
   </div>
 
+  <div class="modal" id="profileModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered modal-sm">
+      <div class="modal-content">
+        <div class="modal-header border-bottom-0">
+          <h5 class="modal-title">회원 프로필 보기</h5>
+          <button aria-label="Close" class="btn-close" data-bs-dismiss="modal" type="button"></button>
+        </div>
+        <div class="modal-body py-0">
+          
+        </div>
+        <div class="modal-footer border-top-0">
+          <div class="d-flex justify-content-center gap-2 flex-nowrap w-100">
+            <button class="btn btn-lg btn-main w-100" data-bs-dismiss="modal" type="button">확인</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <div class="modal" id="changeHiringModal" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered modal-sm modal-360">
@@ -192,6 +210,7 @@
     const alertModalFooter = document.querySelector("#alertModal .modal-footer")
 
     const changeHiringModal = new bootstrap.Modal(document.getElementById('changeHiringModal'))
+    const profileModal = new bootstrap.Modal(document.getElementById('profileModal'))
 
     const countReplies = document.querySelectorAll(".countReplies")
     const replyList = document.getElementById("replyList")
@@ -227,6 +246,11 @@
         return response.data
     }
 
+    async function getProfile(username) {
+        let response = await axios.get(`/member/profile/${username}`)
+        return response.data
+    }
+
     function printReplyList(responseResult) {
         for (let cnt of countReplies) {
             cnt.innerText = responseResult.length
@@ -251,7 +275,7 @@
                 if (loginNickname === boardNickname) {
                     str += `<div class="align-self-center col-12 col-sm-4 ms-sm-auto">
                             <div class="d-flex flex-nowrap gap-2">
-                              <a href="/sitter/${reply.rno}" class="btn btn-gray w-100 text-nowrap">프로필 보기</a>`
+                              <button data-username="${reply.username}" class="btnProfile btn btn-gray w-100 text-nowrap">프로필 보기</button>`
                     if(category === "구해요") {
                         str += `<button class="btnHiring btn btn-success w-100 text-nowrap">구인하기</button>`
                     } else if (category === "일해요") {
@@ -376,11 +400,66 @@
     replyList.addEventListener("click", function(e){
         const btnModify = e.target.closest(".btnModifyReply");
         const btnDelete = e.target.closest(".btnDeleteReply");
+        const btnProfile = e.target.closest(".btnProfile");
         const btnHiring = e.target.closest(".btnHiring");
 
-        if (!btnModify && !btnDelete && !btnHiring) return;
+        if (!btnModify && !btnDelete && !btnProfile && !btnHiring) return;
         e.preventDefault();
 
+        // 프로필 보기
+        if (btnProfile) {
+            let replyUsername = btnProfile.dataset.username
+            getProfile(replyUsername).then(user => {
+                    const profileBody = document.querySelector("#profileModal .modal-body");
+                    let str = `<div class="card rounded-3">
+                                  <div class="card-body">
+                                      <h4 class="memomentKkukkkuk fw-normal pb-3">
+                                          <i class="fa-solid fa-face-smile text-primary"></i> ${user.member.nickname}
+                                      </h4>
+                                      <ul class="ps-3">
+                                          <li class="mb-1"><b>이메일</b> : ${user.member.email}
+                                          <li class="mb-1"><b>연락처</b> : ${user.member.tel}</li>
+                                          <li class="mb-1"><b>지역</b> : ${user.member.sido}/${user.member.sigungu}</li>
+                                          <li class=""><b>시터 인증</b> : `
+
+                    if(user.member.isSitter === "1") {
+                        str += `인증 완료<i class="fa-solid fa-circle-check text-info"></i>`
+                    } else {
+                        str += `미인증`
+                    }
+                    str += `
+                                        </li>
+                                      </ul>
+                                  </div>
+                              </div>
+                              <div class="card rounded-3 mt-3">
+                                  <div class="card-body">
+                                      <h4 class="memomentKkukkkuk fw-normal pb-3">
+                                          <i class="fa-solid fa-paw text-primary"></i>
+                                          반려동물 정보
+                                      </h4>
+                                      <ul class="d-flex flex-column gap-2">`
+                    user.pets.forEach(pet => {
+                        str += `<li>
+                                    <div class="card bg-primary bg-opacity-10 border-0 rounded-3 p-3">
+                                      <p>`
+                            if(pet.type === "dog") {
+                                str += `<span><i class="fa-solid fa-dog"></i></span>`
+                            } else {
+                                str += `<span><i class="fa-solid fa-cat"></i></span>`
+                            }
+                        str += `<b>${pet.name}</b><span>${pet.age}살</b></span>
+                              </p>
+                            </div>
+                        </li>`
+                    })
+                        str +=`</ul>
+                            </div>
+                        </div>`
+                    profileBody.innerHTML = str;
+            })
+            profileModal.show();
+        }
         // 구인/구직 완료하기
         if (btnHiring) {
             changeHiringModal.show();
@@ -395,31 +474,29 @@
         if (btnModify) {
             getReply(rno)
                 .then(reply => {
-                // 모달 내용 갱신 후 표시
-                modifyReplyBody.innerHTML = `<input type="hidden" id="modifyReplyRno">
+                    // 모달 내용 갱신 후 표시
+                    modifyReplyBody.innerHTML = `<input type="hidden" id="modifyReplyRno">
                                              <input type="text" id="modifyReplyText" class="form-control form-control-sm" aria-label="신청내용">
                                             `
-                modifyReplyBody.querySelector('#modifyReplyRno').value = reply.rno;
-                modifyReplyBody.querySelector('#modifyReplyText').value = reply.content ?? '';
+                    modifyReplyBody.querySelector('#modifyReplyRno').value = reply.rno;
+                    modifyReplyBody.querySelector('#modifyReplyText').value = reply.content ?? '';
 
-                modifyReplyModal.show();
-            }).catch(result=>{
+                    modifyReplyModal.show();
+                }).catch(result => {
                 console.error(result);
             })
         }
 
         // 삭제하기
         if (btnDelete) {
-            deleteReply(rno).then(result=>{
+            deleteReply(rno).then(result => {
                 loadReplyList()
-            }).catch(result=>{
+            }).catch(result => {
                 console.error(result)
             })
         }
 
     });
-
-
 
 
 </script>
