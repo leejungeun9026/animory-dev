@@ -21,7 +21,7 @@ import java.util.Set;
 @Table(name = "tbl_spr_board")
 @Getter
 @Setter
-@ToString(exclude = {"member","fileSet"})
+@ToString(exclude = {"member","fileSet","replies"})
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
@@ -52,6 +52,7 @@ public class SprBoard extends BaseEntity {
     @BatchSize(size = 20)
     private Set<SprFile> fileSet = new HashSet<>();
     @OneToMany(mappedBy = "sprBoard", orphanRemoval = true, cascade = CascadeType.REMOVE)
+    @Builder.Default
     private List<SprReply> replies = new ArrayList<>();
 
 

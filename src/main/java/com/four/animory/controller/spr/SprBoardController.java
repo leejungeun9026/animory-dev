@@ -50,12 +50,13 @@ public class SprBoardController {
 
 
     @GetMapping("/list")
-    public void list(PageRequestDTO pageRequestDTO, @RequestParam(value = "category", required = false) String category ,@RequestParam(required = false, defaultValue = "recent")String sort, Model model){
-        PageResponseDTO<SprBoardDTO> responseDTO = sprService.getListByCategory(pageRequestDTO, category, sort);
+    public void list(PageRequestDTO pageRequestDTO, @RequestParam(value = "category", required = false) String category ,@RequestParam(required = false, defaultValue = "recent")String sort, @RequestParam(value = "complete", required = false)Boolean complete, Model model){
+        PageResponseDTO<SprBoardDTO> responseDTO = sprService.getListByCategoryAndComplete(pageRequestDTO, category, sort, complete);
         model.addAttribute("responseDTO",responseDTO);
         model.addAttribute("pageRequestDTO",pageRequestDTO);
         model.addAttribute("category",category);
         model.addAttribute("sort",sort);
+        model.addAttribute("complete",complete);
     }
 
 

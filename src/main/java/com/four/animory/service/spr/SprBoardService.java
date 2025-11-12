@@ -14,7 +14,7 @@ import java.util.stream.Collectors;
 public interface SprBoardService {
     void registerSprBoard(SprBoardDTO sprBoardDTO);
 
-    PageResponseDTO<SprBoardDTO> getListByCategory(PageRequestDTO pageRequestDTO, String category, String sort);
+    PageResponseDTO<SprBoardDTO> getListByCategoryAndComplete(PageRequestDTO pageRequestDTO, String category, String sort, Boolean complete);
 
     SprBoardDTO findBoardById(Long bno, int mode);
 
