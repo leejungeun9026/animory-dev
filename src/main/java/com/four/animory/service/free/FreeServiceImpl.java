@@ -7,6 +7,7 @@ import com.four.animory.dto.free.FreeFileDTO;
 import com.four.animory.dto.free.FreePageRequestDTO;
 import com.four.animory.dto.free.FreePageResponseDTO;
 import com.four.animory.dto.free.FreeBoardListReplyCountDTO;
+import com.four.animory.dto.free.upload.FreeFileThumbnailDTO;
 import com.four.animory.repository.free.FreeBoardRepository;
 import com.four.animory.repository.user.MemberRepository;
 import lombok.extern.log4j.Log4j2;
@@ -130,5 +131,11 @@ public class FreeServiceImpl implements FreeService{
                 .map(this::entityToDTO)
                 .collect(Collectors.toList());
     }
+
+    @Override
+    public List<FreeFileThumbnailDTO> getBoardThumbnails() {
+        return freeBoardRepository.findFirstImageForAllBoards();
+    }
+
 
 }

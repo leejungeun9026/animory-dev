@@ -11,7 +11,7 @@ import java.util.List;
 
 public interface FreeReplyRepository extends JpaRepository<FreeReply, Long> {
     // 게시글 댓글 페이징
-    @Query("select fr from FreeReply fr where fr.freeBoard.bno=:bno order by fr.rno desc")
+    @Query("select fr from FreeReply fr where fr.freeBoard.bno=:bno order by fr.rno asc")
     Page<FreeReply> listOfBoard(@Param("bno") Long bno, Pageable pageable);
 
     List<FreeReply> findByFreeBoard_BnoAndDeletedIsFalse(Long bno);
