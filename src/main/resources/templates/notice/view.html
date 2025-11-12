@@ -24,24 +24,31 @@
                                 <p>작성자</p>
                                 <p th:text="${#temporals.format(notice.regDate, 'yyyy-MM-dd')}">2025-10-10</p>
                                 <p class="ms-auto"><i class="fa-regular fa-eye me-1"></i><span th:text="${notice.readCount}">1</span></p>
-                                <p><i class="fa-regular fa-comment-dots me-1"></i>[[${notice.replyCount}]]</p>
+                                <p><i class="fa-regular fa-comment-dots me-1"></i>
+                                    <span data-reply-count>[[${notice.replyCount}]]</span>
+                                </p>
+
                             </div>
                         </td>
                     </tr>
                     </thead>
                     <tbody>
                     <!-- 첨부파일이 있으면 노출 -->
-                    <tr>
+                    <!--           첨부파일 썸네일 없음(다운가능)         -->
+                    <tr th:if="${notice.noticeFileDTOs != null and notice.noticeFileDTOs.size() > 0}">
                         <td class="px-0 py-3">
                             <ul>
-                                <li>
-                                    <div class="img_wrap">
-                                        <img src="/images/hellokitty.jpg" alt="">
-                                    </div>
+                                <li th:each="file : ${notice.noticeFileDTOs}">
+                                    <a th:href="@{|/uploads/notice/${file.uuid}_${file.fileName}|}"
+                                       th:download="${file.fileName}"
+                                       th:text="${file.fileName}"
+                                       class="text-decoration-underline text-primary"></a>
                                 </li>
                             </ul>
                         </td>
                     </tr>
+
+
                     <!-- 첨부파일이 있으면 노출 끝 -->
                     <tr>
                         <td class="px-0 py-3">
@@ -50,10 +57,18 @@
                     </tr>
                     <tr>
                         <td class="px-0 pt-3">
-                            <p><i class="fa-regular fa-comment-dots me-1"></i>[[${notice.replyCount}]]</p>
+                            <p><i class="fa-regular fa-comment-dots me-1"></i>
+                                <span data-reply-count>[[${notice.replyCount}]]</span>
+                            </p>
+
                             <div class="reply_list_area">
                                 <ul></ul>
                             </div>
+                            <!-- reply 페이징 추가                   -->
+                            <div class="mt-2">
+                                <ul class="pagination replyPaging"></ul>
+                            </div>
+
                             <div class="reply_write_area pt-3">
                                 <div class="mb-2">
                                     <textarea name="replyText" id="replyText" class="form-control" placeholder="댓글 내용을 입력해주세요(최대 1000자)"></textarea>
@@ -73,139 +88,151 @@
 </div>
 
 <script layout:fragment="pagescript" th:inline="javascript">
-    /////// 대댓글 textarea toggle ///////
-    const btnReReplyWriteViews = document.querySelectorAll(".btnReReplyWriteView")
-    function reReplyStr() {
-        return `<div class="reReplyWriteArea">
-                <div class="d-flex justify-content-start align-items-start gap-2 py-2">
-                  <div class="flex-grow-1">
-                    <div class="mb-2">
-                      <textarea name="reReplyText" id="reReplyText" class="form-control" placeholder="대댓글 내용을 입력해주세요(최대 1000자)"></textarea>
-                    </div>
-                    <div class="d-flex">
-                      <button class="btnReReplyRegister ms-auto btn btn-main">대댓글 쓰기</button>
-                    </div>
-                  </div>
-                  <div class="flex-shrink-1">
-                    <button class="btnReReplyWriteClose btn btn-xs btn-outline-danger">
-                      <i class="fa-solid fa-xmark"></i>
-                    </button>
-                  </div>
-                </div>
-              </div>`
+
+        // 기본 엘리먼트/상태
+        const bno = [[${notice.bno}]];
+        const replyList   = document.querySelector(".reply_list_area ul");
+        const replyText   = document.querySelector("#replyText");
+        const btnWrite    = document.querySelector(".btnReplyRegister");
+        const replyPaging = document.querySelector(".replyPaging"); // HTML에 <ul class="pagination replyPaging"></ul> 있어야 함
+        let page = 1, size = 5;
+
+        // 공통 fetch
+        async function api(url, method = "GET", data) {
+        const opt = { method, headers: { "Content-Type": "application/json" } };
+        if (data) opt.body = JSON.stringify(data);
+        const res = await fetch(url, opt);
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const ct = res.headers.get("content-type") || "";
+        return ct.includes("application/json") ? res.json() : res.text();
     }
 
-    btnReReplyWriteViews.forEach(btn => {
-        btn.addEventListener("click", function(e){
-            e.preventDefault()
-            const li = e.target.closest("li.reply_list")
-            console.log(li)
-            if (li.querySelector(".reply_depth2") == null) {
-                li.insertAdjacentHTML("beforeend", `<div class="reply_depth2 ps-4"></div>`)
-            }
-            const depth2 = li.querySelector(".reply_depth2")
-            if (depth2.querySelector(".reReplyWriteArea") != null) {
-                return
-            }
-            depth2.insertAdjacentHTML("beforeend", reReplyStr())
-            const btnReReplyWriteClose = depth2.querySelector(".btnReReplyWriteClose")
-            btnReReplyWriteClose.addEventListener("click", () => {
-                btnReReplyWriteClose.closest(".reReplyWriteArea").remove()
-            })
-        })
-    })
+        // replyCount 갱신
+        function setReplyCount(n){
+        document.querySelectorAll("[data-reply-count]")
+            .forEach(el => el.textContent = String(n ?? 0));
+    }
 
-    // ===========================
-    // 공지 댓글 기능 추가 (기존 코드 전혀 삭제 안 함)
-    // ===========================
-    const bno = [[${notice.bno}]];
-    const replyList = document.querySelector(".reply_list_area ul");
-    const replyText = document.querySelector("#replyText");
-    const replyBtn = document.querySelector(".btnReplyRegister");
+        // 페이지바 렌더
+        function printPages(data){
+        if (!replyPaging || !data || !data.total){ return; }
+        let html = "";
+        if (data.prev) html += `<li class="page-item"><a class="page-link" data-page="${data.start-1}">«</a></li>`;
+        for (let i = data.start; i <= data.end; i++){
+        html += `<li class="page-item ${i===data.page?'active':''}">
+                 <a class="page-link" data-page="${i}">${i}</a>
+               </li>`;
+    }
+        if (data.next) html += `<li class="page-item"><a class="page-link" data-page="${data.end+1}">»</a></li>`;
+        replyPaging.innerHTML = html;
+    }
 
-    // 댓글 목록 불러오기
-    async function loadReplies() {
-        try {
-            const res = await fetch(`/noticereplies/list/${bno}`);
-            const data = await res.json();
-            if (!data.dtoList || data.dtoList.length === 0) {
-                replyList.innerHTML = `<li class="p-2 text-muted">등록된 댓글이 없습니다.</li>`;
+        // 목록 로드
+        async function load(p = page, s = size){
+        try{
+        const data = await api(`/noticereplies/list/${bno}?page=${p}&size=${s}`);
+        setReplyCount(typeof data.total === "number" ? data.total : 0);
+
+        const list = Array.isArray(data.dtoList) ? data.dtoList : [];
+        replyList.innerHTML = list.length ? list.map(r => `
+        <li class="reply_list border-bottom d-flex justify-content-between align-items-start py-2" data-rno="${r.rno}">
+          <div>
+            <b>${r.nickname || "익명"}</b><br>
+            <small class="text-muted" style="margin-left:8px;">${r.regDate || ""}</small>
+            ${r.updateDate ? `<small class="text-muted ms-2">(수정됨 ${r.updateDate})</small>` : ""}
+            <div class="replyContent">${r.deleted ? '<span class="text-secondary">삭제된 댓글입니다.</span>' : (r.content ?? "")}</div>
+          </div>
+          ${(!r.deleted && (r.owner || r.admin)) ? `
+         <div class="flex-shrink-1">
+            <div class="btn-group">
+              <button type="button" class="btn btn-xs rounded-2 btn-outline-gray" data-bs-toggle="dropdown" aria-expanded="false">
+                <i class="fa-solid fa-ellipsis"></i>
+              </button>
+              <ul class="dropdown-menu dropdown-menu-end">
+                <li><a class="dropdown-item modifyBtn" href="#">수정</a></li>
+                <li><a class="dropdown-item deleteBtn" href="#">삭제</a></li>
+              </ul>
+            </div>
+          </div>` : ``}
+        </li>
+      `).join("") : `<li class="p-2 text-muted">등록된 댓글이 없습니다.</li>`;
+
+        printPages(data);
+    }catch(e){
+        console.error(e);
+        replyList.innerHTML = `<li class="p-2 text-muted">댓글을 불러오는 중 오류가 발생했습니다.</li>`;
+        if (replyPaging) replyPaging.innerHTML = "";
+    }
+    }
+
+        // 등록
+        btnWrite?.addEventListener("click", async () => {
+        const content = (replyText?.value || "").trim();
+        if (!content) return alert("댓글 내용을 입력해주세요.");
+        try{
+        await api(`/noticereplies/`, "POST", { bno, content });
+        replyText.value = "";
+        load(1, size); // 첫 페이지로
+    }catch(e){
+        console.error(e); alert("등록 실패");
+    }
+    });
+
+        // 수정 / 삭제 (이벤트 위임)
+        replyList?.addEventListener("click", async (e) => {
+            const a = e.target.closest("a.modifyBtn, a.deleteBtn");
+            if (!a) return;
+
+            e.preventDefault();
+            e.stopPropagation();
+
+            const li  = a.closest("li.reply_list");
+            const rno = li?.dataset?.rno;
+            if (!rno) return;
+
+            // 수정
+            if (a.classList.contains("modifyBtn")) {
+                const old = li.querySelector(".replyContent")?.textContent?.trim() || "";
+                const content = prompt("새 내용 입력:", old);
+                if (!content || content === old) return;
+
+                try {
+                    await api(`/noticereplies/${rno}`, "PUT", { content });
+                    await load(page, size);
+                } catch (err) {
+                    console.error(err);
+                    alert("수정 실패");
+                }
                 return;
             }
 
-            replyList.innerHTML = data.dtoList.map(r => `
-        <li class="reply_list border-bottom" data-rno="${r.rno}">
-          <div class="d-flex justify-content-between align-items-start py-2">
-            <div>
-              <b>${r.nickname || '익명'}</b><br>
-              <small class="text-muted" style="margin-left:8px;">${r.regDate || ''}</small><br>
-              ${r.deleted ? '<span class="text-secondary">삭제된 댓글입니다.</span>' : r.content}
-            </div>
-            ${(!r.deleted && (r.owner || r.admin)) ? `
-            <div>
-              <button class="btn btn-sm btn-outline-secondary btnEdit" data-rno="${r.rno}">수정</button>
-              <button class="btn btn-sm btn-outline-danger btnDelete" data-rno="${r.rno}">삭제</button>
-            </div>` : ''}
-          </div>
-        </li>
-      `).join("");
-        } catch (err) {
-            console.error("댓글 로딩 오류:", err);
-        }
-    }
+            // 삭제
+            if (a.classList.contains("deleteBtn")) {
+                if (!confirm("삭제하시겠습니까?")) return;
 
-    // 댓글 등록
-    replyBtn.addEventListener("click", async () => {
-        const content = replyText.value.trim();
-        if (!content) return alert("댓글 내용을 입력해주세요.");
-        try {
-            const res = await fetch("/noticereplies/", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ bno, content })
-            });
-            if (res.ok) {
-                replyText.value = "";
-                loadReplies();
-            } else {
-                alert("댓글 등록 실패");
+                try {
+                    // 서버가 현재 POST /delete/{rno}를 받도록 되어 있다면 아래 라인을 사용
+                    await api(`/noticereplies/delete/${rno}`, "POST");
+                    await load(page, size);
+                } catch (err) {
+                    console.error(err);
+                    alert("삭제 실패");
+                }
             }
-        } catch (err) {
-            console.error(err);
-        }
+        });
+
+
+        // 페이지 클릭
+        replyPaging?.addEventListener("click", (e)=>{
+        e.preventDefault();
+        const a = e.target.closest("a");
+        if (!a) return;
+        page = Number(a.dataset.page);
+        load(page, size);
     });
 
-    // 수정 / 삭제
-    replyList.addEventListener("click", async (e) => {
-        const rno = e.target.dataset.rno;
-        if (!rno) return;
-
-        // 삭제
-        if (e.target.classList.contains("btnDelete")) {
-            if (!confirm("댓글을 삭제하시겠습니까?")) return;
-            await fetch(`/noticereplies/delete/${rno}`, { method: "POST" });
-            loadReplies();
-        }
-
-        // 수정
-        if (e.target.classList.contains("btnEdit")) {
-            const li = e.target.closest("li");
-            const oldText = li.querySelector(".replyContent")?.innerText || "";
-            const newText = prompt("수정할 내용을 입력하세요:", oldText);
-            if (newText === null) return;
-            await fetch(`/noticereplies/${rno}`, {
-                method: "PUT",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ rno, content: newText })
-            });
-            loadReplies();
-        }
-    });
-
-    // 페이지 진입 시 목록 표시
-    loadReplies();
-    // ===========================
-    // ===========================
-
+        // 초기 로딩
+        load(page, size);
 </script>
+
 </html>

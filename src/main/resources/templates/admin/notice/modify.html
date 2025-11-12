@@ -7,22 +7,24 @@
     <div class="page_title d-flex align-items-center mb-3">
         <h2>공지사항 수정</h2>
     </div>
-
     <div class="board_area">
         <form th:action="@{/admin/notice/modify}" method="post" enctype="multipart/form-data">
+            <!-- 게시글 번호 -->
             <input type="hidden" name="bno" th:value="${notice.bno}">
 
             <div class="mb-2">
                 <div class="form-check">
-                    <input class="form-check-input" type="checkbox" name="pinned" value="true"
-                           id="pinned" th:checked="${notice.pinned}">
-                    <label class="form-check-label" for="pinned">상단 고정</label>
+                    <input class="form-check-input" type="checkbox" name="pinned" value="true" id="pinned"
+                           th:checked="${notice.pinned}">
+                    <label class="form-check-label" for="pinned">
+                        상단 고정
+                    </label>
                 </div>
             </div>
 
             <div class="mb-2">
-                <input type="text" name="title" class="form-control"
-                       th:value="${notice.title}" placeholder="제목을 입력해주세요" required>
+                <input type="text" name="title" class="form-control" placeholder="제목을 입력해주세요"
+                       required th:value="${notice.title}">
             </div>
 
             <div class="mb-2">
@@ -31,14 +33,29 @@
                   th:text="${notice.content}"></textarea>
             </div>
 
+            <!-- 기존 첨부파일 표시 및 삭제 선택 -->
+            <div class="mb-3" th:if="${notice.noticeFileDTOs != null and notice.noticeFileDTOs.size() > 0}">
+                <ul>
+                    <li th:each="file : ${notice.noticeFileDTOs}">
+                        <input type="checkbox" name="deleteFiles" class="form-check-input" th:value="${file.uuid}"> 삭제
+                        <a th:href="@{|/uploads/notice/${file.uuid}_${file.fileName}|}"
+                           th:text="${file.fileName}"></a>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- 새 파일 업로드 -->
+            <div class="mb-3">
+                <input type="file" name="files" class="form-control" multiple>
+            </div>
+
             <div class="button_wrap">
                 <div class="row g-2">
                     <div class="col-6 col-md-auto ms-md-auto">
-                        <a th:href="@{/admin/notice/view(bno=${notice.bno})}"
-                           class="btn btn-lg btn-gray w-100">취소</a>
+                        <a th:href="@{/admin/notice/view(bno=${notice.bno})}" class="btn btn-lg btn-gray w-100">취소</a>
                     </div>
                     <div class="col-6 col-md-auto">
-                        <button type="submit" class="btn btn-lg btn-primary w-100">수정 완료</button>
+                        <button class="btn btn-lg btn-primary w-100">수정 완료</button>
                     </div>
                 </div>
             </div>
@@ -47,5 +64,6 @@
 </div>
 
 <script layout:fragment="pagescript" th:inline="javascript">
+
 </script>
 </html>
