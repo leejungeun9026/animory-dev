@@ -1,7 +1,11 @@
 package com.four.animory.controller;
 
+import com.four.animory.dto.free.FreeBoardDTO;
+import com.four.animory.dto.mate.MateBoardDTO;
 import com.four.animory.dto.sitter.SitterBoardListDTO;
 import com.four.animory.dto.spr.SprBoardDTO;
+import com.four.animory.service.free.FreeService;
+import com.four.animory.service.mate.MateService;
 import com.four.animory.service.sitter.SitterBoardService;
 import com.four.animory.service.spr.SprBoardService;
 import lombok.Getter;
@@ -17,18 +21,30 @@ import java.util.List;
 @Log4j2
 public class HomeController {
   @Autowired
-  private SitterBoardService sitterBoardService;
+  private FreeService freeBoardService;
+  @Autowired
+  private MateService mateBoardService;
   @Autowired
   private SprBoardService sprBoardService;
+  @Autowired
+  private SitterBoardService sitterBoardService;
 
 
   @GetMapping({"/", "/index"})
   public String index(Model model){
+    List<FreeBoardDTO> freeBoard = freeBoardService.getTop10FreeBoardList();
+    List<MateBoardDTO> mateBoard = mateBoardService.getTop10MateBoardList();
     List<SprBoardDTO> sprBoard = sprBoardService.getTop10SprBoards();
     List<SitterBoardListDTO> sitterBoard = sitterBoardService.getRecent(4);
-
+    log.info(mateBoard);
+    model.addAttribute("freeBoard", freeBoard);
     model.addAttribute("sprBoard", sprBoard);
     model.addAttribute("sitterBoard", sitterBoard);
     return "index";
+  }
+
+  @GetMapping("/maptest")
+  public void test() {
+
   }
 }

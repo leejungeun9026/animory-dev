@@ -21,13 +21,13 @@ public class CustomLoginSuccessHandler implements AuthenticationSuccessHandler {
 
         boolean isAdmin = authentication.getAuthorities().stream()
                 .anyMatch(a -> a.getAuthority().equals("ADMIN"));
-        String from = request.getParameter("from"); // admin/login에서 왔는지
-
-        if ("admin".equals(from) && !isAdmin) {
-            // 관리자 로그인 화면에서 일반유저로 로그인 → 경고 후 다시 /admin/login
-            response.sendRedirect("/admin/login?notAdmin=1");
-            return;
-        }
+        String from = request.getParameter("/admin/login"); // admin/login에서 왔는지
+//
+//        if ("admin".equals(from) && !isAdmin) {
+//            // 관리자 로그인 화면에서 일반유저로 로그인 → 경고 후 다시 /admin/login
+//            response.sendRedirect("/admin/login?notAdmin=1");
+//            return;
+//        }
 
         // 평소 분기
         String redirectUrl = isAdmin ? "/admin/dashboard" : "/";

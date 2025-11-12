@@ -67,10 +67,30 @@
       </div>
     </div>
   </div>
+
+  <div class="modal" id="alertModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered modal-sm modal-360">
+      <div class="modal-content">
+        <div class="modal-header border-bottom-0">
+          <h5 class="modal-title">안내</h5>
+          <button aria-label="Close" class="btn-close" data-bs-dismiss="modal" type="button"></button>
+        </div>
+        <div class="modal-body py-0">
+          <p>반려동물 정보는 10마리까지만 등록 가능합니다</p>
+        </div>
+        <div class="modal-footer border-top-0">
+          <div class="d-flex justify-content-center gap-2 flex-nowrap w-100">
+            <button class="btn btn-lg btn-main w-100" data-bs-dismiss="modal" type="button">확인</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
 
 <script layout:fragment="pagescript" th:inline="javascript">
     /////// 반려동물 정보 추가 삭제하기 ///////
+    const alertModal = new bootstrap.Modal(document.getElementById('alertModal'))
     const btnAddPet = document.getElementById("btnAddPet");
     const petInfo = document.getElementById("petInfo");
     const petList = document.getElementById("petList");
@@ -136,7 +156,7 @@
         console.log(petList)
         console.log(liCnt)
         if (liCnt >= 10){
-            alert ("반려동물은 10마리까지만 등록가능합니다")
+            alertModal.show()
             return
         }
         petList.insertAdjacentHTML("beforeend", Li(liCnt));

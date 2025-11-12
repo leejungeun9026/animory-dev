@@ -2,10 +2,12 @@ package com.four.animory.controller.sitter;
 
 import com.four.animory.config.auth.PrincipalDetails;
 import com.four.animory.domain.sitter.SitterFile;
+import com.four.animory.domain.user.Member;
 import com.four.animory.dto.sitter.*;
 import com.four.animory.dto.sitter.file.SitterUploadFileDTO;
 import com.four.animory.dto.user.MemberDTO;
 import com.four.animory.dto.user.MemberWithPetCountDTO;
+import com.four.animory.dto.user.PetDTO;
 import com.four.animory.service.sitter.SitterBoardService;
 import com.four.animory.service.user.UserService;
 import jakarta.validation.Valid;
@@ -53,8 +55,14 @@ public class SitterBoardController {
 
   @GetMapping("/register")
   public void registerGet(@AuthenticationPrincipal PrincipalDetails principal, Model model) {
-    MemberDTO memberDTO = userService.getMemberByUsername(principal.getMember().getUsername());
-    model.addAttribute("memberDTO", memberDTO);
+    if(principal != null) {
+      MemberDTO memberDTO = userService.getMemberByUsername(principal.getMember().getUsername());
+      boolean isSitter = userService.getSitterById(memberDTO.getMid());
+      int petCount = userService.getPetListByMemberId(memberDTO.getMid()).size();
+      model.addAttribute("memberDTO", memberDTO);
+      model.addAttribute("isSitter", isSitter);
+      model.addAttribute("petCount", petCount);
+    }
   }
 
   @PostMapping("/register")

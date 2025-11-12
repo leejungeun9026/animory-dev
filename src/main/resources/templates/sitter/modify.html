@@ -50,7 +50,7 @@
       </div>
       <div class="mb-3">
         <input class="form-control" multiple name="files" type="file">
-        <input type="text" name="deleteFileUuid" id="deleteFileUuid">
+        <!-- /*  <input type="text" name="deleteFileUuid" id="deleteFileUuid">  */-->
         <ul id="fileList" class="list-group mt-2" th:if="${board.fileDTOs != null && board.fileDTOs.size > 0}">
           <li class="list-group-item px-2" th:each="file:${board.fileDTOs}">
             <div class="d-flex align-items-center gap-2">

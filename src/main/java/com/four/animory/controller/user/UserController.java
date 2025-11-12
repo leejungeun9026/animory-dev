@@ -43,12 +43,13 @@ public class UserController {
 
   @GetMapping("/mypage")
   public String mypageGet(@AuthenticationPrincipal PrincipalDetails principal, Model model) {
-    if (principal == null) return "redirect:/member/login";
-    Member member = principal.getMember();
-    MemberDTO memberDTO = userService.getMemberByUsername(member.getUsername());
-    List<PetDTO> petDTOs = userService.getPetListByMemberId(member.getId());
-    model.addAttribute("memberDTO", memberDTO);
-    model.addAttribute("petDTOs", petDTOs);
+    if (principal != null){
+      Member member = principal.getMember();
+      MemberDTO memberDTO = userService.getMemberByUsername(member.getUsername());
+      List<PetDTO> petDTOs = userService.getPetListByMemberId(member.getId());
+      model.addAttribute("memberDTO", memberDTO);
+      model.addAttribute("petDTOs", petDTOs);
+    }
     return "member/mypage";
   }
 
@@ -62,7 +63,7 @@ public class UserController {
   public String modifyPost(PetListDTO petListDTO, Model model) {
     log.info(petListDTO);
     userService.updatePetList(petListDTO);
-    return "redirect:/index";
+    return "redirect:/member/mypage";
   }
 
   @GetMapping("/profile/{username}")

@@ -5,7 +5,7 @@
 <div layout:fragment="content">
   <div class="page_title d-flex align-items-center mb-3">
     <h2>회원 관리</h2>
-    <a class="ms-auto btn btn-lg btn-primary" href="/admin/notice/register">글쓰기</a>
+<!--    <a class="ms-auto btn btn-lg btn-primary" href="/admin/notice/register">글쓰기</a>-->
   </div>
   <div class="row g-4">
     <div class="col-12">
@@ -58,7 +58,7 @@
             </tr>
             <tr th:each="member:${memberList}" th:unless="${#lists.isEmpty(memberList)}" class="text-center">
               <td>[[${member.mid}]]</td>
-              <td><a th:href="@{/admin/member/view(mid=${member.mid})}"><b class="text-info text-link">[[${member.username}]]</b></a></td>
+              <td><b>[[${member.username}]]</b></td>
               <td>
                 <p>[[${member.nickname}]] / [[${member.tel}]]</p>
                 <p>[[${member.email}]]</p>
@@ -66,10 +66,8 @@
               <td>
                 <p th:if="${member.petCount == 0}" class="">없음</p>
                 <p th:unless="${member.petCount == 0}">
-                  <a href="">
-                    <span class="text-info text-link">있음</span>
+                    <span>있음</span>
                     <span class="badge badge-info">[[${member.petCount}]]</span>
-                  </a>
                 </p>
               </td>
               <td>
@@ -84,30 +82,30 @@
             </tr>
             </tbody>
           </table>
-          <div class="paging_area mt-3">
-            <nav aria-label="Page navigation">
-              <ul class="pagination pagination-sm justify-content-center mb-0">
-                <li class="page-item disabled">
-                  <a class="page-link"><i class="fa-solid fa-angles-left"></i></a>
-                </li>
-                <li class="page-item">
-                  <a class="page-link"><i class="fa-solid fa-chevron-left"></i></a>
-                </li>
-                <li class="page-item active">
-                  <a class="page-link">1</a>
-                </li>
-                <li class="page-item">
-                  <a class="page-link">2</a>
-                </li>
-                <li class="page-item">
-                  <a class="page-link"><i class="fa-solid fa-chevron-right"></i></a>
-                </li>
-                <li class="page-item">
-                  <a class="page-link"><i class="fa-solid fa-angles-right"></i></a>
-                </li>
-              </ul>
-            </nav>
-          </div>
+<!--          <div class="paging_area mt-3">-->
+<!--            <nav aria-label="Page navigation">-->
+<!--              <ul class="pagination pagination-sm justify-content-center mb-0">-->
+<!--                <li class="page-item disabled">-->
+<!--                  <a class="page-link"><i class="fa-solid fa-angles-left"></i></a>-->
+<!--                </li>-->
+<!--                <li class="page-item">-->
+<!--                  <a class="page-link"><i class="fa-solid fa-chevron-left"></i></a>-->
+<!--                </li>-->
+<!--                <li class="page-item active">-->
+<!--                  <a class="page-link">1</a>-->
+<!--                </li>-->
+<!--                <li class="page-item">-->
+<!--                  <a class="page-link">2</a>-->
+<!--                </li>-->
+<!--                <li class="page-item">-->
+<!--                  <a class="page-link"><i class="fa-solid fa-chevron-right"></i></a>-->
+<!--                </li>-->
+<!--                <li class="page-item">-->
+<!--                  <a class="page-link"><i class="fa-solid fa-angles-right"></i></a>-->
+<!--                </li>-->
+<!--              </ul>-->
+<!--            </nav>-->
+<!--          </div>-->
         </div>
       </div>
     </div>

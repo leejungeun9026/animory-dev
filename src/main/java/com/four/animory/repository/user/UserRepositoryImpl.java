@@ -21,8 +21,12 @@ public class UserRepositoryImpl extends QuerydslRepositorySupport implements Use
     QPet qPet = QPet.pet;
 
     JPQLQuery<MemberWithPetCountDTO> query = from(qMember)
-        .leftJoin(qPet).on(qPet.member.eq(qMember)) // Member 기준 LEFT JOIN
+        .leftJoin(qPet).on(qPet.member.eq(qMember))
+        // ADMIN 제외
+        .where(qMember.role.ne("ADMIN"))
         .groupBy(qMember.id)
+        // 정렬 추가 (id DESC)
+        .orderBy(qMember.id.desc())
         .select(Projections.bean(
             MemberWithPetCountDTO.class,
             qMember.id.as("mid"),

@@ -19,7 +19,6 @@ public interface MemberRepository extends JpaRepository<Member,Long>, UserReposi
   @Query("SELECT m.sitter FROM Member m WHERE m.id = :memberId")
   boolean findSitterById(@RequestParam Long memberId);
 
-    Member findByNickname(String nickname);
-
-    String username(String username);
+  Member findByNickname(String nickname);
+  String username(String username);
 }

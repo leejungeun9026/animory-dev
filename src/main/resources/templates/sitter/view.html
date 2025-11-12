@@ -410,6 +410,7 @@
         if (btnProfile) {
             let replyUsername = btnProfile.dataset.username
             getProfile(replyUsername).then(user => {
+                     console.log(user.member)
                     const profileBody = document.querySelector("#profileModal .modal-body");
                     let str = `<div class="card rounded-3">
                                   <div class="card-body">
@@ -422,7 +423,8 @@
                                           <li class="mb-1"><b>지역</b> : ${user.member.sido}/${user.member.sigungu}</li>
                                           <li class=""><b>시터 인증</b> : `
 
-                    if(user.member.isSitter === "1") {
+                    if(user.member.sitter === true) {
+
                         str += `인증 완료<i class="fa-solid fa-circle-check text-info"></i>`
                     } else {
                         str += `미인증`

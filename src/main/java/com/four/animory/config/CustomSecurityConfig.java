@@ -29,7 +29,8 @@ public class CustomSecurityConfig {
         .cors(httpSecurityCorsConfigurer -> httpSecurityCorsConfigurer.disable())
         .authorizeHttpRequests(authorizeRequest -> authorizeRequest
             .dispatcherTypeMatchers(DispatcherType.FORWARD).permitAll()
-            .requestMatchers("/", "/index","/member/login", "/member/join").permitAll()
+            .requestMatchers("/", "/index","/member/login", "/member/loginRegister", "/member/join", "/member/joinRegister").permitAll()
+            .requestMatchers(HttpMethod.GET, "/api/regions/**").permitAll()
             .requestMatchers("/member/mypage", "/member/modifyPet").authenticated()
             .requestMatchers("/free/list", "/mate/list", "/spr/list", "/sitter/list", "/notice/list").permitAll()
             .requestMatchers("/free/**", "/mate/**", "/spr/**","/sprreplies/**", "/sitter/**", "/notice/**").authenticated()
@@ -41,7 +42,8 @@ public class CustomSecurityConfig {
             .loginProcessingUrl("/member/loginRegister")
             .usernameParameter("username")
             .passwordParameter("password")
-            .defaultSuccessUrl("/")
+            .successHandler(customLoginSuccessHandler)
+//            .defaultSuccessUrl("/")
             .permitAll())
         .logout(logoutConfigure -> logoutConfigure
             .logoutUrl("/member/logout")

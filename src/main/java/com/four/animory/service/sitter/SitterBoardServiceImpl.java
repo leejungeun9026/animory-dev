@@ -101,6 +101,8 @@ public class SitterBoardServiceImpl implements SitterBoardService {
 
   @Override
   public int deleteBoard(Long bno) {
+    SitterBoard sitterBoard = sitterBoardRepository.findById(bno).orElse(null);
+    sitterBoard.removeFiles();
     sitterReplyRepository.deleteAllReplyByBno(bno);
     sitterBoardRepository.deleteById(bno);
     SitterBoard result = sitterBoardRepository.findById(bno).orElse(null);
