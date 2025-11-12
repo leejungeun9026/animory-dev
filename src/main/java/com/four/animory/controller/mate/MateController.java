@@ -47,35 +47,25 @@ public class MateController {
     @Autowired
     private UserService userService;
 
-
-    //1차 list
-//    @GetMapping("/list")
-//    public String list(Model model) {
-//        List<MateBoardDTO> mateboardList = mateService.findAllMateBoards();
-//        log.info("LIST SIZE = {}", mateboardList.size());
-//        model.addAttribute("mateboardList", mateboardList);
-//        return "mate/list";
-//    }
-
-    // 해결필요
     @GetMapping("/list")
-    public void replyCountList(MatePageRequestDTO matePageRequestDTO, Model model) {
+    public void replyCountList(@AuthenticationPrincipal PrincipalDetails principal, MatePageRequestDTO matePageRequestDTO, Model model) {
+        if(principal != null){
+            MemberDTO memberDTO = userService.getMemberByUsername(principal.getMember().getUsername());
+            int petCount = userService.getPetListByMemberId(memberDTO.getMid()).size();
+            model.addAttribute("memberDTO", memberDTO);
+            model.addAttribute("petCount", petCount);
+        }
         log.info("replyCountList");
         MatePageResponseDTO<MateReplyCountDTO> responseDTO = mateService.getListReplyCount(matePageRequestDTO);
+        log.info(responseDTO);
         model.addAttribute("responseDTO", responseDTO);
     }
-
-    //해결필요
-//    public String list(MatePageRequestDTO matePageRequestDTO, Model model) {
-//        PageResponseDTO<MateBoardDTO> responseDTO = mateService.getList(matePageRequestDTO);
-//        model.addAttribute("responseDTO", responseDTO);
-//        return "mate/list";
-//    }
 
     @GetMapping("/view")
     public void view(Long bno, Integer mode, Model model) {
         if (mode == null) mode = 1;
         model.addAttribute("board", mateService.findMateBoardById(bno, mode));
+
     }
 
     @GetMapping("register")
@@ -83,11 +73,8 @@ public class MateController {
         log.info("registerGet");
     }
 
-    //해결필요
     @PostMapping("register")
     public String registerPost(UploadFileDTO uploadFileDTO, MateBoardDTO mateBoardDTO, @AuthenticationPrincipal PrincipalDetails principalDetails) {
-
-
         List<MateFileDTO> fileDTOS = null; //리턴형은 리스트 스트링이야 아래에 함수 만들었어
         if (uploadFileDTO.getFiles() != null && //getFiles하면 파일의 리스트를 가지고 올수있어. files라는게 있어서 null은
                 // 아닌데 파일을 선택을 안해서 업로드가 안됨. 파일 없으면 글 못씀.
@@ -107,22 +94,21 @@ public class MateController {
         if (uploadFileDTO.getFiles() != null) { //파일이 있으면 실행!
             uploadFileDTO.getFiles().forEach(multifile -> { // uploadFileDTO.getFiles() 하면 파일리스나와 하나씩 꺼내서 멀티파일에 할당
                 String originalFileName = multifile.getOriginalFilename();
-                log.info("originalFileName" + originalFileName); //파일 이름을 찍어줘. 1개든 2개든~
-//                서버에 많은 사람이 쓰니까 같은 파일명을 올리면 난리가 나 uuid를 붙혀줘
-                String uuid = UUID.randomUUID().toString(); //오리지날 파일 이름이 같은게 많으면 uuid 16자리,랜덤
-                Path savePath = Paths.get(uploadPath, uuid + "_" + originalFileName); //file path를 선택하고 uu+진명
-                boolean image = false; //uploadPath, , 콤마가 업로드 패스에 슬러시를 만들어주는데 + 를 쓰면 슬러시 넣어줘야해.
-                try { //파일이 이미지라면 try 돌아
-                    multifile.transferTo(savePath); // 파일이 저장됨 / multifile 파일의 전체정보 . 세이브 페스로 전송한다.
-                    if (Files.probeContentType(savePath).startsWith("image")) { //probes에 image라고 붙어있으면 true
-                        image = true; //savePath가 가진 속성컨텐츠 타입이 image면 이미지 파일이고 true로 하고 아래대로 섬네일 만들어.
-                        File thumbnail = new File(uploadPath, "s_" + uuid + "_" + originalFileName); //섬네일 객체 하나 만들고
-                        Thumbnailator.createThumbnail(savePath.toFile(), thumbnail, 200, 200); //크기가 200 200
-                    } //savePath에 있는 것을 toFile 하고 섬네일 만들고, 이미지 크기 설정 , 고려사항 실제 그림의 비율을 맞춰야해 큰거(ex, 가로)만 고정줘도 수정됨.
+                log.info("originalFileName" + originalFileName);
+                String uuid = UUID.randomUUID().toString();
+                Path savePath = Paths.get(uploadPath, uuid + "_" + originalFileName);
+                boolean image = false;
+                try {
+                    multifile.transferTo(savePath);
+                    if (Files.probeContentType(savePath).startsWith("image")) {
+                        image = true;
+                        File thumbnail = new File(uploadPath, "s_" + uuid + "_" + originalFileName);
+                        Thumbnailator.createThumbnail(savePath.toFile(), thumbnail, 200, 200);
+                    }
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
-//                리스트에 넣기
+//
                 MateFileDTO mateFileDTO = MateFileDTO.builder()
                         .uuid(uuid)
                         .filename(originalFileName)
@@ -146,9 +132,9 @@ public class MateController {
             boolean removed = false;
             try {
                 String contentType = Files.probeContentType(resource.getFile().toPath());
-                removed = resource.getFile().delete(); // 원본 파일 삭제, 이미지 파일이면 현재 리소스 파일이지워진다! 근데 섬네일 지워져 원본은 if로 해결
+                removed = resource.getFile().delete();
                 if (contentType.startsWith("image")) {
-                    String fileName1 = "s_" + filename; //섬네일의 s지우고
+                    String fileName1 = "s_" + filename;
                     File thumFile = new File(uploadPath + File.separator + fileName1);
                     thumFile.delete(); //원본 파일이 지워져
                 }
@@ -156,33 +142,7 @@ public class MateController {
                 e.printStackTrace();
             }
         }
-
     }
-
-
-//    @GetMapping("/register")
-//    public void registerGet(@AuthenticationPrincipal PrincipalDetails principal, Model model) {
-//        MemberDTO memberDTO = null;
-//        if (principal != null)
-//            Member member = principal.getMember();
-//        memberDTO = userService.getMemberByUsername(member.getUsername());
-//        log.info("로그인한 회원 정보: {}", memberDTO);
-//         }else{
-//            log.info("비로그인 상태에서 글쓰기 페이지 접근");
-//        }
-//        model.addAttribute("memberDTO", memberDTO);
-//    }
-//
-//    @PostMapping("/register")
-//    public String registerPost(MateBoardDTO mateBoardDTO, MateUploadFileDTO mateUploadFileDTO, RedirectAttributes redirectAttributes) {
-//        List<MateFileDTO> mateFileDTOS = null;
-//        if(mateUploadFileDTO.getFiles() !== null && ! mateUploadFileDTO.getFiles().get(0).getOriginalFilename().equals("")){
-//            mateFileDTOS = fileUpload(mateUploadFileDTO);
-//        }
-//        mateBoardDTO.setMateFileDTOs(mateFileDTOS);
-//        mateService.registerMateBoard(mateBoardDTO);
-//        return "redirect:/mate/list";
-//    }
 
     @GetMapping("/modify")
     public String modify(Long bno, Integer mode, Model model) {
@@ -203,20 +163,6 @@ public class MateController {
         mateService.deleteMateBoardById(bno);
         return "redirect:/mate/list";
     }
-
-    //    @ResponseBody
-//    @GetMapping("/like")
-//    public MateBoardDTO likePost(Long bno){
-//        return mateService.updateLikecount(bno);
-//    }
-
-    @GetMapping("/like-test")
-    @ResponseBody
-    public String testLike(Long bno) {
-        int updated = mateService.increaseLikeCountAndGet(bno);
-        return "업데이트 후 likecount=" + updated;
-    }
-
 
     @PostMapping(value = "/like", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody

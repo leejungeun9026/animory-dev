@@ -83,10 +83,14 @@ public class MateSearchImpl extends QuerydslRepositorySupport implements MateSea
                         qBoard.bno,
                         qBoard.title,
                         qBoard.member.username,
+                        qBoard.member.nickname,
+                        qBoard.category,
                         qBoard.sido,
                         qBoard.sigungu,
                         qBoard.readCount,
                         qBoard.regDate,
+                        qBoard.likecount,
+                        qBoard.dueDate,
                         qreply.count().as("replyCount")));
 
         //member를 가지고 와야지 실제 author를 넣을 수 있어

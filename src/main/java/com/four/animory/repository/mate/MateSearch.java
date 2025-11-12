@@ -7,5 +7,7 @@ import org.springframework.data.domain.Pageable;
 
 public interface MateSearch {
   Page<MateBoard> searchAll(String[] types, String keyword, Pageable pageable);
-    Page<MateReplyCountDTO> searchWithReplyCount(String[] types, String keyword, Pageable pageable);
+  Page<MateReplyCountDTO> searchWithReplyCount(String[] types, String keyword, Pageable pageable);
+
+
 }

@@ -21,7 +21,10 @@
                         <td class="tb_title border-bottom pb-3 px-0">
                             <div class="d-flex gap-2 flex-nowrap align-items-end mb-2">
                                 <div class="d-flex gap-2 flex-nowrap align-items-center">
-                                    <p class="badge badge-info"
+                                    <div class="badge badge-gray mb-2">
+                                        <span>[[${board.sido}]]</span> / <span>[[${board.sigungu}]]</span>
+                                    </div>
+                                    <p class="badge badge-info mb-2"
                                        th:if="${board != null and (board.category == '1:1 모집' or board.category == '그룹 모집')}"
                                        th:text="${board.category}">
                                     </p>
@@ -42,7 +45,7 @@
 
                                 <p class="ms-auto mb-0 d-flex align-items-center">
                                     <i class="fa-regular fa-eye me-1"></i>
-                                    <span>[[${board.readCount}]]</span>
+                                    <span th:text="${board.readCount}">0</span>
 
                                     <i class="like-btn"
                                        th:attr="data-bno=${board.bno}"
@@ -53,9 +56,8 @@
                                     <span class="like-count"
                                           th:attr="data-bno=${board.bno}"
                                           th:text="${board.likecount}">0</span>
-
                                     <i class="fa-regular fa-comment-dots ms-3 me-1"></i>
-                                    <span>[[${board.replyCount} ?: 0]]</span>
+                                    <span class="reply-count" th:text="${board.replyCount} ?: 0">0</span>
                                 </p>
                             </div>
 
@@ -64,12 +66,12 @@
                     </thead>
                     <tbody>
                     <!-- 첨부파일이 있으면 노출 -->
-                    <tr>
+                    <tr th:if="${board.mateFileDTOs != null && board.mateFileDTOs.size > 0}">
                         <td class="px-0 py-3">
                             <ul>
-                                <li>
+                                <li class="mb-2" th:each="file:${board.mateFileDTOs}">
                                     <div class="img_wrap">
-                                        <img alt="" src="">
+                                        <img th:src="|/uploads/${file.uuid}_${file.filename}|">
                                     </div>
                                 </li>
                             </ul>
@@ -84,33 +86,24 @@
                     <tr>
                         <td class="px-0 pt-3">
                             <!-- 좋아요 버튼 -->
-                            <div class="d-flex justify-content-between align-items-center mb-2">
-                                <div>
+                            <div class="d-flex justify-content-center align-items-center mb-2">
                                     <button type="button" class="btn btn-outline-danger" id="likeBtn">좋아요!</button>
-                                </div>
-                                <!-- 댓글 수 -->
-                                <div class="text-secondary">
-                                    <i class="fa-regular fa-comment-dots me-1"></i>
-                                    댓글 <b class="text-danger reply-count">[[${board.replyCount} ?: 0]]</b>
-                                </div>
                             </div>
-
-                            <!--마감일 -->
-                            <div class="mt-1 tb_content text-end" th:if="${board.dueDate != null}">
+                            <!-- 신청마감일 표시 블록 -->
+                            <div class="mt-1" th:if="${board.dueDate != null}">
                                 신청마감일 :
-                                <span th:text="${#strings.replace(board.dueDate, 'T', ' ')}"></span>
+                                <span th:text="${board.dueDisplay}"
+                                      th:classappend="${board.expired} ? ' text-secondary' : ' text-danger'">
+                                </span>
                             </div>
                         </td>
                     </tr>
-
-                    <tr>
+                    <<tr>
                         <td class="px-0 pt-3">
-                            <i class="fa-regular fa-comment-dots me-1"></i>
-                            <span class="reply-count">[[${board.replyCount} ?: 0]]</span>
-                            <p><i class="fa-regular fa-comment-dots me-1"></i>댓글 <b class="text-dange">[[${board.replyCount}]]</b>
+                            <p>
+                                <i class="fa-regular fa-comment-dots me-1"></i>
+                                댓글 <b class="text-danger">[[${board.replyCount}]]</b>
                             </p>
-
-                            <!--댓글 리스트 영역-->
                             <div class="reply_list_area">
                                 <ul class="replyList"></ul>
                                 <ul class="replyPaging pagination pagination-sm mt-3"></ul>
@@ -124,16 +117,12 @@
                                         <textarea class="replyText form-control" name="replyText"
                                                   placeholder="댓글 내용을 입력해주세요(최대 1000자)"></textarea>
                                     </div>
-                                    <div class="d-flex">
-                                        <label class="form-check-label" for="secret">비밀댓글</label>
-                                        <input class="form-check-input secretCheck" id="secret" name="secret"
-                                               type="checkbox">
-                                        <button class="btnReplyRegister ms-auto btn btn-main" type="button">댓글 쓰기
-                                        </button>
+                                        <div class="d-flex">
+                                            <button class="btnReplyRegister ms-auto btn btn-main" type="button">댓글 쓰기</button>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-
                             <!-- 댓글 수정 -->
                             <div class="modal modifyModal" tabindex="-1">
                                 <div class="modal-dialog">
@@ -160,18 +149,28 @@
     <!-- /* //view 화면 html 코드 작성 끝 */ -->
 </div>
 
-<script layout:fragment="pagescript" th:inline="javascript">
-    const bno = [[${board.bno}]];
-    const boardUsername = [[${board.username}]];
-    const loginUser = [[${#authentication.principal.username}]];
 
+
+<script layout:fragment="pagescript" th:inline="javascript">
+
+    const bno = [[${board.bno}]];
     const replyList = document.querySelector(".replyList");
+    const replyPaging = document.querySelector(".replyPaging")
+    const boardUsername = [[${board.username}]];
+    //지금 로그인 중인 회원
+    const loginUser = [[${#authentication.principal.username}]];
+    const loginRole = [[${#authentication.principal.authorities[0].authority}]]
+
+
     let page = 1;
     let size = 10;
 
-    /* ============================
-       1. 댓글 리스트 렌더링
-    ============================ */
+
+
+
+        /* ============================
+           1. 댓글 리스트 렌더링
+        ============================ */
     function printList(dtoList) {
         let str = '';
         if (dtoList && dtoList.length > 0) {
@@ -199,7 +198,7 @@
                 <ul class="dropdown-menu">
                   <li><a class="dropdown-item modifyBtn" href="#">수정</a></li>
                   <li><a class="dropdown-item deleteBtn" href="#">삭제</a></li>
-                  <li><a class="btnReReplyWriteView dropdown-item" href="#">대댓글 달기</a></li>
+<!--                  <li><a class="btnReReplyWriteView dropdown-item" href="#">대댓글 달기</a></li>-->
                 </ul>
               </div>`}
             </div>
@@ -254,6 +253,7 @@
     }
     printReplies(bno, page, size, false);
 
+
     /* ============================
        4. 댓글 등록/수정/삭제
     ============================ */
@@ -263,19 +263,18 @@
     const modifyText = document.querySelector(".modifyText");
     const modifyCloseBtn = document.querySelector(".modifyCloseBtn");
 
+
     // 댓글 등록
     registerBtn.addEventListener("click", async () => {
-        const isSecret = document.querySelector(".secretCheck").checked;
         const replyObj = {
             bno,
             content: replyText.value,
-            secret: isSecret ? 1 : 0,
+            secret: 0, // 항상 공개 댓글
             deleted: false
         };
         try {
             await axios.post(`/matereplies/`, replyObj);
             replyText.value = '';
-            document.querySelector(".secretCheck").checked = false;
             printReplies(bno, 1, 10, false);
         } catch (err) {
             alert("댓글 입력 오류");
@@ -375,6 +374,7 @@
         page = pageNum;
         printReplies(bno, page, size, false);
     });
+
 
     /* ============================
        7. 좋아요 (공통함수 + 버튼)

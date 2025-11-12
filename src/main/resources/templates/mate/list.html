@@ -16,33 +16,39 @@
             <div class="col-12 col-sm-10 col-md-8 col-lg-6 mx-auto">
                 <section class="search_area">
                     <form action="/mate/list" method="get">
-                        <input type="hidden" id="responsePage" name="page" th:value="${matePageRequestDTO.page}">
-                        <input type="hidden" name="size" th:value="${matePageRequestDTO.size}">
+                        <input id="responsePage" name="page" th:value="${matePageRequestDTO.page}" type="hidden">
+                        <input name="size" th:value="${matePageRequestDTO.size}" type="hidden">
                         <div class="d-flex gap-2">
-                          <div class="col-6 col-lg">
-                              <select name="sido" id="sido" class="form-select form-select-sm" aria-label="시/도">
-                                  <option value="">지역 전체</option>
-                              </select>
-                          </div>
-                          <div class="col-6 col-lg">
-                                <select name="sigungu" id="sigungu" class="form-select form-select-sm" aria-label="시/군/구">
-                                    <option value="">시/군/구</option>
-                                </select>
-                          </div>
-                          <div class="d-flex gap-2">
-                            <select name="field" id="field" class="form-select form-select-sm w-auto flex-shrink-1" aria-label="검색어 타입">
+<!--                            <div class="col-6 col-lg">-->
+<!--                                <select aria-label="시/도" class="form-select form-select-sm" id="sido" name="sido">-->
+<!--                                    <option value="">지역 전체</option>-->
+<!--                                </select>-->
+<!--                            </div>-->
+<!--                            <div class="col-6 col-lg">-->
+<!--                                <select aria-label="시/군/구" class="form-select form-select-sm" id="sigungu"-->
+<!--                                        name="sigungu">-->
+<!--                                    <option value="">시/군/구</option>-->
+<!--                                </select>-->
+<!--                            </div>-->
+                            <div class="d-flex gap-2">
+                                <select aria-label="검색어 타입" class="form-select form-select-sm w-auto flex-shrink-1"
+                                        id="field"
+                                        name="field">
 
-                                <option value="">-----</option>
-                                <option th:selected="${matePageRequestDTO.field=='tc'}" value="tc">제목+내용</option>
-                                <option th:selected="${matePageRequestDTO.field=='t'}" value="t">제목</option>
-                                <option th:selected="${matePageRequestDTO.field=='c'}" value="c">내용</option>
-                                <option th:selected="${matePageRequestDTO.field=='w'}" value="w">작성자</option>
-                            </select>
-                            <input class="form-control form-control-sm" name="keyword" type="text" placeholder="검색어를 입력하세요" th:value="${matePageRequestDTO.keyword}" aria-label="검색어">
-                            <button class="btn btn-sm btn-secondary text-nowrap" type="submit">
-                                <i class="fa-solid fa-magnifying-glass me-1"></i>검색
-                            </button>
-                            <button class="btn btn-sm btn-gray text-nowrap" type="button">초기화</button>
+                                    <option value="">-----</option>
+                                    <option th:selected="${matePageRequestDTO.field=='tc'}" value="tc">제목+내용</option>
+                                    <option th:selected="${matePageRequestDTO.field=='t'}" value="t">제목</option>
+                                    <option th:selected="${matePageRequestDTO.field=='c'}" value="c">내용</option>
+                                    <option th:selected="${matePageRequestDTO.field=='w'}" value="w">작성자</option>
+                                </select>
+                                <input aria-label="검색어" class="form-control form-control-sm" name="keyword"
+                                       placeholder="검색어를 입력하세요" th:value="${matePageRequestDTO.keyword}"
+                                       type="text">
+                                <button class="btn btn-sm btn-secondary text-nowrap" type="submit">
+                                    <i class="fa-solid fa-magnifying-glass me-1"></i>검색
+                                </button>
+                                <button class="btn btn-sm btn-gray text-nowrap" type="button">초기화</button>
+                            </div>
                         </div>
                     </form>
                 </section>
@@ -53,7 +59,7 @@
                     <div class="d-flex align-items-end mb-2">
                         <small>총 12개 (1/2페이지)</small>
                         <div class="ms-auto" sec:authorize="isAuthenticated()">
-                            <a class="btn btn-lg btn-main px-4" href="/mate/register"><i class="fa-solid fa-pencil"></i>
+                            <a id="btnRegister" class="btn btn-lg btn-main px-4" href="/mate/register"><i class="fa-solid fa-pencil"></i>
                                 글쓰기</a>
                         </div>
                     </div>
@@ -82,7 +88,7 @@
                                            th:if="${board != null and (board.category == '1:1 모집' or board.category == '그룹 모집')}"
                                            th:text="${board.category}">
                                         </p>
-<!--                                        <p class="badge badge-success mb-2">[[${board.category}]]</p>-->
+                                        <!--                                        <p class="badge badge-success mb-2">[[${board.category}]]</p>-->
                                         <!-- 표시 뱃지 끝 -->
                                     </div>
                                     <a class="d-block mb-1" th:href="@{/mate/view(bno=${board.bno})}">
@@ -94,23 +100,31 @@
                                         <div class="d-flex flex-column">
                                             <div class="d-flex gap-2 flex-wrap">
                                                 <p class="mb-0">[[${board.nickname}]]</p>
-                                                <p class="mb-0" th:text="${#temporals.format(board.regDate, 'yyyy.MM.dd')}"></p>
-                                             </div>
-                                            <div class="mt-1 text-danger"
-                                               th:if="${board.dueDate != null}">
-                                                신청마감일 :
-                                                <span th:text="${#strings.replace(board.dueDate, 'T', ' ')}"></span>
+                                                <p class="mb-0"
+                                                   th:text="${#temporals.format(board.regDate, 'yyyy.MM.dd')}"></p>
                                             </div>
+
+                                            <!-- 신청마감일 표시 블록 -->
+                                            <div class="mt-1" th:if="${board.dueDate != null}">
+                                                신청마감일 :
+                                                <span th:text="${board.dueDisplay}"
+                                                      th:classappend="${board.expired} ? ' text-secondary' : ' text-danger'">
+                                                </span>
+                                            </div>
+
+
                                         </div>
                                         <!-- 오른쪽: 조회수 -->
                                         <div class="d-flex gap-2 flex-nowrap text-secondary">
                                             <span class="d-inline-flex align-items-center">
                                                 <i class="fa-regular fa-eye me-1"></i>
-                                                <span th:text ="${board.readCount}"></span>
+                                                <span th:text="${board.readCount}"></span>
                                             </span>
                                             <span class="d-inline-flex align-items-center">
-                                                <i th:class="${board.likecount >= 1} ? 'fa-solid fa-heart me-1 text-danger' : 'fa-regular fa-heart me-1 text-danger'"></i>
-                                                <span th:text ="${board.likecount}"></span>
+                                                <i th:class="${(board.likecount ?: 0) >= 1}
+                                                  ? 'fa-solid fa-heart me-1 text-danger'
+                                                  : 'fa-regular fa-heart me-1 text-danger'"></i>
+                                                <span th:text="${board.likecount} ?: 0">0</span>
                                             </span>
                                             <p>
                                                 <i class="fa-regular fa-comment-dots me-1"></i>
@@ -118,12 +132,7 @@
                                             </p>
                                         </div>
                                     </div>
-
-
-
-
                                 </div>
-
                             </td>
                         </tr>
                         </tbody>
@@ -135,10 +144,12 @@
                     <nav aria-label="Page navigation">
                         <ul class="pagination pagination-sm justify-content-center mb-0">
                             <li class="page-item">
-                                <a class="page-link" th:data-num="${responseDTO.start}"><i class="fa-solid fa-angles-left"></i></a>
+                                <a class="page-link" th:data-num="${responseDTO.start}"><i
+                                        class="fa-solid fa-angles-left"></i></a>
                             </li>
                             <li class="page-item" th:if="${responseDTO.prev}">
-                                <a class="page-link" th:data-num="${responseDTO.start -1}"><i class="fa-solid fa-chevron-left"></i></a>
+                                <a class="page-link" th:data-num="${responseDTO.start -1}"><i
+                                        class="fa-solid fa-chevron-left"></i></a>
                             </li>
                             <th:block th:each="i:${#numbers.sequence(responseDTO.start, responseDTO.end)}">
                                 <li th:class="${responseDTO.page==i}?'page-item active':'page-item'">
@@ -146,78 +157,113 @@
                                 </li>
                             </th:block>
                             <li class="page-item" th:if="${responseDTO.next}">
-                                <a class="page-link" th:data-num="${responseDTO.end +1}"><i class="fa-solid fa-chevron-right"></i></a>
+                                <a class="page-link" th:data-num="${responseDTO.end +1}"><i
+                                        class="fa-solid fa-chevron-right"></i></a>
                             </li>
                             <li class="page-item">
-                                <a class="page-link" th:data-num="${responseDTO.end}"><i class="fa-solid fa-angles-right"></i></a>
+                                <a class="page-link" th:data-num="${responseDTO.end}"><i
+                                        class="fa-solid fa-angles-right"></i></a>
                             </li>
                         </ul>
                     </nav>
                 </section>
             </div>
         </div>
-
-
+   </div>
+    <div class="modal" id="alertModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered modal-sm modal-360">
+            <div class="modal-content">
+                <div class="modal-header border-bottom-0">
+                    <h5 class="modal-title">글 작성 안내</h5>
+                    <button aria-label="Close" class="btn-close" data-bs-dismiss="modal" type="button"></button>
+                </div>
+                <div class="modal-body py-0">
+                </div>
+                <div class="modal-footer border-top-0">
+                </div>
+            </div>
+        </div>
     </div>
     <!-- /* //view 화면 html 코드 작성 끝 */ -->
 </div>
-
-
 <script layout:fragment="pagescript" th:inline="javascript">
+    const memberMid = /*[[${memberDTO.mid != null ? memberDTO.mid : null}]]*/ null;
+    const alertModal = new bootstrap.Modal(document.getElementById('alertModal'))
+    const alertModalBody = document.querySelector("#alertModal .modal-body")
+    const alertModalFooter = document.querySelector("#alertModal .modal-footer")
+
+    if(memberMid !== null) {
+        const hasPet = [[${petCount}]]
+        const btnRegister = document.getElementById("btnRegister")
+
+        btnRegister.addEventListener("click", function(e) {
+
+            if (hasPet === 0) {
+                e.preventDefault()
+                alertModalBody.innerHTML = `<p>펫 정보가 있는 회원만 작성할 수 있어요</p>`
+                alertModalFooter.innerHTML = `
+              <div class="d-flex justify-content-center gap-2 flex-nowrap w-100">
+                  <button class="btn btn-lg btn-gray w-100" data-bs-dismiss="modal" type="button">취소</button>
+                  <a href="/member/modifyPet?mid=${memberMid}" class=" btn btn-lg btn-main w-100" type="button">반려동물 등록하기</a>
+              </div>`
+                alertModal.show()
+                cate.value = "0"
+            }
+        })
+    }
 
     // 페이지에 필요한 스크립트 작성 부분
     /////// 사용자 정보 - 시도,시군구 정보 초기화 ///////
-    const searchSido = /*[[${matePageRequestDTO.sido != null ? matePageRequestDTO.sido : null}]]*/ null;
-    const searchSigungu = /*[[${matePageRequestDTO.sigungu != null ? matePageRequestDTO.sigungu : null}]]*/ null;
-
-    const sido = document.querySelector("#sido");
-    const sigungu = document.querySelector("#sigungu");
-
-    async function loadSido() {
-        const {data} = await axios.get('/api/regions/sido');
-        sido.innerHTML = `<option value="">지역 전체</option>` +
-            data.map(s => `<option value="${s.name}" data-sido-id="${s.id}">${s.name}</option>`).join('');
-    }
-
-    async function loadSigungu(sidoId) {
-        if (!sidoId) {
-            sigungu.innerHTML = '<option value="">시/군/구</option>';
-            return;
-        }
-        const { data } = await axios.get('/api/regions/sigungu', { params: { sidoId } });
-        sigungu.innerHTML =
-            '<option value="">전체</option>' +
-            data.map(g => `<option value="${g.name}" ${searchSigungu === g.name ? 'selected' : ''}>${g.name}</option>`).join('');
-        // ↑ 여기에서 백틱 닫힘이 정확해야 해요. (오류 원인 fix)
-    }
-
-    sido.addEventListener('change', (e) => {
-        const selectedOption = e.target.selectedOptions[0]; // 선택된 <option> 요소
-        const sidoId = selectedOption.dataset.sidoId;       // data-sidoid 값 읽기
-        loadSigungu(sidoId);
-    });
-
-    loadSido()
+    // const searchSido = /*[[${matePageRequestDTO.sido != null ? matePageRequestDTO.sido : null}]]*/ null;
+    // const searchSigungu = /*[[${matePageRequestDTO.sigungu != null ? matePageRequestDTO.sigungu : null}]]*/ null;
+    // const sido = document.querySelector("#sido");
+    // const sigungu = document.querySelector("#sigungu");
+    //
+    // async function loadSido() {
+    //     const {data} = await axios.get('/api/regions/sido');
+    //     sido.innerHTML = `<option value="">지역 전체</option>` +
+    //         data.map(s => `<option value="${s.name}" data-sido-id="${s.id}">${s.name}</option>`).join('');
+    // }
+    //
+    // async function loadSigungu(sidoId) {
+    //     if (!sidoId) {
+    //         sigungu.innerHTML = '<option value="">시/군/구</option>';
+    //         return;
+    //     }
+    //     const {data} = await axios.get('/api/regions/sigungu', {params: {sidoId}});
+    //     sigungu.innerHTML =
+    //         '<option value="">전체</option>' +
+    //         data.map(g => `<option value="${g.name}" ${searchSigungu === g.name ? 'selected' : ''}>${g.name}</option>`).join('');
+    //     // ↑ 여기에서 백틱 닫힘이 정확해야 해요. (오류 원인 fix)
+    // }
+    //
+    // sido.addEventListener('change', (e) => {
+    //     const selectedOption = e.target.selectedOptions[0]; // 선택된 <option> 요소
+    //     const sidoId = selectedOption.dataset.sidoId;       // data-sidoid 값 읽기
+    //     loadSigungu(sidoId);
+    // });
+    //
+    // loadSido()
 
     /// 페이징
 
-    document.querySelector(".pagination").addEventListener("click", function (e){
+    document.querySelector(".pagination").addEventListener("click", function (e) {
         e.preventDefault()
 
         const a = e.target.closest('a.page-link');
         if (!a) return;
 
         const li = a.closest('li');
-      if (li && (li.classList.contains('disabled') || li.classList.contains('active'))) return;
+        if (li && (li.classList.contains('disabled') || li.classList.contains('active'))) return;
 
-      const num = a.dataset.num;
-      if (!num) return;
+        const num = a.dataset.num;
+        if (!num) return;
 
-      const formObj = document.querySelector("form")
-      const page = formObj.page
-      console.log(page.value)
-      page.value = num
-      formObj.submit()
+        const formObj = document.querySelector("form")
+        const page = formObj.page
+        console.log(page.value)
+        page.value = num
+        formObj.submit()
     })
 
 
