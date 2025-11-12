@@ -64,6 +64,7 @@ public class CustomSecurityConfig {
   public WebSecurityCustomizer configurer() {
     return(web->web.ignoring()
         .requestMatchers(PathRequest.toStaticResources().atCommonLocations())
-        .requestMatchers("/fonts/**", "/favicon.ico", "/robots.txt"));
+        .requestMatchers("/favicon.ico", "/robots.txt")
+        .requestMatchers("/css/**", "/js/**","/fonts/**", "/images/**", "/uploads/**"));
   }
 }
