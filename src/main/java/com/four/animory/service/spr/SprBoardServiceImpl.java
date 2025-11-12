@@ -37,10 +37,10 @@ public class SprBoardServiceImpl implements SprBoardService {
     }
 
     @Override
-    public PageResponseDTO<SprBoardDTO> getListByCategory(PageRequestDTO pageRequestDTO, String category, String sort) {
+    public PageResponseDTO<SprBoardDTO> getListByCategoryAndComplete(PageRequestDTO pageRequestDTO, String category, String sort, Boolean complete) {
         Pageable pageable = pageRequestDTO.getPageable("bno");
         Page<SprBoardDTO> result = sprRepository.searchAll(
-                pageRequestDTO.getTypes(), pageRequestDTO.getKeyword(), pageable, category, sort);
+                pageRequestDTO.getTypes(), pageRequestDTO.getKeyword(), pageable, category, sort, complete);
         PageResponseDTO<SprBoardDTO> responseDTO = PageResponseDTO.<SprBoardDTO>withAll()
                 .pageRequestDTO(pageRequestDTO)
                 .dtoList(result.getContent())
@@ -91,7 +91,7 @@ public class SprBoardServiceImpl implements SprBoardService {
 
     @Override
     public List<SprBoardDTO> getTop10SprBoards() {
-        List<SprBoard> sprBoards = sprRepository.findTop10ByOrderByRecommendDesc();
+        List<SprBoard> sprBoards = sprRepository.findTop10ByCompleteFalseOrderByRecommendDesc();
         return sprBoards.stream()
                 .map(this::entityToDTO)
                 .collect(Collectors.toList());

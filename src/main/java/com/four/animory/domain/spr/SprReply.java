@@ -14,7 +14,7 @@ import java.util.List;
 @Table(name="tbl_spr_reply")
 @Getter
 @Setter
-@ToString(exclude = "sprBoard")
+@ToString(exclude = {"sprBoard","parent","children"})
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
@@ -37,5 +37,6 @@ public class SprReply extends BaseEntity {
     private SprReply parent;
 
     @OneToMany(mappedBy = "parent", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    @Builder.Default
     private List<SprReply> children = new ArrayList<>();
 }

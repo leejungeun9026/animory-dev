@@ -7,5 +7,5 @@ import org.springframework.data.domain.Pageable;
 
 public interface SprBoardSearch {
     Page<SprBoard> search1(Pageable pageable);
-    Page<SprBoardDTO> searchAll(String[] types, String keyword, Pageable pageable, String category, String sort);
+    Page<SprBoardDTO> searchAll(String[] types, String keyword, Pageable pageable, String category, String sort, Boolean complete);
 }

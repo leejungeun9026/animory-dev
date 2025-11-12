@@ -39,7 +39,7 @@ public class SprBoardSearchImpl extends QuerydslRepositorySupport implements Spr
     }
 
     @Override
-    public Page<SprBoardDTO> searchAll(String[] types, String keyword, Pageable pageable, String category, String sort) {
+    public Page<SprBoardDTO> searchAll(String[] types, String keyword, Pageable pageable, String category, String sort, Boolean complete) {
         QSprBoard qsprboard = QSprBoard.sprBoard;
         QSprReply qsprreply = QSprReply.sprReply;
         JPQLQuery<SprBoard> query = from(qsprboard);
@@ -68,6 +68,9 @@ public class SprBoardSearchImpl extends QuerydslRepositorySupport implements Spr
         }
         if(category != null && !category.isEmpty()){
             query.where(qsprboard.category.eq(category));
+        }
+        if(complete != null){
+            query.where(qsprboard.complete.eq(complete));
         }
         if(sort != null){
             switch (sort) {

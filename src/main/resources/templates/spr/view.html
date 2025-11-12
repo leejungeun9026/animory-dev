@@ -21,10 +21,13 @@
                             <td class="tb_title border-bottom pb-3 px-0">
                                 <div class="d-flex gap-2 flex-nowrap align-items-end mb-2">
                                     <div class="d-flex gap-2 flex-nowrap align-items-center">
-                                        <p class="badge badge-success">[[${board.category}]]</p>
+                                        <p class="badge badge-secondary"><i class="fa-solid fa-list"></i>&nbsp;[[${board.category}]]</p>
                                         <!-- 나눔 / 공구 카테고리일 때 진행중 / 완료 표시 뱃지 -->
-                                        <p class="badge badge-info" th:if="${board.category == '나눔' || board.category == '공구'} and ${board.complete == false}">[[${board.category}]]중</p>
-                                        <p class="badge badge-info" th:if="${board.category == '나눔' || board.category == '공구'} and ${board.complete == true}">[[${board.category}]]완료</p>
+                                        <p class="badge badge-info" th:if="${board.category == '나눔' || board.category == '공구'} and ${board.complete == false}"><i class="fa-solid fa-hourglass-half"></i>&nbsp;[[${board.category}]]중</p>
+                                        <p class="badge badge-danger" th:if="${board.category == '나눔' || board.category == '공구'} and ${board.complete == true}"><i class="fa-solid fa-store-slash"></i>&nbsp;[[${board.category}]]완료</p>
+                                        <!-- 표시 뱃지 끝 -->
+                                        <!-- 나눔 카테고리일 때 시도 시군구 표시 뱃지 -->
+                                        <p class="badge badge-success" th:if="${board.category == '나눔'}"><i class="fa-solid fa-map-location-dot"></i>&nbsp;[[${board.sido}]] [[${board.sigungu}]]</p>
                                         <!-- 표시 뱃지 끝 -->
                                     </div>
                                     <!-- 로그인 사용자 == 글작성자 같을 경우 / Role이 어드민일 경우에 노출 -->
@@ -518,7 +521,6 @@
               type : "GET",
               data : { bno : bno},
               success : function(response){
-                  console.log(response);
                   // 업데이트 된 레코맨드 수 가져오기
                   var recommend = response.recommend;
                   $('#likeCount').text(recommend);
