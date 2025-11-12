@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 
 public class MateFileDTO {
     private String uuid;
-    private String fileName;
+    private String filename;
     private int ord;
     private boolean image;
 }

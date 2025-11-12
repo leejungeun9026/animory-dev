@@ -34,13 +34,12 @@ public class MatePageRequestDTO {
   private String category;
   private String field;
   private String keyword;
-  private String type;
 
-    public String[] getTypes(){
-        if(type==null || type.isEmpty()){
+    public String[] getFields(){
+        if(field==null || field.isEmpty()){
             return null;
         } else {
-            return type.split("");
+            return field.split("");
         }
     }
   
@@ -54,16 +53,12 @@ public class MatePageRequestDTO {
       StringBuilder builder = new StringBuilder();
       builder.append("page=").append(this.page);
       builder.append("&size=").append(this.size);
-
       // null 또는 빈 문자열은 제외
       if (this.sido != null && !this.sido.isEmpty()) {
         builder.append("&sido=").append(this.sido);
       }
       if (this.sigungu != null && !this.sigungu.isEmpty()) {
         builder.append("&sigungu=").append(this.sigungu);
-      }
-      if (this.category != null && !this.category.isEmpty()) {
-        builder.append("&category=").append(this.category);
       }
       // 검색 필드와 키워드가 있을 경우만 추가
       if (this.field != null && !this.field.isEmpty() && this.keyword != null && !this.keyword.isEmpty()) {

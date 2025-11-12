@@ -37,7 +37,7 @@ public interface MateService {
 
         if(mateBoardDTO.getMateFileDTOs() != null){
             mateBoardDTO.getMateFileDTOs().forEach(file-> {
-                mateBoard.addFile(file.getUuid(), file.getFileName(), file.isImage());
+                mateBoard.addFile(file.getUuid(), file.getFilename(), file.isImage());
             });
         }
         return mateBoard;
@@ -70,7 +70,7 @@ public interface MateService {
     default MateFileDTO fileEntityToDTO(MateFile mateFile) {
         MateFileDTO dto = MateFileDTO.builder()
                 .uuid(mateFile.getUuid())
-                .fileName(mateFile.getFileName())
+                .filename(mateFile.getFileName())
                 .image(mateFile.isImage())
                 .ord(mateFile.getOrd())
                 .build();

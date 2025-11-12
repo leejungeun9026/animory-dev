@@ -15,18 +15,30 @@
         <div class="row g-4">
             <div class="col-12 col-sm-10 col-md-8 col-lg-6 mx-auto">
                 <section class="search_area">
-                    <form action="">
+                    <form action="/mate/list" method="get">
+                        <input type="hidden" id="responsePage" name="page" th:value="${matePageRequestDTO.page}">
+                        <input type="hidden" name="size" th:value="${matePageRequestDTO.size}">
                         <div class="d-flex gap-2">
-                            <select class="form-select form-select-sm w-auto flex-shrink-1" id="" name="type">
+                          <div class="col-6 col-lg">
+                              <select name="sido" id="sido" class="form-select form-select-sm" aria-label="시/도">
+                                  <option value="">지역 전체</option>
+                              </select>
+                          </div>
+                          <div class="col-6 col-lg">
+                                <select name="sigungu" id="sigungu" class="form-select form-select-sm" aria-label="시/군/구">
+                                    <option value="">시/군/구</option>
+                                </select>
+                          </div>
+                          <div class="d-flex gap-2">
+                            <select name="field" id="field" class="form-select form-select-sm w-auto flex-shrink-1" aria-label="검색어 타입">
+
                                 <option value="">-----</option>
-                                <option th:selected="${pageRequestDTO.type=='tc'}" value="tc">제목+내용</option>
-                                <option th:selected="${pageRequestDTO.type=='t'}" value="t">제목</option>
-                                <option th:selected="${pageRequestDTO.type=='c'}" value="c">내용</option>
-                                <option th:selected="${pageRequestDTO.type=='w'}" value="w">작성자</option>
+                                <option th:selected="${matePageRequestDTO.field=='tc'}" value="tc">제목+내용</option>
+                                <option th:selected="${matePageRequestDTO.field=='t'}" value="t">제목</option>
+                                <option th:selected="${matePageRequestDTO.field=='c'}" value="c">내용</option>
+                                <option th:selected="${matePageRequestDTO.field=='w'}" value="w">작성자</option>
                             </select>
-                            <!--                            <input type="text" name="keyword" class="input-control" th:value="${pageRequestDTO.keyword}">-->
-                            <input class="form-control form-control-sm" name="keyword" placeholder="검색어를 입력하세요"
-                                   type="text">
+                            <input class="form-control form-control-sm" name="keyword" type="text" placeholder="검색어를 입력하세요" th:value="${matePageRequestDTO.keyword}" aria-label="검색어">
                             <button class="btn btn-sm btn-secondary text-nowrap" type="submit">
                                 <i class="fa-solid fa-magnifying-glass me-1"></i>검색
                             </button>
@@ -152,10 +164,14 @@
 
 
 <script layout:fragment="pagescript" th:inline="javascript">
+
     // 페이지에 필요한 스크립트 작성 부분
     /////// 사용자 정보 - 시도,시군구 정보 초기화 ///////
-    const sido = document.querySelector("#sido")
-    const sigungu = document.querySelector("#sigungu")
+    const searchSido = /*[[${matePageRequestDTO.sido != null ? matePageRequestDTO.sido : null}]]*/ null;
+    const searchSigungu = /*[[${matePageRequestDTO.sigungu != null ? matePageRequestDTO.sigungu : null}]]*/ null;
+
+    const sido = document.querySelector("#sido");
+    const sigungu = document.querySelector("#sigungu");
 
     async function loadSido() {
         const {data} = await axios.get('/api/regions/sido');
@@ -168,9 +184,11 @@
             sigungu.innerHTML = '<option value="">시/군/구</option>';
             return;
         }
-        const {data} = await axios.get('/api/regions/sigungu', {params: {sidoId}});
-        sigungu.innerHTML = '<option value="">전체</option>' +
-            data.map(g => `<option value="${g.name}">${g.name}</option>`).join('');
+        const { data } = await axios.get('/api/regions/sigungu', { params: { sidoId } });
+        sigungu.innerHTML =
+            '<option value="">전체</option>' +
+            data.map(g => `<option value="${g.name}" ${searchSigungu === g.name ? 'selected' : ''}>${g.name}</option>`).join('');
+        // ↑ 여기에서 백틱 닫힘이 정확해야 해요. (오류 원인 fix)
     }
 
     sido.addEventListener('change', (e) => {
@@ -185,20 +203,22 @@
 
     document.querySelector(".pagination").addEventListener("click", function (e){
         e.preventDefault()
-        e.stopPropagation()
 
-        const target = e.target.closest('a')
-        if(!target){
-            return
-        }
-        const num = target.getAttribute("data-num")
-        const formOjb = document.querySelector("form")
-        formOjb.innerHTML+=`<input type='hidden' name='page' value='${num}'>`
-        formOjb.submit()
+        const a = e.target.closest('a.page-link');
+        if (!a) return;
+
+        const li = a.closest('li');
+      if (li && (li.classList.contains('disabled') || li.classList.contains('active'))) return;
+
+      const num = a.dataset.num;
+      if (!num) return;
+
+      const formObj = document.querySelector("form")
+      const page = formObj.page
+      console.log(page.value)
+      page.value = num
+      formObj.submit()
     })
-
-
-
 
 
     // 페이지에 필요한 스크립트 작성 끝
