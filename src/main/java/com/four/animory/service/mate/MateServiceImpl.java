@@ -13,6 +13,7 @@ import com.four.animory.repository.mate.MateBoardRepository;
 import com.four.animory.repository.mate.MateReplyRepository;
 import com.four.animory.repository.user.MemberRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -29,6 +30,7 @@ import static com.four.animory.domain.mate.QMateBoard.mateBoard;
 @Service
 @RequiredArgsConstructor
 @Transactional
+@Log4j2
 public class MateServiceImpl implements MateService {
     @Autowired
     MateBoardRepository mateBoardRepository;
@@ -40,8 +42,9 @@ public class MateServiceImpl implements MateService {
     //글 등록하기
     @Override
     public Long registerMateBoard(MateBoardDTO mateBoardDTO) {
+        log.info("register mate board success1111 : mateBoardDTO=" + mateBoardDTO);
         MateBoard entity = dtoToEntity(mateBoardDTO);
-        Member member = memberRepository.findByNickname(mateBoardDTO.getNickname());
+        Member member = memberRepository.findByUsername(mateBoardDTO.getUsername());
         entity.setMember(member);
         MateBoard saved = mateBoardRepository.save(entity);
         return saved.getBno(); // PK 반환
@@ -115,7 +118,7 @@ public class MateServiceImpl implements MateService {
     public MatePageResponseDTO<MateBoardDTO> getList(MatePageRequestDTO matePageRequestDTO) {
         Pageable pageable = matePageRequestDTO.getPageable("bno"); //pageable 객체 만들었어 -> pagerequestDTO따라
         Page<MateBoard> result = mateBoardRepository.searchAll(
-                matePageRequestDTO.getTypes(),
+                matePageRequestDTO.getFields(),
                 matePageRequestDTO.getKeyword(),
                 pageable); //동적 쿼리를 통해 검색해 오고 아래의 내용을 추출해 LIST에 넣어
 
@@ -134,10 +137,11 @@ public class MateServiceImpl implements MateService {
 
     @Override
     public MatePageResponseDTO<MateReplyCountDTO> getListReplyCount(MatePageRequestDTO matePageRequestDTO) {
-        String[] types = matePageRequestDTO.getTypes();
+        String[] field = matePageRequestDTO.getFields();
         String keyword = matePageRequestDTO.getKeyword();
         Pageable pageable = matePageRequestDTO.getPageable("bno");
-        Page<MateReplyCountDTO> result= mateBoardRepository.searchWithReplyCount(types, keyword, pageable);
+        Page<MateReplyCountDTO> result= mateBoardRepository.searchWithReplyCount(field, keyword, pageable);
+        log.info(result.getContent());
 
         return MatePageResponseDTO.<MateReplyCountDTO>withAll()
                 .matePageRequestDTO(matePageRequestDTO)
