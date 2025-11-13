@@ -53,8 +53,8 @@
                         </tr>
                         </thead>
                         <tbody>
-                        <tr th:each="notice : ${responseDTO.dtoList}">
-                            <td th:text="${notice.bno}">1</td>
+                        <tr th:each="notice, stat : ${responseDTO.dtoList}">
+                            <td th:text="${stat.count}">1</td>
                             <td th:text="${notice.pinned ? '📌' : ''}">📌</td>
                             <td>
                                 <a th:href="@{/admin/notice/view(bno=${notice.bno},mode=1)}">
