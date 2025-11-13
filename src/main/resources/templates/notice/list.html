@@ -45,8 +45,8 @@
                         </tr>
                         </thead>
                         <tbody>
-                        <tr th:each="notice : ${responseDTO.dtoList}">
-                            <td th:text="${notice.bno}">1</td>
+                        <tr th:each="notice,stat : ${responseDTO.dtoList}">
+                            <td th:text="${stat.count}">1</td>
                             <td>
                                 <div class="py-2">
                                     <a th:href="@{/notice/view(bno=${notice.bno})}" class="d-block mb-1">
