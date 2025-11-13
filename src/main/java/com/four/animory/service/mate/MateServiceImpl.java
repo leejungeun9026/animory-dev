@@ -5,10 +5,8 @@ import com.four.animory.domain.mate.MateBoard;
 import com.four.animory.domain.user.Member;
 import com.four.animory.dto.common.PageRequestDTO;
 import com.four.animory.dto.common.PageResponseDTO;
-import com.four.animory.dto.mate.MateBoardDTO;
-import com.four.animory.dto.mate.MatePageRequestDTO;
-import com.four.animory.dto.mate.MatePageResponseDTO;
-import com.four.animory.dto.mate.MateReplyCountDTO;
+import com.four.animory.dto.mate.*;
+import com.four.animory.dto.spr.SprFileDTO;
 import com.four.animory.repository.mate.MateBoardRepository;
 import com.four.animory.repository.mate.MateReplyRepository;
 import com.four.animory.repository.user.MemberRepository;
@@ -80,6 +78,13 @@ public class MateServiceImpl implements MateService {
     public void updateMateBoard(MateBoardDTO mateBoardDTO) {
         MateBoard mateBoard = mateBoardRepository.findById(mateBoardDTO.getBno()).orElse(null); // 기존의 board 데이터 가져오기
         mateBoard.change(mateBoardDTO.getContent(), mateBoardDTO.getContent(), mateBoardDTO.getCategory());
+//        //1112추가
+//        if(mateBoardDTO.getMateFileDTOs() != null) {
+//            mateBoard.removeFile();
+//            for (MateFileDTO fileDTO : mateBoardDTO.getMateFileDTOs()) {
+//                mateBoard.addFile(fileDTO.getUuid(), fileDTO.getFilename(), fileDTO.isImage());
+//            }
+//        }
         mateBoardRepository.save(mateBoard);
     }
 
@@ -109,11 +114,7 @@ public class MateServiceImpl implements MateService {
         return board.getLikecount(); // 증가된 최신값 반환
     }
 
-
-
     // 검색 + 페이징 -> DTO 변환
-
-
     @Override
     public MatePageResponseDTO<MateBoardDTO> getList(MatePageRequestDTO matePageRequestDTO) {
         Pageable pageable = matePageRequestDTO.getPageable("bno"); //pageable 객체 만들었어 -> pagerequestDTO따라

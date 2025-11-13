@@ -65,10 +65,20 @@
              : ''}">
             </div>
 
-
-            <div class="mb-3">
-                <input class="form-control" multiple name="files" type="file">
+            <div class="mb-3" th:if="${mateBoard.mateFileDTOs != null and !mateBoard.mateFileDTOs.isEmpty()}">
+                <label class="form-label fw-bold">현재 첨부파일</label>
+                <div class="border rounded p-3 bg-light">
+                    <div class="mb-2" th:each="file : ${mateBoard.mateFileDTOs}">
+                        <div class="d-flex align-items-center justify-content-between">
+                            <span th:text="${file.filename}"></span>
+                        </div>
+                    </div>
+                </div>
             </div>
+
+<!--            <div class="mb-3">-->
+<!--                <input class="form-control" multiple name="files" type="file">-->
+<!--            </div>-->
             <div class="button_wrap">
                 <div class="row g-2">
                     <div class="col-6 col-md-auto ms-md-auto">
@@ -76,7 +86,6 @@
                     </div>
                     <div class="col-6 col-md-auto">
                         <button class="btn btn-lg btn-main w-100" type="submit">저장</button>
-                        <!--                        <a class="btn btn-gray" th:href="@{/mate/view/{bno}(bno=${mateBoard.bno})}">취소</a>-->
                     </div>
                 </div>
             </div>
