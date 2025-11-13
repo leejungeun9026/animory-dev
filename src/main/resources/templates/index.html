@@ -92,7 +92,7 @@
             </li>
             <li class="swiper-slide" th:each="board:${freeBoard}" th:unless="${#lists.isEmpty(freeBoard)}">
               <div class="item_card">
-                <div class="card__img">
+                <a class="card__img" th:href="@{/free/view(bno=${board.bno}, mode=1)}">
                   <div class="category_badge">
                     <p th:if="${board.btype == '자유'}" class="badge badge-success">&#x1F4AC; 자유수다</p>
                     <p th:if="${board.btype == '정보'}" class="badge badge-warning">&#x1F4A1; 정보공유</p>
@@ -109,7 +109,7 @@
                     <i class="fa-solid fa-paw"></i>
                   </div>
                   <img  th:if="${board.thumbnailMain != null}" th:src="@{/uploads/free/{thumb}(thumb=${board.thumbnailMain})}">
-                </div>
+                </a>
                 <div class="card__body">
                   <a th:href="@{/free/view(bno=${board.bno}, mode=1)}">
                     <h5 class="item_title mb-1">
@@ -155,9 +155,7 @@
                   <div class="row py-3">
                     <div class="col-12">
                       <div class="d-flex gap-2 flex-nowrap mb-1">
-                        <p class="badge badge-gray">
-                          <span>[[${board.sido}]]</span> / <span>[[${board.sigungu}]]</span>
-                        </p>
+                        <p class="badge badge-gray">[[${board.sido}]] / [[${board.sigungu}]]</p>
                         <p th:if="${board != null and board.category == '1:1 모집'}" class="badge badge-warning">
                           &#x1F464; [[${board.category}]]
                         </p>
@@ -165,11 +163,10 @@
                           &#x1F465; [[${board.category}]]
                         </p>
                       </div>
-                      <!-- 신청마감일 표시 블록 -->
-                      <p th:if="${board.dueDate != null && !board.expired}" class="badge badge-danger mb-1">[[${board.dueDisplay}]] 까지</p>
-                      <p th:if="${board.dueDate != null && board.expired}" class="badge badge-danger mb-">마감</p>
-
-                      <a th:href="@{/mate/view(bno=${board.bno}, mode=1)}" class="d-inline-flex justify-content-start align-items-center gap-1 flex-nowrap w-100 mb-1">
+                      <a th:href="@{/mate/view(bno=${board.bno}, mode=1)}"  class="d-inline-flex justify-content-start align-items-center gap-1 flex-nowrap w-100 mb-1">
+                        <!-- 신청마감일 표시 블록 -->
+                        <p th:if="${board.dueDate != null && !board.expired}" class="badge badge-danger">[[${board.dueDisplay}]] 까지</p>
+                        <p th:if="${board.dueDate != null && board.expired}" class="badge badge-danger">마감</p>
                         <h6 class="text-overflew-line-1">[[${board.title}]]</h6>
                       </a>
                     </div>
@@ -200,60 +197,45 @@
     </section>
     <!-- // MATE BOARD END -->
 
-    <!-- SPR BOARD -->
+    <!-- SITTER BOARD -->
     <section class="main_board_list col mb-3 mb-md-4">
       <div class="card rounded-4 h-100">
         <div class="card-body p-4">
           <div class="section_title mb-1 mb-md-2">
-            <h4 class="memomentKkukkkuk fw-normal"><i class="fa-solid fa-bag-shopping text-primary"></i> 사고팔개</h4>
-            <small class="text-secondary">필요없는 물건은 나누고, 공동구매로 저렴하게</small>
+            <h4 class="memomentKkukkkuk fw-normal"><i class="fa-solid fa-bowl-food text-primary"></i> 돌보미</h4>
+            <small class="text-secondary">시터가 필요한 누구나, 시터로 일하고싶은 누구나</small>
           </div>
           <div class="section_content">
             <ul>
-              <li th:if="${#lists.isEmpty(sprBoard)}">
+              <li th:if="${#lists.isEmpty(sitterBoard)}">
                 <div class="py-2">
                   <p class="text-secondary">게시글이 없어요</p>
                 </div>
               </li>
-              <li th:each="board:${sprBoard}" th:unless="${#lists.isEmpty(sprBoard)}">
+              <li th:each="board:${sitterBoard}" th:unless="${#lists.isEmpty(sitterBoard)}">
                 <div class="border-bottom">
                   <div class="row py-3">
                     <div class="col-12">
-                      <div class="mb-1">
-                        <div class="d-flex gap-2 flex-nowrap mb-1">
-                          <p th:if="${board.category == '신고'}" class="badge text-bg-danger">&#x1F6AB; [[${board.category}]]</p>
-                          <p th:if="${board.category == '공구'}" class="badge badge-warning">&#x1F6D2; [[${board.category}]]</p>
-                          <p th:if="${board.category == '나눔'}" class="badge badge-warning">&#x1F381; [[${board.category}]]</p>
-                          <!-- 나눔 / 공구 카테고리일 때 진행중 / 완료 표시 뱃지 -->
-                          <p class="badge badge-info" th:if="${board.category == '나눔' || board.category == '공구'} and ${board.complete == false}">
-                            [[${board.category}]]중
-                          </p>
-                          <p class="badge badge-success" th:if="${board.category == '나눔' || board.category == '공구'} and ${board.complete == true}">
-                            [[${board.category}]]완료
-                          </p>
-                        </div>
-                        <div class="d-flex gap-2 flex-nowrap mb-2" th:if="${board.category == '나눔'}">
-                          <!-- 나눔 카테고리일 때 시도 시군구 표시 뱃지 -->
-                          <p class="badge badge-gray">[[${board.sido}]] / [[${board.sigungu}]]</p>
-                        </div>
-                        <a th:href="@{/spr/view(bno=${board.bno}, mode=1)}" class="d-inline-flex justify-content-start align-items-center gap-1 flex-nowrap w-100 mb-1">
-                          <span class="text-nowrap badge badge-danger" th:if="${board.category == '공구'} and ${board.complete == false}">[[${board.dueDate}]]까지</span>
-                          <span class="text-nowrap badge badge-danger" th:if="${board.category == '공구'} and ${board.complete == true}">마감</span>
-                          <h6 class="text-overflew-line-1">[[${board.title}]]</h6>
-                        </a>
+                      <div class="d-flex gap-2 flex-nowrap mb-1">
+                        <p th:if="${board.category == '구해요'}" class="badge badge-warning">&#x1F440; 돌봄 구해요</p>
+                        <p th:if="${board.category == '일해요'}" class="badge badge-danger">&#x1F525; 돌봄 일해요</p>
+                        <p th:class="${board.state == '구인중' or board.state == '구직중' ? 'badge badge-info':'badge badge-success'}">[[${board.state}]]</p>
+                        <p th:text="${board.petInfo == 'dog' ? '강아지' : '고양이'}" class="badge badge-outline-secondary"></p>
                       </div>
+                      <a th:href="@{/sitter/view(bno=${board.bno}, mode=1)}" class="d-inline-flex align-items-center gap-1 flex-nowrap w-100 mb-1">
+                        <p class="badge badge-gray">[[${board.sido}]]/[[${board.sigungu}]]</p>
+                        <h6 class="text-overflew-line-1">[[${board.title}]]</h6>
+                      </a>
                     </div>
                     <div class="col">
                       <div class="d-flex gap-2 flex-nowrap text-secondary">
-                        <p class="text-nowrap">[[${board.author}]]</p>
+                        <p class="text-nowrap">[[${board.nickname}]]</p>
                         <p class="text-nowrap">[[${#temporals.format(board.regDate, 'MM-dd')}]]</p>
                       </div>
                     </div>
                     <div class="col-auto">
                       <div class="d-flex gap-2 flex-nowrap text-secondary">
-                        <p class="text-nowrap"><i class="fa-regular fa-eye me-1"></i>[[${board.readcount}]]</p>
-                        <p class="text-nowrap" th:if="${board.recommend >= 1}"><i class="fa-solid fa-heart me-1 text-danger"></i>[[${board.recommend}]]</p>
-                        <p class="text-nowrap" th:if="${board.recommend == 0}"><i class="fa-regular fa-heart me-1 text-danger"></i>[[${board.recommend}]]</p>
+                        <p class="text-nowrap"><i class="fa-regular fa-eye me-1"></i>[[${board.readCount}]]</p>
                         <p class="text-nowrap"><i class="fa-regular fa-comment-dots me-1"></i>[[${board.replyCount}]]</p>
                       </div>
                     </div>
@@ -264,54 +246,67 @@
           </div>
         </div>
         <div class="card-footer bg-transparent py-3 text-center">
-          <a href="/spr/list">사고팔개 더보기<i class="fa-solid fa-chevron-right ms-1"></i></a>
+          <a href="/sitter/list">돌보미 더보기<i class="fa-solid fa-chevron-right ms-1"></i></a>
         </div>
       </div>
     </section>
-    <!-- // SPR BOARD END -->
+    <!-- // SITTER BOARD END -->
   </div>
 
-  <!-- SITTER BOARD -->
+  <!-- SPR BOARD -->
   <section class="main_board_list col mb-3 mb-md-4">
     <div class="card rounded-4 h-100">
       <div class="card-body p-4">
         <div class="section_title mb-1 mb-md-2">
-          <h4 class="memomentKkukkkuk fw-normal"><i class="fa-solid fa-bowl-food text-primary"></i> 돌보미</h4>
-          <small class="text-secondary">시터가 필요한 누구나, 시터로 일하고싶은 누구나</small>
+          <h4 class="memomentKkukkkuk fw-normal"><i class="fa-solid fa-bag-shopping text-primary"></i> 사고팔개</h4>
+          <small class="text-secondary">필요없는 물건은 나누고, 공동구매로 저렴하게</small>
         </div>
         <div class="section_content">
           <ul>
-            <li th:if="${#lists.isEmpty(sitterBoard)}">
+            <li th:if="${#lists.isEmpty(sprBoard)}">
               <div class="py-2">
                 <p class="text-secondary">게시글이 없어요</p>
               </div>
             </li>
-            <li th:each="board:${sitterBoard}" th:unless="${#lists.isEmpty(sitterBoard)}">
+            <li th:each="board:${sprBoard}" th:unless="${#lists.isEmpty(sprBoard)}">
               <div class="border-bottom">
                 <div class="row py-3">
                   <div class="col-12">
                     <div class="mb-1">
                       <div class="d-flex gap-2 flex-nowrap mb-1">
-                        <p th:if="${board.category == '구해요'}" class="badge badge-warning">&#x1F440; 돌봄 구해요</p>
-                        <p th:if="${board.category == '일해요'}" class="badge badge-danger">&#x1F525; 돌봄 일해요</p>
-                        <p th:class="${board.state == '구인중' or board.state == '구직중' ? 'badge badge-info':'badge badge-success'}">[[${board.state}]]</p>
-                        <p th:text="${board.petInfo == 'dog' ? '강아지' : '고양이'}" class="badge badge-outline-secondary"></p>
+                        <p th:if="${board.category == '신고'}" class="badge text-bg-danger">&#x1F6AB; [[${board.category}]]</p>
+                        <p th:if="${board.category == '공구'}" class="badge badge-warning">&#x1F6D2; [[${board.category}]]</p>
+                        <p th:if="${board.category == '나눔'}" class="badge badge-warning">&#x1F381; [[${board.category}]]</p>
+                        <!-- 나눔 / 공구 카테고리일 때 진행중 / 완료 표시 뱃지 -->
+                        <p class="badge badge-info" th:if="${board.category == '나눔' || board.category == '공구'} and ${board.complete == false}">
+                          [[${board.category}]]중
+                        </p>
+                        <p class="badge badge-success" th:if="${board.category == '나눔' || board.category == '공구'} and ${board.complete == true}">
+                          [[${board.category}]]완료
+                        </p>
                       </div>
-                      <a th:href="@{/sitter/view(bno=${board.bno}, mode=1)}" class="d-inline-flex align-items-center gap-1 flex-nowrap w-100 mb-1">
-                        <span class="badge badge-gray">[[${board.sido}]]/[[${board.sigungu}]]</span>
+                      <div class="d-flex gap-2 flex-nowrap mb-2" th:if="${board.category == '나눔'}">
+                        <!-- 나눔 카테고리일 때 시도 시군구 표시 뱃지 -->
+                        <p class="badge badge-gray">[[${board.sido}]] / [[${board.sigungu}]]</p>
+                      </div>
+                      <a th:href="@{/spr/view(bno=${board.bno}, mode=1)}" class="d-inline-flex justify-content-start align-items-center gap-1 flex-nowrap w-100 mb-1">
+                        <span class="text-nowrap badge badge-danger" th:if="${board.category == '공구'} and ${board.complete == false}">[[${board.dueDate}]]까지</span>
+                        <span class="text-nowrap badge badge-danger" th:if="${board.category == '공구'} and ${board.complete == true}">마감</span>
                         <h6 class="text-overflew-line-1">[[${board.title}]]</h6>
                       </a>
                     </div>
                   </div>
                   <div class="col">
                     <div class="d-flex gap-2 flex-nowrap text-secondary">
-                      <p class="text-nowrap">[[${board.nickname}]]</p>
+                      <p class="text-nowrap">[[${board.author}]]</p>
                       <p class="text-nowrap">[[${#temporals.format(board.regDate, 'MM-dd')}]]</p>
                     </div>
                   </div>
                   <div class="col-auto">
                     <div class="d-flex gap-2 flex-nowrap text-secondary">
-                      <p class="text-nowrap"><i class="fa-regular fa-eye me-1"></i>[[${board.readCount}]]</p>
+                      <p class="text-nowrap"><i class="fa-regular fa-eye me-1"></i>[[${board.readcount}]]</p>
+                      <p class="text-nowrap" th:if="${board.recommend >= 1}"><i class="fa-solid fa-heart me-1 text-danger"></i>[[${board.recommend}]]</p>
+                      <p class="text-nowrap" th:if="${board.recommend == 0}"><i class="fa-regular fa-heart me-1 text-danger"></i>[[${board.recommend}]]</p>
                       <p class="text-nowrap"><i class="fa-regular fa-comment-dots me-1"></i>[[${board.replyCount}]]</p>
                     </div>
                   </div>
@@ -322,12 +317,11 @@
         </div>
       </div>
       <div class="card-footer bg-transparent py-3 text-center">
-        <a href="/sitter/list">돌보미 더보기<i class="fa-solid fa-chevron-right ms-1"></i></a>
+        <a href="/spr/list">사고팔개 더보기<i class="fa-solid fa-chevron-right ms-1"></i></a>
       </div>
     </div>
   </section>
-  <!-- // SITTER BOARD END -->
-
+  <!-- // SPR BOARD END -->
 </div>
 
 <script layout:fragment="pagescript" th:inline="javascript">

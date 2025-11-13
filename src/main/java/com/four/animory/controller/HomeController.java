@@ -41,7 +41,6 @@ public class HomeController {
       List<SprBoardDTO> sprBoard = sprBoardService.getTop10SprBoards();
       List<SitterBoardListDTO> sitterBoard = sitterBoardService.getRecent(10);
       List<NoticeBoardDTO>noticeBoard = noticeService.getTop10NoticeBoardList();
-      log.info(freeBoard);
       model.addAttribute("freeBoard", freeBoard);
       model.addAttribute("mateBoard", mateBoard);
       model.addAttribute("sprBoard", sprBoard);
