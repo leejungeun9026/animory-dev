@@ -84,14 +84,13 @@
               <div class="tb_content">[[${board.content}]]</div>
             </td>
           </tr>
-          <!--                        <tr>-->
-          <!--                            <td class="px-0 py-3">-->
-          <!--                                <div th:align="center">-->
-          <!--                                    <button type="button" class="btn btn-outline-danger" id="likeBtn">좋아요!</button>-->
-          <!--                                </div>-->
-          <!--                                <div class="tb_content" th:align="right" th:if="${board.category == '공구'}">(마감일)[[${board.dueDate}]]</div>-->
-          <!--                            </td>-->
-          <!--                        </tr>-->
+          <tr>
+              <td class="px-0 py-3">
+                  <div th:align="center">
+                      <button type="button" class="btn btn-outline-danger" id="likeBtn">좋아요!</button>
+                  </div>
+              </td>
+          </tr>
           <tr>
             <td class="px-0 pt-3">
               <p><i class="fa-regular fa-comment-dots me-1"></i>댓글 <b class="text-danger">[[${board.replyCount}]]</b>
