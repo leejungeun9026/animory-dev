@@ -9,17 +9,20 @@ import com.four.animory.dto.notice.NoticeFileDTO;
 import com.four.animory.repository.notice.NoticeRepository;
 import com.four.animory.repository.notice.NoticeReplyRepository;
 import com.four.animory.repository.user.MemberRepository;
+
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
 @Log4j2
+@Transactional
 public class NoticeServiceImpl implements NoticeService {
 
     @Autowired

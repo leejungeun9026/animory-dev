@@ -50,7 +50,7 @@ public class NoticeBoard extends BaseEntity {
     public void addFile(String uuid, String fileName, boolean image){
         NoticeFile noticeFile = NoticeFile.builder()
                 .uuid(uuid)
-                .filename(fileName)
+                .fileName(fileName)
                 .noticeBoard(this)
                 .ord(fileSet.size())
                 .image(image)

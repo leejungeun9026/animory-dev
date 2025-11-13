@@ -39,7 +39,7 @@ public interface NoticeService {
         return noticeBoard;
     }
 
-    // ✅ entityToDTO - return 뒤 코드 정리, 변수명 수정
+
     default NoticeBoardDTO entityToDTO(NoticeBoard entity) {
         NoticeBoardDTO noticeBoardDTO = NoticeBoardDTO.builder()
                 .bno(entity.getBno())
@@ -67,7 +67,7 @@ public interface NoticeService {
     default NoticeFileDTO fileEntityToDTO(NoticeFile noticeFile) {
         return NoticeFileDTO.builder()
                 .uuid(noticeFile.getUuid())
-                .fileName(noticeFile.getFilename())
+                .fileName(noticeFile.getFileName())
                 .image(noticeFile.isImage())
                 .ord(noticeFile.getOrd())
                 .build();
