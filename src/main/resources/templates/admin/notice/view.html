@@ -16,7 +16,10 @@
               <div class="d-flex gap-2 flex-nowrap">
                 <a class="btn btn-lg btn-secondary" href="/admin/notice/list"><i class="fa-solid fa-chevron-left"></i> 목록으로</a>
                 <div class="d-flex gap-2 flex-nowrap ms-auto">
-                  <a class="btn btn-lg btn-danger" th:href="@{/admin/notice/remove(bno=${notice.bno})}">삭제</a>
+                  <a class="btn btn-lg btn-danger"
+                     th:href="@{/admin/notice/remove(bno=${notice.bno})}"
+                     onclick="return confirm('정말 삭제하시겠습니까?');">삭제
+                  </a>
                   <a class="btn btn-lg btn-primary" th:href="@{/admin/notice/modify(bno=${notice.bno})}">수정</a>
                 </div>
               </div>
