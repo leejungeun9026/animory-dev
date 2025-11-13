@@ -152,7 +152,8 @@
                                   <b>${dto.nickname || '작성자'}</b>
                                   <div>${dto.content}</div>
                                   <small class="">
-                                  ${dto.regDate} ${dto.updateDate ? `<small class="text-muted ms-2">(수정됨 ${dto.updateDate})</small>` : ''}
+                                  ${dto.regDate}
+                                  ${dto.updateDate && dto.updateDate !==dto.regDate ? `<small class="text-muted ms-2">(수정됨 ${dto.updateDate})</small>` : ''}
                                   </small>
                                 </div>
                                 <div class="col-auto">

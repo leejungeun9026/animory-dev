@@ -157,7 +157,7 @@
               <p><b>${r.nickname || "익명"}</b></p>
               <div class="replyContent">${r.deleted ? '<span class="text-secondary">삭제된 댓글입니다.</span>' : (r.content ?? "")}</div>
               <small class="text-secondary">${r.regDate || ""}
-              ${r.updateDate ? `(수정됨 ${r.updateDate})</small>` : ""}
+              ${r.updateDate && r.updateDate!==r.regDate ? `(수정됨 ${r.updateDate})</small>` : ""}
               </small>
             </div>
             ${(!r.deleted && (r.owner || r.admin)) ? `
