@@ -6,8 +6,6 @@ import com.four.animory.domain.user.Member;
 import com.four.animory.dto.free.*;
 import com.four.animory.dto.free.FreeBoardListReplyCountDTO;
 import com.four.animory.dto.free.upload.FreeFileThumbnailDTO;
-
-
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -26,7 +24,6 @@ public interface FreeService {
     List<FreeBoardDTO> getTop10FreeBoardList(); // 메인에 출력할 리스트 10개
 
     List<FreeFileThumbnailDTO> getBoardThumbnails(); // 썸네일 출력
-
 
     // dto -> Entity
     default FreeBoard dtoToEntity(FreeBoardDTO freeBoardDTO) {
@@ -81,5 +78,8 @@ public interface FreeService {
                 .build();
         return dto;
     }
+
+    
+
 
 }

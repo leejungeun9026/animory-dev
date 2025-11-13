@@ -1,7 +1,6 @@
 package com.four.animory.controller.free;
 
 import com.four.animory.config.auth.PrincipalDetails;
-import com.four.animory.domain.free.FreeBoard;
 import com.four.animory.domain.user.Member;
 import com.four.animory.dto.free.*;
 import com.four.animory.dto.free.upload.FreeFileThumbnailDTO;
@@ -13,13 +12,16 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.Banner;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.AccessDeniedException;
 import java.nio.file.Files;
 import java.util.List;
 
@@ -39,22 +41,6 @@ public class FreeController {
         model.addAttribute("freeboardList", freeboardList);
         return "free/list";
     }
-
-//    @GetMapping("/list")
-//    public String replyCountList(FreePageRequestDTO freePageRequestDTO, Model model) {
-//        List<FreeBoardDTO> freeboardList = freeService.findAllFreeBoards();
-//        model.addAttribute("freeboardList", freeboardList);
-//
-//        // 게시글 썸네일 리스트
-//        List<FreeFileThumbnailDTO> thumbnails = freeService.getBoardThumbnails();
-//        model.addAttribute("thumbnails", thumbnails);
-//
-//        FreePageResponseDTO<FreeBoardListReplyCountDTO> freePageResponseDTO =
-//        freeService.getListReplyCount(freePageRequestDTO);
-//        model.addAttribute("freePageResponseDTO", freePageResponseDTO);
-//        model.addAttribute("freePageRequestDTO",  freePageRequestDTO);
-//        return "free/list";
-//    }
 
     @GetMapping("/list")
     public String replyCountList(FreePageRequestDTO freePageRequestDTO, Model model) {
@@ -81,13 +67,13 @@ public class FreeController {
         return "free/list";
     }
 
-
-
-        @GetMapping("/view")
+    @GetMapping("/view")
     public void view(Long bno, Integer mode, Model model) {
         if (mode == null) mode = 1;
         model.addAttribute("freeBoard", freeService.findFreeBoardById(bno, mode));
     }
+
+
 
     @GetMapping("/register")
     public String registerGet(@AuthenticationPrincipal PrincipalDetails principalDetails, Model model) {
@@ -99,19 +85,26 @@ public class FreeController {
     @GetMapping("/modify")
     public String modify(Long bno, Integer mode, Model model) {
         FreeBoardDTO freeBoardDTO = freeService.findFreeBoardById(bno, mode);
+
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        String currentUsername = auth.getName();
+
         model.addAttribute("freeBoard", freeBoardDTO);
         return "free/modify";
     }
 
     @GetMapping("remove")
-    public String removeFreeBoard(Long bno) {
-        log.info("removeFreeBoard");
+    public String removeFreeBoard(Long bno) {;
         FreeBoardDTO freeBoardDTO = freeService.findFreeBoardById(bno,2);
+
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        String currentUsername = auth.getName();
+
         List<FreeFileDTO> freeFileDTOS = freeBoardDTO.getFreeFileDTOS();
         if (freeFileDTOS != null && !freeFileDTOS.isEmpty()) {
-            log.info("!!!!!!!!! removeFreeBoard");
             removeFile(freeFileDTOS);
         }
+
         freeService.deleteFreeBoardById(bno);
         return "redirect:/free/list";
     }

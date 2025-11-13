@@ -2,13 +2,10 @@ package com.four.animory.domain.free;
 
 import com.four.animory.domain.BaseEntity;
 import com.four.animory.domain.user.Member;
-import com.four.animory.dto.free.FreeBoardDTO;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.BatchSize;
 import org.hibernate.annotations.ColumnDefault;
-
-import java.time.LocalDateTime;
 import java.util.*;
 
 @Entity
@@ -23,8 +20,10 @@ public class FreeBoard extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long bno;
+
     @Column(nullable = false, length = 300)
     private String title;
+
     @Column(nullable = false, length = 3000)
     private String content;
 
@@ -69,15 +68,18 @@ public class FreeBoard extends BaseEntity {
         this.fileSet.clear();
     }
 
+    // 게시판 글 수정하기 
     public void change(String title, String content, String btype) {
         this.title = title;
         this.content = content;
         this.btype = btype;
     }
+    
+    // 조회수 증가
     public void updateReadCount() {
         this.readcount = readcount+1;
     }
-
+    // 좋아요 수 증가
     public void updateLikecount() { this.likecount = likecount+1; }
 
 }

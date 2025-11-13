@@ -1,7 +1,6 @@
 package com.four.animory.dto.free;
 
 import lombok.Data;
-
 import java.time.LocalDateTime;
 
 @Data

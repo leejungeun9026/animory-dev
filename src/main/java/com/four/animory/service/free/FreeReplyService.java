@@ -15,7 +15,6 @@ public interface FreeReplyService {
     FreePageResponseDTO<FreeReplyDTO> getListOfFreeBoard(Long bno, FreePageRequestDTO freePageRequestDTO);
 
 
-
         default FreeReply dtoToEntity(FreeReplyDTO freeReplyDTO) {
             FreeBoard freeBoard = FreeBoard.builder().bno(freeReplyDTO.getBno()).build();
             FreeReply parent = null;
@@ -53,10 +52,5 @@ public interface FreeReplyService {
                     }
                     return builder.build();
         }
-
-
-
-
-
 
 }

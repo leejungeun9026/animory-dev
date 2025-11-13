@@ -1,6 +1,5 @@
 package com.four.animory.dto.free;
 
-import com.four.animory.dto.common.PageRequestDTO;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.ToString;

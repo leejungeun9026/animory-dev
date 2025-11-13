@@ -21,10 +21,12 @@ public class FreeFile implements Comparable<FreeFile>{
     @JoinColumn(name="bno")
     private FreeBoard freeBoard;
 
-    @Override // 파일의 순서 정하기
+    // 파일의 순서 정하기
+    @Override
     public int compareTo(FreeFile other) {
         return this.ord - other.ord;
     }
+
     // 게시판 파일이 바뀔 대
     public void changeFreeBoard(FreeBoard freeBoard) {
         this.freeBoard = freeBoard;
