@@ -115,6 +115,22 @@
     .mvSwiper .swiper-slide > a {
         border-radius: 0;
     }
+
+
+    .free_thumb {
+        width: 114px;
+        height: 114px;
+    }
+    .free_title {
+        max-height: 22px;
+        height: 100%;
+        text-overflow: ellipsis;
+        overflow: hidden;
+        word-break: break-word;
+        display: -webkit-box;
+        -webkit-line-clamp: 1;
+        -webkit-box-orient: vertical;
+    }
 }
 /* breakpoints-md 768 끝 */
 
@@ -141,7 +157,10 @@
     .main_header .gnb > li > a > p {
         font-size: 1.125rem;
     }
-
+    .free_thumb {
+        width: 102px;
+        height: 102px;
+    }
 
 
 }

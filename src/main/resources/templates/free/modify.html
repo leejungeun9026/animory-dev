@@ -13,52 +13,52 @@
     <h3 class="memomentKkukkkuk fw-normal mt-2">게시글 수정</h3>
   </div>
   <div class="board_area">
-    <form action="/free/modify" enctype="multipart/form-data" method="post" entype="multipart/form-data">
-        <input type="hidden" name="bno" th:value="${freeBoard.bno}">
+    <form action="/free/modify" enctype="multipart/form-data" entype="multipart/form-data" method="post">
+      <input name="bno" th:value="${freeBoard.bno}" type="hidden">
       <div class="mb-2">
         <select class="form-select w-auto" id="btype" name="btype" required>
           <option value="">카테고리(필수)</option>
-          <option value="자유" th:selected="${freeBoard.btype != null and freeBoard.btype == '자유'}">자유</option>
-          <option value="정보" th:selected="${freeBoard.btype != null and freeBoard.btype == '정보'}">정보</option>
+          <option th:selected="${freeBoard.btype != null and freeBoard.btype == '자유'}" value="자유">자유</option>
+          <option th:selected="${freeBoard.btype != null and freeBoard.btype == '정보'}" value="정보">정보</option>
         </select>
       </div>
       <div class="mb-2">
-        <label class="form-label">제목</label>
-        <input class="form-control" name="title" required type="text" th:value="${freeBoard.title}">
+        <input class="form-control" name="title" required th:value="${freeBoard.title}" type="text" aria-label="제목">
       </div>
       <div class="mb-2">
-        <input type="hidden" name="nickname" value="닉네임">
-        <label class="form-label">내용</label>
-        <textarea class="form-control" cols="30" id="content" name="content" required rows="10">[[${freeBoard.content}]]</textarea>
+        <textarea class="form-control" cols="30" id="content" name="content" required
+                  rows="10" aria-label="내용">[[${freeBoard.content}]]</textarea>
       </div>
-        <tr class="mb-3">
-            <td>
-                <span class="input-group-text">첨부파일</span>
-                <div class="col" th:if="${freeBoard.freeFileDTOS !=null && freeBoard.freeFileDTOS.size()>0}">
-                    <div class="container-fluid d-flex uploadResult" style="flex-wrap: wrap">
-                        <div th:each="freeDTO:${freeBoard.freeFileDTOS}">
-                            <div th:if="${freeDTO.image}">
-                                <img class="mb-3" th:src="|/uploads/free/s_${freeDTO.uuid}_${freeDTO.filename}|">
-                                <span th:text="${freeDTO.filename}"></span>
-                            </div>
-                            <div th:unless="${freeDTO.image}">
-                                <img class="mb-3" src="/uploads/free/images/file.jpg" width="100" height="100">
-                                <span th:text="${freeDTO.filename}"></span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </td>
-        <tr>
-        <div class="mb-3">
-            <input class="form-control" multiple name="files" type="file">
-        </div>
+
+      <div class="mb-1" th:if="${freeBoard.freeFileDTOS !=null && freeBoard.freeFileDTOS.size()>0}">
+        <label class="form-label fw-bold">현재 첨부파일</label>
+        <ul id="fileList" class="list-group">
+          <li class="list-group-item px-2" th:each="freeDTO:${freeBoard.freeFileDTOS}">
+            <div class="d-flex align-items-center gap-2">
+              <div th:if="${freeDTO.image}" class="img_wrap thumb_40x40 border-1">
+                <img  th:src="|/uploads/free/s_${freeDTO.uuid}_${freeDTO.filename}|">
+              </div>
+              <div th:unless="${freeDTO.image}" class="img_wrap thumb_40x40 border-1" >
+                <img src="/uploads/free/images/file.jpg">
+              </div>
+              <div>
+                <p>[[${freeDTO.filename}]]</p>
+              </div>
+            </div>
+          </li>
+        </ul>
+      </div>
+      <div class="mb-3">
+        <input class="form-control" multiple name="files" type="file">
+      </div>
       <div class="button_wrap">
         <div class="row g-2">
-            <div class="col d-flex justify-content-end gap-2">
-                <button type="submit" class="btn btn-info">수정완료</button>
-                <a class="btn btn-gray" th:href="@{/free/view(bno=${freeBoard.bno})}">취소</a>
-            </div>
+          <div class="col-6 col-md-auto ms-md-auto">
+            <a class="btn btn-lg btn-gray w-100" th:href="@{/free/view(bno=${freeBoard.bno})}">취소</a>
+          </div>
+          <div class="col-6 col-md-auto">
+            <button class="btn btn-lg btn-main w-100">저장</button>
+          </div>
         </div>
       </div>
     </form>
