@@ -19,7 +19,7 @@ public interface SprSprBoardRepository extends JpaRepository<SprBoard, Long>, Sp
     @Query("select b from SprBoard  b where b.bno=:bno")
     Optional<SprBoard> findByBIdWithImages(Long bno);
 
-    List<SprBoard> findTop10ByCompleteFalseOrderByRecommendDesc();
+    List<SprBoard> findTop10ByCompleteFalseOrderByRecommendDescBnoDesc();
 
     List<SprBoard> findByCategory(String category, Pageable pageable);
 

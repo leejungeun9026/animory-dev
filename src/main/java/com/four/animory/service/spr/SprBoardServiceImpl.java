@@ -91,7 +91,7 @@ public class SprBoardServiceImpl implements SprBoardService {
 
     @Override
     public List<SprBoardDTO> getTop10SprBoards() {
-        List<SprBoard> sprBoards = sprRepository.findTop10ByCompleteFalseOrderByRecommendDesc();
+        List<SprBoard> sprBoards = sprRepository.findTop10ByCompleteFalseOrderByRecommendDescBnoDesc();
         return sprBoards.stream()
                 .map(this::entityToDTO)
                 .collect(Collectors.toList());
