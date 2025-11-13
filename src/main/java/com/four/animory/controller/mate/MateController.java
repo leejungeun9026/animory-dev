@@ -49,8 +49,9 @@ public class MateController {
 
     @GetMapping("/list")
     public void replyCountList(@AuthenticationPrincipal PrincipalDetails principal, MatePageRequestDTO matePageRequestDTO, Model model) {
+        MemberDTO memberDTO = null;
         if(principal != null){
-            MemberDTO memberDTO = userService.getMemberByUsername(principal.getMember().getUsername());
+            memberDTO = userService.getMemberByUsername(principal.getMember().getUsername());
             int petCount = userService.getPetListByMemberId(memberDTO.getMid()).size();
             model.addAttribute("memberDTO", memberDTO);
             model.addAttribute("petCount", petCount);
@@ -68,12 +69,12 @@ public class MateController {
 
     }
 
-    @GetMapping("register")
+    @GetMapping("/register")
     public void registerGet(Model model) {
         log.info("registerGet");
     }
 
-    @PostMapping("register")
+    @PostMapping("/register")
     public String registerPost(UploadFileDTO uploadFileDTO, MateBoardDTO mateBoardDTO, @AuthenticationPrincipal PrincipalDetails principalDetails) {
         List<MateFileDTO> fileDTOS = null; //리턴형은 리스트 스트링이야 아래에 함수 만들었어
         if (uploadFileDTO.getFiles() != null && //getFiles하면 파일의 리스트를 가지고 올수있어. files라는게 있어서 null은

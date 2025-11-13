@@ -23,7 +23,6 @@
                            type="text">
                 </div>
             </div>
-
             <div class="mb-2">
                 <select class="form-select w-auto" id="category" name="category" required>
                     <option value="">카테고리(필수)</option>
@@ -31,7 +30,6 @@
                     <option value="그룹 모집" th:selected="${mateBoard.category} == '그룹 모집'">그룹 모집</option>
                 </select>
             </div>
-
             <div class="mb-2">
                 <div class="d-flex align-items-center gap-1">
                     <select class="form-select" id="sido" name="sido" required
@@ -75,10 +73,6 @@
                     </div>
                 </div>
             </div>
-
-<!--            <div class="mb-3">-->
-<!--                <input class="form-control" multiple name="files" type="file">-->
-<!--            </div>-->
             <div class="button_wrap">
                 <div class="row g-2">
                     <div class="col-6 col-md-auto ms-md-auto">
@@ -95,7 +89,6 @@
 </div>
 
 <script layout:fragment="pagescript" th:inline="javascript">
-
 
     // 시군구 수정 - 이전 값 미리보기
     const sido    = document.getElementById('sido');
@@ -154,4 +147,3 @@
 
 </script>
 
-</html>
