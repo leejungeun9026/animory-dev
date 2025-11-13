@@ -5,150 +5,150 @@
       xmlns:th="http://www.thymeleaf.org">
 
 <div layout:fragment="content">
-    <!-- /* view 화면 html 코드 작성 부분 */ -->
-    <div class="page_title mb-4">
-        <a class="d-inline-flex align-items-baseline" href="/mate/list">
-            <small class="text-danger">산책 게시판 <i class="fa-solid fa-chevron-right fs-xs"></i></small>
-        </a>
-        <h3 class="memomentKkukkkuk fw-normal mt-2">게시글 보기</h3>
-    </div>
-    <div class="board_area">
-        <div class="card rounded-3">
-            <div class="card-body">
-                <table class="table table-borderless">
-                    <thead>
-                    <tr>
-                        <td class="tb_title border-bottom pb-3 px-0">
-                            <div class="d-flex gap-2 flex-nowrap align-items-end mb-2">
-                                <div class="d-flex gap-2 flex-nowrap align-items-center">
-                                    <div class="badge badge-gray mb-2">
-                                        <span>[[${board.sido}]]</span> / <span>[[${board.sigungu}]]</span>
-                                    </div>
-                                    <p class="badge badge-info mb-2"
-                                       th:if="${board != null and (board.category == '1:1 모집' or board.category == '그룹 모집')}"
-                                       th:text="${board.category}">
-                                    </p>
-                                    <!--                      <p class="badge badge-success">[[${board.category}]]</p>        -->
-                                </div>
-                                <!-- 로그인 사용자 == 글작성자 같을 경우만 노출 -->
-                                <div class="d-flex gap-1 flex-nowrap ms-auto">
-                                    <a class="btn btn-danger" th:href="@{/mate/remove(bno=${board.bno})}">삭제</a>
-                                    <a class="btn btn-gray" th:href="@{/mate/modify(bno=${board.bno}, mode=2)}">수정</a>
-                                    <!--                         추가 할 것-->
-                                </div>
-                                <!-- // 로그인 사용자 == 글작성자 같을 경우만 노출 끝 -->
-                            </div>
-                            <h4 class="py-2">[[${board.title}]]</h4>
-                            <div class="d-flex gap-2 flex-nowrap text-secondary">
-                                <p>[[${board.nickname}]]</p>
-                                <p>[[${#temporals.format(board.regDate, 'yyyy-MM-dd HH:mm:ss')}]]</p>
+  <!-- /* view 화면 html 코드 작성 부분 */ -->
+  <div class="page_title mb-4">
+    <a class="d-inline-flex align-items-baseline" href="/mate/list">
+      <small class="text-danger">산책메이트 게시판 <i class="fa-solid fa-chevron-right fs-xs"></i></small>
+    </a>
+    <h3 class="memomentKkukkkuk fw-normal mt-2">게시글 보기</h3>
+  </div>
+  <div class="board_area">
+    <div class="card rounded-3">
+      <div class="card-body">
+        <table class="table table-borderless">
+          <thead>
+          <tr>
+            <td class="tb_title border-bottom pb-3 px-0">
+              <div class="d-flex gap-2 flex-nowrap align-items-end mb-2">
+                <div>
+                  <!-- 표시 뱃지 -->
+                  <div class="d-flex gap-2 flex-nowrap">
+                    <p class="badge badge-gray">
+                      <span>[[${board.sido}]]</span> / <span>[[${board.sigungu}]]</span>
+                    </p>
+                    <p th:if="${board != null and board.category == '1:1 모집'}" class="badge badge-warning">
+                      &#x1F464; [[${board.category}]]
+                    </p>
+                    <p th:if="${board != null and board.category == '그룹 모집'}" class="badge badge-info">
+                      &#x1F465; [[${board.category}]]
+                    </p>
+                    <p th:if="${board.dueDate != null && !board.expired}" class="badge badge-danger">[[${board.dueDisplay}]] 까지</p>
+                    <p th:if="${board.dueDate != null && board.expired}" class="badge badge-danger">마감</p>
+                    <!-- 신청마감일 표시 블록 -->
+                  </div>
+                  <!-- 표시 뱃지 끝 -->
+                </div>
+                <!-- 로그인 사용자 == 글작성자 같을 경우만 노출 -->
+                <div class="d-flex gap-1 flex-nowrap ms-auto">
+                  <a class="btn btn-danger" th:href="@{/mate/remove(bno=${board.bno})}">삭제</a>
+                  <a class="btn btn-gray" th:href="@{/mate/modify(bno=${board.bno}, mode=2)}">수정</a>
+                </div>
+                <!-- // 로그인 사용자 == 글작성자 같을 경우만 노출 끝 -->
+              </div>
+              <h4 class="py-2">[[${board.title}]]</h4>
+              <div class="d-flex gap-2 flex-nowrap text-secondary">
+                <p>[[${board.nickname}]]</p>
+                <p>[[${#temporals.format(board.regDate, 'yyyy-MM-dd HH:mm:ss')}]]</p>
 
-                                <p class="ms-auto mb-0 d-flex align-items-center">
-                                    <i class="fa-regular fa-eye me-1"></i>
-                                    <span th:text="${board.readCount}">0</span>
+                <p class="ms-auto mb-0 d-flex align-items-center">
+                  <i class="fa-regular fa-eye me-1"></i>
+                  <span th:text="${board.readCount}">0</span>
 
-                                    <i class="like-btn"
-                                       th:attr="data-bno=${board.bno}"
-                                       th:class="${board.likecount >= 1}
+                  <i class="like-btn"
+                     th:attr="data-bno=${board.bno}"
+                     th:class="${board.likecount >= 1}
                                          ? 'fa-solid fa-heart ms-3 me-1 text-danger'
                                          : 'fa-regular fa-heart ms-3 me-1 text-danger'"></i>
 
-                                    <span class="like-count"
-                                          th:attr="data-bno=${board.bno}"
-                                          th:text="${board.likecount}">0</span>
-                                    <i class="fa-regular fa-comment-dots ms-3 me-1"></i>
-                                    <span class="reply-count" th:text="${board.replyCount} ?: 0">0</span>
-                                </p>
-                            </div>
+                  <span class="like-count"
+                        th:attr="data-bno=${board.bno}"
+                        th:text="${board.likecount}">0</span>
+                  <i class="fa-regular fa-comment-dots ms-3 me-1"></i>
+                  <span class="reply-count" th:text="${board.replyCount} ?: 0">0</span>
+                </p>
+              </div>
 
-                        </td>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    <!-- 첨부파일이 있으면 노출 -->
-                    <tr th:if="${board.mateFileDTOs != null && board.mateFileDTOs.size > 0}">
-                        <td class="px-0 py-3">
-                            <ul>
-                                <li class="mb-2" th:each="file:${board.mateFileDTOs}">
-                                    <div class="img_wrap">
-                                        <img th:src="|/uploads/mate/${file.uuid}_${file.filename}|">
-                                    </div>
-                                </li>
-                            </ul>
-                        </td>
-                    </tr>
-                    <!-- 첨부파일이 있으면 노출 끝 -->
-                    <tr>
-                        <td class="px-0 py-3">
-                            <div class="tb_content">[[${board.content}]]</div>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td class="px-0 pt-3">
-                            <!-- 좋아요 버튼 -->
-                            <div class="d-flex justify-content-center align-items-center mb-2">
-                                    <button type="button" class="btn btn-outline-danger" id="likeBtn">좋아요!</button>
-                            </div>
-                            <!-- 신청마감일 표시 블록 -->
-                            <div class="mt-1" th:if="${board.dueDate != null}">
-                                신청마감일 :
-                                <span th:text="${board.dueDisplay}"
-                                      th:classappend="${board.expired} ? ' text-secondary' : ' text-danger'">
-                                </span>
-                            </div>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td class="px-0 pt-3">
-                            <p>
-                                <i class="fa-regular fa-comment-dots me-1"></i>
-                                댓글 <b class="text-danger">[[${board.replyCount}]]</b>
-                            </p>
-                            <div class="reply_list_area">
-                                <ul class="replyList"></ul>
-                                <ul class="replyPaging pagination pagination-sm mt-3"></ul>
-                            </div>
-                            <div>
-                                <ul class="pagination replyPaging"></ul>
-                            </div>
-                            <div class="replyModal">
-                                <div class="reply_write_area pt-3">
-                                    <div class="mb-2">
-                                        <textarea class="replyText form-control" name="replyText"
-                                                  placeholder="댓글 내용을 입력해주세요(최대 1000자)"></textarea>
-                                    </div>
-                                        <div class="d-flex">
-                                            <button class="btnReplyRegister ms-auto btn btn-main" type="button">댓글 쓰기</button>
-                                        </div>
-                                </div>
-                            </div>
+            </td>
+          </tr>
+          </thead>
+          <tbody>
+          <!-- 첨부파일이 있으면 노출 -->
+          <tr th:if="${board.mateFileDTOs != null && board.mateFileDTOs.size > 0}">
+            <td class="px-0 py-3">
+              <ul>
+                <li class="mb-2" th:each="file:${board.mateFileDTOs}">
+                  <div class="img_wrap">
+                    <img th:src="|/uploads/mate/${file.uuid}_${file.filename}|">
+                  </div>
+                </li>
+              </ul>
+            </td>
+          </tr>
+          <!-- 첨부파일이 있으면 노출 끝 -->
+          <tr>
+            <td class="px-0 py-3">
+              <div class="tb_content">[[${board.content}]]</div>
+            </td>
+          </tr>
+          <tr>
+            <td class="px-0 pt-3">
+              <!-- 좋아요 버튼 -->
+              <div class="d-flex justify-content-center align-items-center mb-2">
+                <button class="btn btn-outline-danger" id="likeBtn" type="button">좋아요!</button>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td class="px-0 pt-3">
+              <p>
+                <i class="fa-regular fa-comment-dots me-1"></i>
+                댓글 <b class="text-danger reply-count">[[${board.replyCount}]]</b>
+              </p>
+              <div class="reply_list_area">
+                <ul class="replyList"></ul>
+                <ul class="replyPaging pagination pagination-sm justify-content-center mt-3"></ul>
+              </div>
+              <div class="replyModal">
+                <div class="reply_write_area pt-3">
+                  <div class="mb-2">
+                    <textarea class="replyText form-control" name="replyText"
+                            placeholder="댓글 내용을 입력해주세요(최대 1000자)"></textarea>
+                  </div>
+                  <div class="d-flex">
+                    <button class="btnReplyRegister ms-auto btn btn-main" type="button">댓글 쓰기</button>
+                  </div>
+                </div>
+              </div>
 
-                            <!-- 댓글 수정 -->
-                            <div class="modal modifyModal" tabindex="-1">
-                                <div class="modal-dialog">
-                                    <div class="modal-content">
-                                        <div class="modal-body">
-                                            <div class="input-group mb-3">
-                                                <input class="form-control modifyText" type="text">
-                                            </div>
-                                        </div>
-                                        <div class="modal-footer">
-                                            <button class="btn btn-dark modifyCloseBtn" type="button">닫기</button>
-                                            <button class="btn btn-primary modifyBtn2" type="button">수정</button>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </td>
-                    </tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
+              <!-- 댓글 수정 -->
+              <div class="modal modifyModal" tabindex="-1">
+                <div class="modal-dialog modal-dialog-centered modal-sm">
+                  <div class="modal-content">
+                    <div class="modal-header border-bottom-0">
+                      <h5 class="modal-title">댓글 수정하기</h5>
+                      <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body py-0">
+                      <input class="form-control modifyText" type="text" aria-label="댓글 내용">
+                    </div>
+                    <div class="modal-footer border-top-0">
+                      <div class="d-flex justify-content-center gap-2 flex-nowrap w-100">
+                        <button class="btn btn-lg btn-gray w-100 modifyCloseBtn" type="button">취소</button>
+                        <button class="btn btn-lg btn-main w-100 modifyBtn2" type="button">저장</button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </td>
+          </tr>
+          </tbody>
+        </table>
+      </div>
     </div>
-    <!-- /* //view 화면 html 코드 작성 끝 */ -->
+  </div>
+  <!-- /* //view 화면 html 코드 작성 끝 */ -->
 </div>
-
 
 
 <script layout:fragment="pagescript" th:inline="javascript">
@@ -165,9 +165,9 @@
     let page = 1;
     let size = 10;
 
-        /* ============================
-           1. 댓글 리스트 렌더링
-        ============================ */
+    /* ============================
+       1. 댓글 리스트 렌더링
+    ============================ */
     function printList(dtoList) {
         let str = '';
         if (dtoList && dtoList.length > 0) {
@@ -232,7 +232,7 @@
        3. 댓글 불러오기 + 카운트 갱신
     ============================ */
     async function printReplies(bno, page, size, goLast) {
-        const response = await axios.get(`/matereplies/list/${bno}`, { params: { page, size } });
+        const response = await axios.get(`/matereplies/list/${bno}`, {params: {page, size}});
         const data = response.data;
 
         if (goLast) {
@@ -245,9 +245,13 @@
         printPages(data);
 
         if (typeof data.total === 'number') {
-            document.querySelector('.reply-count')?.replaceChildren(document.createTextNode(data.total));
+            let replyCountArea = document.querySelectorAll('.reply-count')
+            for (let replyCountNum of replyCountArea ) {
+                replyCountNum.innerHTML = data.total;
+            }
         }
     }
+
     printReplies(bno, page, size, false);
 
 
@@ -292,7 +296,7 @@
             modifyModal.show();
 
             document.querySelector(".modifyBtn2").onclick = async function () {
-                await axios.put(`/matereplies/${rno}`, { rno, content: modifyText.value });
+                await axios.put(`/matereplies/${rno}`, {rno, content: modifyText.value});
                 modifyModal.hide();
                 printReplies(bno, page, size, false);
             };
@@ -335,7 +339,10 @@
         e.preventDefault();
         const $li = $(this).closest('li.reply_list');
         const $exist = $li.find('.reReplyWriteArea');
-        if ($exist.length) { $exist.remove(); return; }
+        if ($exist.length) {
+            $exist.remove();
+            return;
+        }
         $li.append(reReplyStr());
     });
 
@@ -345,15 +352,18 @@
 
     $(document).on('click', '.btnReReplyRegister', async function () {
         const $area = $(this).closest('.reReplyWriteArea');
-        const $li   = $(this).closest('li.reply_list');
+        const $li = $(this).closest('li.reply_list');
         const parentRno = $li.data('rno');
-        const content   = $area.find('.reReplyText').val().trim();
-        const secret    = $area.find('.reSecretCheck').is(':checked') ? 1 : 0;
+        const content = $area.find('.reReplyText').val().trim();
+        const secret = $area.find('.reSecretCheck').is(':checked') ? 1 : 0;
 
-        if (!content) { alert('내용을 입력해주세요'); return; }
+        if (!content) {
+            alert('내용을 입력해주세요');
+            return;
+        }
 
         try {
-            await axios.post('/matereplies/', { bno, content, secret, parentRno });
+            await axios.post('/matereplies/', {bno, content, secret, parentRno});
             $area.remove();
             printReplies(bno, page, size, false);
         } catch (err) {
@@ -381,7 +391,7 @@
         $count.text(current + 1);
         if ($icon && $icon.length) $icon.removeClass('fa-regular').addClass('fa-solid');
 
-        const token  = $('meta[name="_csrf"]').attr('content');
+        const token = $('meta[name="_csrf"]').attr('content');
         const header = $('meta[name="_csrf_header"]').attr('content');
 
         $.ajax({
@@ -390,7 +400,7 @@
             contentType: 'application/json',
             dataType: 'json',
             cache: false,
-            data: JSON.stringify({ bno }),
+            data: JSON.stringify({bno}),
             beforeSend: function (xhr) {
                 if (token && header) xhr.setRequestHeader(header, token);
             },
@@ -415,16 +425,16 @@
     }
 
     $(document).on('click', '.like-btn', function () {
-        const $icon  = $(this);
-        const bno    = $icon.data('bno');
-        const $row   = $icon.closest('p');
+        const $icon = $(this);
+        const bno = $icon.data('bno');
+        const $row = $icon.closest('p');
         const $count = $row.find('.like-count[data-bno="' + bno + '"]');
         sendLike(bno, $icon, $count);
     });
 
     $(document).on('click', '#likeBtn', function () {
         const $count = $('.like-count[data-bno="' + bno + '"]');
-        const $icon  = $('.like-btn[data-bno="' + bno + '"]');
+        const $icon = $('.like-btn[data-bno="' + bno + '"]');
         sendLike(bno, $icon, $count);
     });
 </script>

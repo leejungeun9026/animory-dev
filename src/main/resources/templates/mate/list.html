@@ -5,205 +5,196 @@
       xmlns:th="http://www.thymeleaf.org">
 
 <div layout:fragment="content">
-    <!-- /* view 화면 html 코드 작성 부분 */ -->
-    <div class="page_title mb-4 mb-md-5">
-        <h3 class="memomentKkukkkuk fw-normal mb-2">산책 게시판</h3>
-        <small class="text-secondary">반려동물 정보를 입력한 회원만 작성 가능합니다</small>
-    </div>
-    <!--조회 옵션-->
-    <div class="board_area">
-        <div class="row g-4">
-            <div class="col-12 col-sm-10 col-md-8 col-lg-6 mx-auto">
-                <section class="search_area">
-                    <form action="/mate/list" method="get">
-                        <input id="responsePage" name="page" th:value="${matePageRequestDTO.page}" type="hidden">
-                        <input name="size" th:value="${matePageRequestDTO.size}" type="hidden">
-                        <div class="d-flex gap-2">
-                            <select aria-label="검색어 타입" class="form-select form-select-sm w-auto flex-shrink-1"
-                                    id="field"
-                                    name="field">
-                                <option value="">-----</option>
-                                <option th:selected="${matePageRequestDTO.field=='tc'}" value="tc">제목+내용</option>
-                                <option th:selected="${matePageRequestDTO.field=='t'}" value="t">제목</option>
-                                <option th:selected="${matePageRequestDTO.field=='c'}" value="c">내용</option>
-                                <option th:selected="${matePageRequestDTO.field=='w'}" value="w">작성자</option>
-                            </select>
-                            <input aria-label="검색어" class="form-control form-control-sm" name="keyword"
-                                   placeholder="검색어를 입력하세요" th:value="${matePageRequestDTO.keyword}"
-                                   type="text">
-                            <button class="btn btn-sm btn-secondary text-nowrap" type="submit">
-                                <i class="fa-solid fa-magnifying-glass me-1"></i>검색
-                            </button>
-                            <button class="btn btn-sm btn-gray text-nowrap" type="button">초기화</button>
-                        </div>
-                    </form>
-                </section>
+  <!-- /* view 화면 html 코드 작성 부분 */ -->
+  <div class="page_title mb-4 mb-md-5">
+    <h3 class="memomentKkukkkuk fw-normal mb-2">산책메이트</h3>
+    <small class="text-secondary">같이 산책 나가요! 반려동물 정보를 입력한 회원만 글 작성 가능해요</small>
+  </div>
+  <!--조회 옵션-->
+  <div class="board_area">
+    <div class="row g-4">
+      <div class="col-12 col-sm-10 col-md-8 col-lg-6 mx-auto">
+        <section class="search_area">
+          <form action="/mate/list" method="get">
+            <input id="responsePage" name="page" th:value="${matePageRequestDTO.page}" type="hidden">
+            <input name="size" th:value="${matePageRequestDTO.size}" type="hidden">
+            <div class="d-flex gap-2">
+              <select aria-label="검색어 타입" class="form-select form-select-sm w-auto flex-shrink-1"
+                      id="field"
+                      name="field">
+                <option value="">검색어</option>
+                <option th:selected="${matePageRequestDTO.field=='tc'}" value="tc">제목+내용</option>
+                <option th:selected="${matePageRequestDTO.field=='t'}" value="t">제목</option>
+                <option th:selected="${matePageRequestDTO.field=='c'}" value="c">내용</option>
+                <option th:selected="${matePageRequestDTO.field=='w'}" value="w">작성자</option>
+              </select>
+              <input aria-label="검색어" class="form-control form-control-sm" name="keyword"
+                     placeholder="검색어를 입력하세요" th:value="${matePageRequestDTO.keyword}"
+                     type="text">
+              <button class="btn btn-sm btn-secondary text-nowrap" type="submit">
+                <i class="fa-solid fa-magnifying-glass me-1"></i>검색
+              </button>
+              <button class="btn btn-sm btn-gray text-nowrap" type="button">초기화</button>
             </div>
-            <!-- 리스트 목록보기 -->
-            <div class="col-12">
-                <section class="search_result_area">
-                    <div class="d-flex align-items-end mb-2">
-                        <small>총 12개 (1/2페이지)</small>
-                        <div class="ms-auto" sec:authorize="isAuthenticated()">
-                            <a class="btn btn-lg btn-main px-4" href="/mate/register" id="btnRegister">
-                                <i class="fa-solid fa-pencil"></i>글쓰기
-                            </a>
-                        </div>
+          </form>
+        </section>
+      </div>
+      <!-- 리스트 목록보기 -->
+      <div class="col-12">
+        <section class="search_result_area">
+          <div class="d-flex align-items-end mb-2">
+            <small>총 12개 (1/2페이지)</small>
+            <div class="ms-auto" sec:authorize="isAuthenticated()">
+              <a class="btn btn-main px-4" href="/mate/register" id="btnRegister">
+                <i class="fa-solid fa-pencil"></i>글쓰기
+              </a>
+            </div>
+          </div>
+          <table class="table border-top align-middle">
+            <colgroup>
+              <col style="width:40px;">
+              <col style="width:calc(100% - 40px);">
+            </colgroup>
+            <thead>
+            <tr>
+              <td>no.</td>
+              <td>내용</td>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="board:${responseDTO.dtoList}">
+              <td th:text="${board.bno}"></td>
+              <td>
+                <div class="py-2">
+                  <!-- 표시 뱃지 -->
+                  <div class="d-flex gap-2 flex-nowrap mb-1">
+                    <p class="badge badge-gray">
+                      <span>[[${board.sido}]]</span> / <span>[[${board.sigungu}]]</span>
+                    </p>
+                    <p th:if="${board != null and board.category == '1:1 모집'}" class="badge badge-warning">
+                      &#x1F464; [[${board.category}]]
+                    </p>
+                    <p th:if="${board != null and board.category == '그룹 모집'}" class="badge badge-info">
+                      &#x1F465; [[${board.category}]]
+                    </p>
+                  </div>
+                  <!-- 신청마감일 표시 블록 -->
+                  <p th:if="${board.dueDate != null && !board.expired}" class="badge badge-danger mb-1">[[${board.dueDisplay}]] 까지</p>
+                  <p th:if="${board.dueDate != null && board.expired}" class="badge badge-danger mb-">마감</p>
+                  <!-- 표시 뱃지 끝 -->
+                  <a class="d-block mb-1" th:href="@{/mate/view(bno=${board.bno})}">
+                    <h5 class="text-overflew-line-2">[[${board.title}]]</h5>
+                  </a>
+                  <div class="d-flex text-secondary small justify-content-between align-items-start">
+                    <!-- 왼쪽: 두 줄(윗줄: 작성자/작성일, 아랫줄: 마감일) -->
+                    <div class="d-flex flex-column">
+                      <div class="d-flex gap-2 flex-wrap">
+                        <p class="mb-0">[[${board.nickname}]]</p>
+                        <p class="mb-0"
+                           th:text="${#temporals.format(board.regDate, 'yyyy-MM-dd')}"></p>
+                      </div>
+
                     </div>
-                    <table class="table border-top align-middle">
-                        <colgroup>
-                            <col style="width:40px;">
-                            <col style="width:calc(100% - 40px);">
-                        </colgroup>
-                        <thead>
-                        <tr>
-                            <td>no.</td>
-                            <td>내용</td>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        <tr th:each="board:${responseDTO.dtoList}">
-                            <td th:text="${board.bno}"></td>
-                            <td>
-                                <div class="py-2">
-                                    <div class="d-flex gap-2 flex-nowrap mb-2">
-                                        <div class="badge badge-gray mb-2">
-                                            <span>[[${board.sido}]]</span> / <span>[[${board.sigungu}]]</span>
-                                        </div>
-                                        <!-- 표시 뱃지 -->
-                                        <p class="badge badge-info mb-2"
-                                           th:if="${board != null and (board.category == '1:1 모집' or board.category == '그룹 모집')}"
-                                           th:text="${board.category}">
-                                        </p>
-                                        <!-- 표시 뱃지 끝 -->
-                                    </div>
-                                    <a class="d-block mb-1" th:href="@{/mate/view(bno=${board.bno})}">
-                                        <h5 class="text-overflew-line-2">[[${board.title}]]</h5>
-                                    </a>
-                                    <div class="d-flex text-secondary small justify-content-between align-items-start">
-                                        <!-- 왼쪽: 두 줄(윗줄: 작성자/작성일, 아랫줄: 마감일) -->
-                                        <div class="d-flex flex-column">
-                                            <div class="d-flex gap-2 flex-wrap">
-                                                <p class="mb-0">[[${board.nickname}]]</p>
-                                                <p class="mb-0"
-                                                   th:text="${#temporals.format(board.regDate, 'yyyy.MM.dd')}"></p>
-                                            </div>
-                                            <!-- 신청마감일 표시 블록 -->
-                                            <div class="mt-1" th:if="${board.dueDate != null}">
-                                                신청마감일 :
-                                                <span th:classappend="${board.expired} ? ' text-secondary' : ' text-danger'"
-                                                      th:text="${board.dueDisplay}">
-                                                </span>
-                                            </div>
-                                        </div>
-                                        <!-- 오른쪽: 조회수 -->
-                                        <div class="d-flex gap-2 flex-nowrap text-secondary">
+                    <!-- 오른쪽: 조회수 -->
+                    <div class="d-flex gap-2 flex-nowrap text-secondary">
                                             <span class="d-inline-flex align-items-center">
                                                 <i class="fa-regular fa-eye me-1"></i>
                                                 <span th:text="${board.readCount}"></span>
                                             </span>
-                                            <span class="d-inline-flex align-items-center">
+                      <span class="d-inline-flex align-items-center">
                                                 <i th:class="${(board.likecount ?: 0) >= 1}
                                                   ? 'fa-solid fa-heart me-1 text-danger'
                                                   : 'fa-regular fa-heart me-1 text-danger'"></i>
                                                 <span th:text="${board.likecount} ?: 0">0</span>
                                             </span>
-                                            <p>
-                                                <i class="fa-regular fa-comment-dots me-1"></i>
-                                                [[${board.replyCount} ?: 0]]
-                                            </p>
-                                        </div>
-                                    </div>
-                                </div>
-                            </td>
-                        </tr>
-                        </tbody>
-                    </table>
-                </section>
-            </div>
-            <div class="col-12 col-sm-10 col-md-8 col-lg-6 mx-auto">
-                <section class="paging_area">
-                    <nav aria-label="Page navigation">
-                        <ul class="pagination pagination-sm justify-content-center mb-0">
-                            <li class="page-item">
-                                <a class="page-link" th:data-num="${responseDTO.start}">
-                                    <i class="fa-solid fa-angles-left"></i></a>
-                            </li>
-                            <li class="page-item" th:if="${responseDTO.prev}">
-                                <a class="page-link" th:data-num="${responseDTO.start -1}">
-                                    <i class="fa-solid fa-chevron-left"></i></a>
-                            </li>
-                            <th:block th:each="i:${#numbers.sequence(responseDTO.start, responseDTO.end)}">
-                                <li th:class="${responseDTO.page==i}?'page-item active':'page-item'">
-                                    <a class="page-link" th:data-num="${i}">[[${i}]]</a>
-                                </li>
-                            </th:block>
-                            <li class="page-item" th:if="${responseDTO.next}">
-                                <a class="page-link" th:data-num="${responseDTO.end +1}">
-                                    <i class="fa-solid fa-chevron-right"></i>
-                                </a>
-                            </li>
-                            <li class="page-item">
-                                <a class="page-link" th:data-num="${responseDTO.end}">
-                                    <i class="fa-solid fa-angles-right"></i>
-                                </a>
-                            </li>
-                        </ul>
-                    </nav>
-                </section>
-            </div>
-        </div>
+                      <p>
+                        <i class="fa-regular fa-comment-dots me-1"></i>
+                        [[${board.replyCount} ?: 0]]
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </td>
+            </tr>
+            </tbody>
+          </table>
+        </section>
+      </div>
+      <div class="col-12 col-sm-10 col-md-8 col-lg-6 mx-auto">
+        <section class="paging_area">
+          <nav aria-label="Page navigation">
+            <ul class="pagination pagination-sm justify-content-center mb-0">
+              <li class="page-item">
+                <a class="page-link" th:data-num="${responseDTO.start}">
+                  <i class="fa-solid fa-angles-left"></i></a>
+              </li>
+              <li class="page-item" th:if="${responseDTO.prev}">
+                <a class="page-link" th:data-num="${responseDTO.start -1}">
+                  <i class="fa-solid fa-chevron-left"></i></a>
+              </li>
+              <th:block th:each="i:${#numbers.sequence(responseDTO.start, responseDTO.end)}">
+                <li th:class="${responseDTO.page==i}?'page-item active':'page-item'">
+                  <a class="page-link" th:data-num="${i}">[[${i}]]</a>
+                </li>
+              </th:block>
+              <li class="page-item" th:if="${responseDTO.next}">
+                <a class="page-link" th:data-num="${responseDTO.end +1}">
+                  <i class="fa-solid fa-chevron-right"></i>
+                </a>
+              </li>
+              <li class="page-item">
+                <a class="page-link" th:data-num="${responseDTO.end}">
+                  <i class="fa-solid fa-angles-right"></i>
+                </a>
+              </li>
+            </ul>
+          </nav>
+        </section>
+      </div>
     </div>
+  </div>
 
 
-
-    <div class="modal" id="alertModal" tabindex="-1">
-        <div class="modal-dialog modal-dialog-centered modal-sm modal-360">
-            <div class="modal-content">
-                <div class="modal-header border-bottom-0">
-                    <h5 class="modal-title">글 작성 안내</h5>
-                    <button aria-label="Close" class="btn-close" data-bs-dismiss="modal" type="button"></button>
-                </div>
-                <div class="modal-body py-0">
-                </div>
-                <div class="modal-footer border-top-0">
-                </div>
-            </div>
+  <div class="modal" id="alertModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered modal-sm modal-360">
+      <div class="modal-content">
+        <div class="modal-header border-bottom-0">
+          <h5 class="modal-title">글 작성 안내</h5>
+          <button aria-label="Close" class="btn-close" data-bs-dismiss="modal" type="button"></button>
         </div>
+        <div class="modal-body py-0">
+        </div>
+        <div class="modal-footer border-top-0">
+        </div>
+      </div>
     </div>
-    <!-- /* //view 화면 html 코드 작성 끝 */ -->
+  </div>
+  <!-- /* //view 화면 html 코드 작성 끝 */ -->
 </div>
 
 <script layout:fragment="pagescript" th:inline="javascript">
 
-     const loginUser = /*[[${loginUser != null ? loginUser : null}]]*/ null;
-     const alertModal = new bootstrap.Modal(document.getElementById('alertModal'))
-     const alertModalBody = document.querySelector("#alertModal .modal-body")
-     const alertModalFooter = document.querySelector("#alertModal .modal-footer")
+    const loginUser = /*[[${loginUser != null ? loginUser : null}]]*/ null;
+    const alertModal = new bootstrap.Modal(document.getElementById('alertModal'))
+    const alertModalBody = document.querySelector("#alertModal .modal-body")
+    const alertModalFooter = document.querySelector("#alertModal .modal-footer")
 
-     if (loginUser !== null) {
-         const hasPet = [[${petCount}]]
-         const btnRegister = document.getElementById("btnRegister")
-         btnRegister.addEventListener("click", function (e) {
-             if (hasPet === 0) {
-                 e.preventDefault()
-                 alertModalBody.innerHTML = `<p>펫 정보가 있는 회원만 작성할 수 있어요</p>`
-                 alertModalFooter.innerHTML = `
+    if (loginUser !== null) {
+        const hasPet = [[${petCount}]]
+        const btnRegister = document.getElementById("btnRegister")
+        btnRegister.addEventListener("click", function (e) {
+            if (hasPet === 0) {
+                e.preventDefault()
+                alertModalBody.innerHTML = `<p>펫 정보가 있는 회원만 작성할 수 있어요</p>`
+                alertModalFooter.innerHTML = `
                <div class="d-flex justify-content-center gap-2 flex-nowrap w-100">
                    <button class="btn btn-lg btn-gray w-100" data-bs-dismiss="modal" type="button">취소</button>
                    <a href="/member/modifyPet?mid=${loginUser.mid}" class=" btn btn-lg btn-main w-100" type="button">반려동물 등록하기</a>
                </div>`
-                 alertModal.show()
-             }
-         })
-     }
-
-
-
-
-
-
-
+                alertModal.show()
+            }
+        })
+    }
 
 
     /// 페이징

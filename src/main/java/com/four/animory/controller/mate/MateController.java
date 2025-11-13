@@ -2,15 +2,10 @@ package com.four.animory.controller.mate;
 
 import com.four.animory.config.auth.PrincipalDetails;
 
-
-import com.four.animory.domain.user.Member;
-import com.four.animory.dto.common.PageRequestDTO;
-import com.four.animory.dto.common.PageResponseDTO;
 import com.four.animory.dto.mate.*;
 import com.four.animory.dto.mate.upload.UploadFileDTO;
 
 import com.four.animory.dto.user.MemberDTO;
-import com.four.animory.service.mate.MateReplyService;
 import com.four.animory.service.mate.MateService;
 import com.four.animory.service.user.UserService;
 import lombok.extern.log4j.Log4j2;
@@ -24,7 +19,6 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.io.File;
 import java.io.IOException;
@@ -69,8 +63,12 @@ public class MateController {
     }
 
     @GetMapping("/register")
-    public void registerGet(Model model) {
-        log.info("registerGet");
+    public void registerGet(@AuthenticationPrincipal PrincipalDetails principal, Model model) {
+      if(principal != null) {
+        MemberDTO memberDTO = userService.getMemberByUsername(principal.getMember().getUsername());
+        model.addAttribute("memberDTO", memberDTO);
+      }
+      log.info("registerGet");
     }
 
     @PostMapping("/register")
