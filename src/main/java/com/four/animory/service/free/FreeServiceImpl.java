@@ -1,6 +1,7 @@
 package com.four.animory.service.free;
 
 import com.four.animory.domain.free.FreeBoard;
+import com.four.animory.domain.free.FreeFile;
 import com.four.animory.domain.user.Member;
 import com.four.animory.dto.free.FreeBoardDTO;
 import com.four.animory.dto.free.FreeFileDTO;
@@ -13,12 +14,12 @@ import com.four.animory.repository.user.MemberRepository;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -124,18 +125,49 @@ public class FreeServiceImpl implements FreeService{
                 .build();
     }
 
-    @Override
-    public List<FreeBoardDTO> getTop10FreeBoardList() {
-        List<FreeBoard> freeBoards = freeBoardRepository.findTop10ByOrderByBnoDesc();
-        return freeBoards.stream()
-                .map(this::entityToDTO)
-                .collect(Collectors.toList());
-    }
+//    @Override
+//    public List<FreeBoardDTO> getTop10FreeBoardList() {
+//        List<FreeBoard> freeBoards = freeBoardRepository.findTop10ByOrderByBnoDesc();
+//        return freeBoards.stream()
+//                .map(this::entityToDTO)
+//                .collect(Collectors.toList());
+//    }
 
     @Override
     public List<FreeFileThumbnailDTO> getBoardThumbnails() {
         return freeBoardRepository.findFirstImageForAllBoards();
     }
 
+    @Override
+    public List<FreeBoardDTO> getTop10FreeBoardList() {
+        List<FreeBoard> boards = freeBoardRepository.findTopWithFilesAndReplies(PageRequest.of(0, 10));
+
+        return boards.stream().map(fb -> {
+            String thumbnail = fb.getFileSet().stream()
+                    .filter(FreeFile::isImage)
+                    .filter(f -> f.getOrd() == 0)
+                    .map(f -> f.getUuid() + "_" + f.getFilename())
+                    .findFirst()
+                    .orElse(null);
+
+            long replyCount = fb.getReplies() != null ? fb.getReplies().size() : 0;
+            String nickname = fb.getMember().getNickname();
+
+            return FreeBoardDTO.builder()
+                    .bno(fb.getBno())
+                    .title(fb.getTitle())
+                    .content(fb.getContent())
+                    .nickname(nickname)
+                    .username(fb.getMember().getUsername())
+                    .btype(fb.getBtype())
+                    .readcount(fb.getReadcount())
+                    .likecount(fb.getLikecount())
+                    .replycount(fb.getReplies().size())
+                    .updateDate(fb.getUpdateDate())
+                    .thumbnailMain(thumbnail)
+                    .build();
+        }).toList();
+
+    }
 
 }

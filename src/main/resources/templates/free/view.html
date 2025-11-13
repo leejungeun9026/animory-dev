@@ -28,8 +28,12 @@
                                     <div class="col-6 col-md-auto ms-md-auto">
                                         <a class="btn btn-gray" href="/free/list">목록</a>
                                     </div>
-                                    <a th:href="|@{/free/modify(bno=${freeBoard.bno},mode=2)}|" class="btn btn-info">수정</a>
-                                    <a th:href="@{/free/remove(bno=${freeBoard.bno},mode=2)}" class="btn btn-danger">삭제</a>
+                                    <div th:if="${freeBoard.username == #authentication.name}">
+                                        <a th:href="|@{/free/modify(bno=${freeBoard.bno},mode=2)}|" class="btn btn-info">수정</a>
+                                    </div>
+                                    <div th:if="${freeBoard.username == #authentication.name}">
+                                        <a th:href="@{/free/remove(bno=${freeBoard.bno},mode=2)}" class="btn btn-danger">삭제</a>
+                                    </div>
                                 </div>
                                 <!-- // 로그인 사용자 == 글작성자 같을 경우만 노출 끝 -->
                             </div>
@@ -58,7 +62,7 @@
                                 <div class="container-fluid d-flex uploadResult" style="flex-wrap: wrap">
                                     <div th:each="freeDTO:${freeBoard.freeFileDTOS}">
                                         <div th:if="${freeDTO.image}">
-                                            <img class="mb-3" th:src="|/uploads/free/s_${freeDTO.uuid}_${freeDTO.filename}|">
+                                            <img class="mb-3" th:src="|/uploads/free/${freeDTO.uuid}_${freeDTO.filename}|">
 <!--                                            <span th:text="${freeDTO.filename}"></span>-->
                                         </div>
                                         <div th:unless="${freeDTO.image}">
@@ -210,7 +214,6 @@
         return ``;
     }
 
-    ////----------- 댓글(reply)을 화면에 보여주는 HTML을 동적으로 생성하는 함수
 
     // ---------- 댓글(reply)을 화면에 보여주는 HTML 생성
     function renderReply(dto){

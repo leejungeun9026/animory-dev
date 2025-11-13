@@ -1,7 +1,5 @@
 package com.four.animory.dto.free;
 
-import com.four.animory.domain.free.FreeFile;
-import com.four.animory.domain.sitter.SitterFile;
 import jakarta.validation.constraints.NotEmpty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -36,5 +34,7 @@ public class FreeBoardDTO {
 
     private List<FreeFileDTO> freeFileDTOS;
 //    private List<FreeFile> fileDTOs;
+
+    private String thumbnailMain;
 
 }
