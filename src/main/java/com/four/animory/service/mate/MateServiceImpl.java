@@ -77,7 +77,7 @@ public class MateServiceImpl implements MateService {
     @Override // 게시글 업데이트
     public void updateMateBoard(MateBoardDTO mateBoardDTO) {
         MateBoard mateBoard = mateBoardRepository.findById(mateBoardDTO.getBno()).orElse(null); // 기존의 board 데이터 가져오기
-        mateBoard.change(mateBoardDTO.getContent(), mateBoardDTO.getContent(), mateBoardDTO.getCategory());
+        mateBoard.change(mateBoardDTO.getTitle(), mateBoardDTO.getContent(), mateBoardDTO.getCategory());
         mateBoardRepository.save(mateBoard);
     }
 

@@ -26,8 +26,8 @@
             <div class="mb-2">
                 <select class="form-select w-auto" id="category" name="category" required>
                     <option value="">카테고리(필수)</option>
-                    <option value="1:1 모집" th:selected="${mateBoard.category} == '1:1 모집'">1:1 모집</option>
-                    <option value="그룹 모집" th:selected="${mateBoard.category} == '그룹 모집'">그룹 모집</option>
+                    <option th:selected="${mateBoard.category} == '1:1 모집'" value="1:1 모집">1:1 모집</option>
+                    <option th:selected="${mateBoard.category} == '그룹 모집'" value="그룹 모집">그룹 모집</option>
                 </select>
             </div>
             <div class="mb-2">
@@ -48,19 +48,19 @@
                        type="text">
             </div>
             <div class="mb-2">
-        <textarea class="form-control" cols="30" id="content" name="content"
+            <textarea class="form-control" cols="30" id="content" name="content"
                   placeholder=" 시간과 장소, 희망하는 산책 친구의 성격 등 자세히 알려주세요!(최대 1000자)"
                   required rows="10">[[${mateBoard.content}]]</textarea>
             </div>
 
             <div class="mb-2">
                 <span class="form-control" id="due">마감일</span>
-                <input class="form-control" type="datetime-local" name="dueDate" id="dueDate"
-                       th:value="${mateBoard != null and mateBoard.dueDate != null
+                <input class="form-control" id="dueDate" name="dueDate" th:value="${mateBoard != null and mateBoard.dueDate != null
              ? (#strings.contains(mateBoard.dueDate,'T')
                   ? mateBoard.dueDate
                   : #strings.replace(mateBoard.dueDate,' ','T'))
-             : ''}">
+             : ''}"
+                       type="datetime-local">
             </div>
 
             <div class="mb-3" th:if="${mateBoard.mateFileDTOs != null and !mateBoard.mateFileDTOs.isEmpty()}">
@@ -91,17 +91,17 @@
 <script layout:fragment="pagescript" th:inline="javascript">
 
     // 시군구 수정 - 이전 값 미리보기
-    const sido    = document.getElementById('sido');
+    const sido = document.getElementById('sido');
     const sigungu = document.getElementById('sigungu');
 
     async function initRegion() {
         // 1) 시/도 옵션 로드
-        const { data: sidoList } = await axios.get('/api/regions/sido');
+        const {data: sidoList} = await axios.get('/api/regions/sido');
         sido.innerHTML = '<option value="">시/도</option>' +
             sidoList.map(s => `<option value="${s.name}" data-sido-id="${s.id}">${s.name}</option>`).join('');
 
         // 2) 등록 당시 값 읽기
-        const currentSido    = sido.dataset.currentSido || '';
+        const currentSido = sido.dataset.currentSido || '';
         const currentSigungu = sigungu.dataset.currentSigungu || '';
 
         // 3) 시/도가 있으면 선택 후 해당 시군구 로드
@@ -113,7 +113,7 @@
 
                 // 3-1) 시군구 로드
                 const sidoId = sidoOption.dataset.sidoId;
-                const { data: sigunguList } = await axios.get('/api/regions/sigungu', { params: { sidoId } });
+                const {data: sigunguList} = await axios.get('/api/regions/sigungu', {params: {sidoId}});
                 sigungu.innerHTML = '<option value="">시/군/구</option>' +
                     sigunguList.map(g => `<option value="${g.name}">${g.name}</option>`).join('');
                 sigungu.disabled = false;
@@ -136,7 +136,7 @@
             sigungu.disabled = true;
             return;
         }
-        const { data } = await axios.get('/api/regions/sigungu', { params: { sidoId } });
+        const {data} = await axios.get('/api/regions/sigungu', {params: {sidoId}});
         sigungu.innerHTML = '<option value="">시/군/구</option>' +
             data.map(g => `<option value="${g.name}">${g.name}</option>`).join('');
         sigungu.disabled = false;

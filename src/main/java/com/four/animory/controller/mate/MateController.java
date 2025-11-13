@@ -66,7 +66,6 @@ public class MateController {
     public void view(Long bno, Integer mode, Model model) {
         if (mode == null) mode = 1;
         model.addAttribute("board", mateService.findMateBoardById(bno, mode));
-
     }
 
     @GetMapping("/register")
@@ -91,19 +90,20 @@ public class MateController {
     }
 
     private List<MateFileDTO> fileUpload(UploadFileDTO uploadFileDTO) {
+        String mateUploadPath = uploadPath + "\\mate";
         List<MateFileDTO> list = new ArrayList<>();
         if (uploadFileDTO.getFiles() != null) {
             uploadFileDTO.getFiles().forEach(multifile -> {
                 String originalFileName = multifile.getOriginalFilename();
                 log.info("originalFileName" + originalFileName);
                 String uuid = UUID.randomUUID().toString();
-                Path savePath = Paths.get(uploadPath, uuid + "_" + originalFileName);
+                Path savePath = Paths.get(mateUploadPath, uuid + "_" + originalFileName);
                 boolean image = false;
                 try {
                     multifile.transferTo(savePath);
                     if (Files.probeContentType(savePath).startsWith("image")) {
                         image = true;
-                        File thumbnail = new File(uploadPath, "s_" + uuid + "_" + originalFileName);
+                        File thumbnail = new File(mateUploadPath, "s_" + uuid + "_" + originalFileName);
                         Thumbnailator.createThumbnail(savePath.toFile(), thumbnail, 200, 200);
                     }
                 } catch (Exception e) {
@@ -123,10 +123,11 @@ public class MateController {
 
 
     public void removeFile(List<MateFileDTO> fileDTOS) {
+        String mateUploadPath = uploadPath + "\\mate";
         for (MateFileDTO mateFileDTO : fileDTOS) {
             String filename = mateFileDTO.getUuid() + "_" + mateFileDTO.getFilename();
             Resource resource = new FileSystemResource(
-                    uploadPath + File.separator + filename);
+                    mateUploadPath + File.separator + filename);
             String resourceName = resource.getFilename();
             boolean removed = false;
             try {
@@ -134,7 +135,7 @@ public class MateController {
                 removed = resource.getFile().delete();
                 if (contentType.startsWith("image")) {
                     String fileName1 = "s_" + filename;
-                    File thumFile = new File(uploadPath + File.separator + fileName1);
+                    File thumFile = new File(mateUploadPath + File.separator + fileName1);
                     thumFile.delete(); //원본 파일이 지워져
                 }
             } catch (IOException e) {
@@ -170,10 +171,12 @@ public class MateController {
         int updated = mateService.increaseLikeCountAndGet(bno);
         return Map.of("likecount", updated);
     }
+
+    @GetMapping("/top10-test")
+    @ResponseBody
+    public List<MateBoardDTO> getTop10Test() {
+        List<MateBoardDTO> list = mateService.getTop10MateBoardList();
+        return list;
+    }
+
 }
-
-
-
-
-
-
