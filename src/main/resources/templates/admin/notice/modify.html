@@ -4,63 +4,67 @@
       xmlns:th="http://www.thymeleaf.org">
 
 <div layout:fragment="content">
-    <div class="page_title d-flex align-items-center mb-3">
-        <h2>공지사항 수정</h2>
-    </div>
-    <div class="board_area">
-        <form th:action="@{/admin/notice/modify}" method="post" enctype="multipart/form-data">
-            <!-- 게시글 번호 -->
-            <input type="hidden" name="bno" th:value="${notice.bno}">
+  <div class="page_title d-flex align-items-center mb-3">
+    <h2>공지사항 수정</h2>
+  </div>
+  <div class="board_area">
+    <form enctype="multipart/form-data" method="post" th:action="@{/admin/notice/modify}">
+      <!-- 게시글 번호 -->
+      <input name="bno" th:value="${notice.bno}" type="hidden">
 
-            <div class="mb-2">
-                <div class="form-check">
-                    <input class="form-check-input" type="checkbox" name="pinned" value="true" id="pinned"
-                           th:checked="${notice.pinned}">
-                    <label class="form-check-label" for="pinned">
-                        상단 고정
-                    </label>
-                </div>
-            </div>
+      <div class="mb-2">
+        <div class="form-check">
+          <input class="form-check-input" id="pinned" name="pinned" th:checked="${notice.pinned}" type="checkbox"
+                 value="true">
+          <label class="form-check-label" for="pinned">
+            상단 고정
+          </label>
+        </div>
+      </div>
 
-            <div class="mb-2">
-                <input type="text" name="title" class="form-control" placeholder="제목을 입력해주세요"
-                       required th:value="${notice.title}">
-            </div>
+      <div class="mb-2">
+        <input class="form-control" name="title" placeholder="제목을 입력해주세요" required
+               th:value="${notice.title}" type="text">
+      </div>
 
-            <div class="mb-2">
-        <textarea name="content" id="content" cols="30" rows="10" class="form-control"
-                  placeholder="내용을 입력해주세요" required
+      <div class="mb-2">
+        <textarea class="form-control" cols="30" id="content" name="content" placeholder="내용을 입력해주세요"
+                  required rows="10"
                   th:text="${notice.content}"></textarea>
-            </div>
+      </div>
 
-            <!-- 기존 첨부파일 표시 및 삭제 선택 -->
-            <div class="mb-3" th:if="${notice.noticeFileDTOs != null and notice.noticeFileDTOs.size() > 0}">
-                <ul>
-                    <li th:each="file : ${notice.noticeFileDTOs}">
-                        <input type="checkbox" name="deleteFiles" class="form-check-input" th:value="${file.uuid}"> 삭제
-                        <a th:href="@{|/uploads/notice/${file.uuid}_${file.fileName}|}"
-                           th:text="${file.fileName}"></a>
-                    </li>
-                </ul>
+      <!-- 기존 첨부파일 목록 + 삭제 선택-->
+      <div class="mb-1" th:if="${notice.noticeFileDTOs != null and notice.noticeFileDTOs.size() > 0}">
+        <label class="form-label fw-bold">현재 첨부파일</label>
+        <ul id="fileList" class="list-group">
+          <li class="list-group-item px-2" th:each="file : ${notice.noticeFileDTOs}">
+            <div class="d-flex align-items-center gap-2">
+              <p th:text="${file.fileName}"></p>
+              <label class="ms-auto text-danger" style="cursor:pointer;">
+                <input class="form-check-input" name="deleteFiles" th:value="${file.uuid}" type="checkbox">
+                삭제
+              </label>
             </div>
+          </li>
+        </ul>
+      </div>
+      <!-- 새 파일 업로드 -->
+      <div class="mb-3">
+        <input class="form-control" multiple name="files" type="file">
+      </div>
 
-            <!-- 새 파일 업로드 -->
-            <div class="mb-3">
-                <input type="file" name="files" class="form-control" multiple>
-            </div>
-
-            <div class="button_wrap">
-                <div class="row g-2">
-                    <div class="col-6 col-md-auto ms-md-auto">
-                        <a th:href="@{/admin/notice/view(bno=${notice.bno})}" class="btn btn-lg btn-gray w-100">취소</a>
-                    </div>
-                    <div class="col-6 col-md-auto">
-                        <button class="btn btn-lg btn-primary w-100">수정 완료</button>
-                    </div>
-                </div>
-            </div>
-        </form>
-    </div>
+      <div class="button_wrap">
+        <div class="row g-2">
+          <div class="col-6 col-md-auto ms-md-auto">
+            <a class="btn btn-lg btn-gray w-100" th:href="@{/admin/notice/view(bno=${notice.bno})}">취소</a>
+          </div>
+          <div class="col-6 col-md-auto">
+            <button class="btn btn-lg btn-primary w-100">수정 완료</button>
+          </div>
+        </div>
+      </div>
+    </form>
+  </div>
 </div>
 
 <script layout:fragment="pagescript" th:inline="javascript">

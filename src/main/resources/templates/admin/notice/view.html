@@ -14,11 +14,12 @@
           <tr>
             <td class="border-bottom px-0 pb-3">
               <div class="d-flex gap-2 flex-nowrap">
-                <a class="btn btn-lg btn-secondary" href="/admin/notice/list"><i class="fa-solid fa-chevron-left"></i> 목록으로</a>
+                <a class="btn btn-lg btn-secondary" href="/admin/notice/list"><i class="fa-solid fa-chevron-left"></i>
+                  목록으로</a>
                 <div class="d-flex gap-2 flex-nowrap ms-auto">
                   <a class="btn btn-lg btn-danger"
-                     th:href="@{/admin/notice/remove(bno=${notice.bno})}"
-                     onclick="return confirm('정말 삭제하시겠습니까?');">삭제
+                     onclick="return confirm('정말 삭제하시겠습니까?');"
+                     th:href="@{/admin/notice/remove(bno=${notice.bno})}">삭제
                   </a>
                   <a class="btn btn-lg btn-primary" th:href="@{/admin/notice/modify(bno=${notice.bno})}">수정</a>
                 </div>
@@ -31,11 +32,12 @@
               <div class="d-flex gap-2 flex-nowrap text-secondary">
                 <p>작성자</p>
                 <p th:text="${#temporals.format(notice.regDate, 'yyyy-MM-dd')}">2025-10-10</p>
-                <p class="ms-auto"><i class="fa-regular fa-eye me-1"></i><span th:text="${notice.readCount}">1</span></p>
-                  <p>
-                      <i class="fa-regular fa-comment-dots me-1"></i>
-                      <span data-reply-count th:text="${notice.replyCount}">0</span>
-                  </p>
+                <p class="ms-auto"><i class="fa-regular fa-eye me-1"></i><span th:text="${notice.readCount}">1</span>
+                </p>
+                <p>
+                  <i class="fa-regular fa-comment-dots me-1"></i>
+                  <span data-reply-count th:text="${notice.replyCount}">0</span>
+                </p>
 
               </div>
             </td>
@@ -44,149 +46,59 @@
           <tbody>
           <!-- 첨부파일이 있으면 노출 -->
           <tr th:if="${notice.noticeFileDTOs != null and notice.noticeFileDTOs.size() > 0}">
-              <td class="px-0 py-3">
-                  <ul>
-                      <li th:each="file : ${notice.noticeFileDTOs}">
-                          <a th:href="@{|/uploads/notice/${file.uuid}_${file.fileName}|}"
-                             th:download="${file.fileName}"
-                             th:text="${file.fileName}"
-                             class="text-decoration-underline text-primary"></a>
-                      </li>
-                  </ul>
-              </td>
+            <td class="px-0 py-3">
+              <ul>
+                <li th:each="file : ${notice.noticeFileDTOs}">
+                  <div class="img_wrap" th:if="${file.image}">
+                    <img alt="" th:src="|/uploads/notice/${file.uuid}_${file.fileName}|" >
+                  </div>
+                </li>
+              </ul>
+            </td>
           </tr>
-
-
           <!-- 첨부파일이 있으면 노출 끝 -->
           <tr>
             <td class="px-0 py-3">
               <div class="tb_content" th:text="${notice.content}">내용</div>
             </td>
           </tr>
+          <!-- 첨부파일 다운 -->
+          <tr th:if="${notice.noticeFileDTOs != null and notice.noticeFileDTOs.size() > 0}">
+            <td class="px-0 py-3">
+              <p><i class="fa-regular fa-floppy-disk me-1"></i>
+                다운로드
+              </p>
+              <ul id="fileList" class="list-group mt-1">
+                <li class="list-group-item px-2" th:each="file : ${notice.noticeFileDTOs}">
+                  <div class="d-flex align-items-center gap-2">
+                    <i class="fa-regular fa-square-caret-down"></i>
+                    <a class="text-link text-info"
+                       th:download="${file.fileName}"
+                       th:href="@{|/uploads/notice/${file.uuid}_${file.fileName}|}"
+                       th:text="${file.fileName}"></a>
+                  </div>
+                </li>
+              </ul>
+            </td>
+          </tr>
+          <!-- // 첨부파일 다운 끝 -->
+
           <tr>
             <td class="px-0 pt-3">
-                <p>
-                    <i class="fa-regular fa-comment-dots me-1"></i>
-                    <span data-reply-count th:text="${notice.replyCount}">0</span>
-                </p>
+              <p>
+                <i class="fa-regular fa-comment-dots me-1"></i>댓글
+                <span data-reply-count th:text="${notice.replyCount}">0</span>
+              </p>
 
-                <div class="reply_list_area">
-                <ul>
-                  <li class="reply_list border-bottom">
-                    <div class="d-flex justify-content-start align-items-start gap-2 py-2">
-                      <div class="flex-grow-1">
-                        <b>댓작성자</b>
-                        <div class="replyContent">어쩌고저쩌고</div>
-                      </div>
-                      <div class="flex-shrink-1">
-                        <div class="btn-group">
-                          <button aria-expanded="false" class="btn btn-xs rounded-2 btn-outline-gray" data-bs-toggle="dropdown"
-                                  type="button">
-                            <i class="fa-solid fa-ellipsis"></i>
-                          </button>
-                          <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" href="">수정</a></li>
-                            <li><a class="dropdown-item" href="">삭제</a></li>
-                            <li><a class="btnReReplyWriteView dropdown-item">대댓글 달기</a></li>
-                          </ul>
-                        </div>
-                      </div>
-                    </div>
-                    <div class="reply_depth2 ps-4">
-                      <ul>
-                        <li class="rerpley_list border-top">
-                          <div class="d-flex justify-content-start align-items-start gap-2 py-2">
-                            <div class="flex-grow-1">
-                              <b>대댓작성자</b>
-                              <div class="replyContent">어쩌고저쩌고</div>
-                            </div>
-                            <div class="flex-shrink-1">
-                              <div class="btn-group">
-                                <button aria-expanded="false" class="btn btn-xs rounded-2 btn-outline-gray"
-                                        data-bs-toggle="dropdown" type="button">
-                                  <i class="fa-solid fa-ellipsis"></i>
-                                </button>
-                                <ul class="dropdown-menu">
-                                  <li><a class="dropdown-item" href="">수정</a></li>
-                                  <li><a class="dropdown-item" href="">삭제</a></li>
-                                </ul>
-                              </div>
-                            </div>
-                          </div>
-                        </li>
-                        <li class="border-top">
-                          <div class="d-flex justify-content-start align-items-start gap-2 py-2">
-                            <div class="flex-grow-1">
-                              <b>댓작성자</b>
-                              <div class="replyContent">어쩌고저쩌고</div>
-                            </div>
-                            <div class="flex-shrink-1">
-                              <div class="btn-group">
-                                <button aria-expanded="false" class="btn btn-xs rounded-2 btn-outline-gray"
-                                        data-bs-toggle="dropdown" type="button">
-                                  <i class="fa-solid fa-ellipsis"></i>
-                                </button>
-                                <ul class="dropdown-menu">
-                                  <li><a class="dropdown-item" href="">수정</a></li>
-                                  <li><a class="dropdown-item" href="">삭제</a></li>
-                                </ul>
-                              </div>
-                            </div>
-                          </div>
-                        </li>
-                      </ul>
-                    </div>
-                  </li>
-                  <li class="reply_list border-bottom">
-                    <div class="d-flex justify-content-start align-items-start gap-2 py-2">
-                      <div class="flex-grow-1">
-                        <b>댓작성자</b>
-                        <div class="replyContent">어쩌고저쩌고</div>
-                      </div>
-                      <div class="flex-shrink-1">
-                        <div class="btn-group">
-                          <button aria-expanded="false" class="btn btn-xs rounded-2 btn-outline-gray" data-bs-toggle="dropdown"
-                                  type="button">
-                            <i class="fa-solid fa-ellipsis"></i>
-                          </button>
-                          <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" href="">수정</a></li>
-                            <li><a class="dropdown-item" href="">삭제</a></li>
-                            <li><a class="btnReReplyWriteView dropdown-item">대댓글 달기</a></li>
-                          </ul>
-                        </div>
-                      </div>
-                    </div>
-                  </li>
-                  <li class="reply_list border-bottom">
-                    <div class="d-flex justify-content-start align-items-start gap-2 py-2">
-                      <div class="flex-grow-1">
-                        <b>댓작성자</b>
-                        <div class="replyContent">어쩌고저쩌고</div>
-                      </div>
-                      <div class="flex-shrink-1">
-                        <div class="btn-group">
-                          <button aria-expanded="false" class="btn btn-xs rounded-2 btn-outline-gray" data-bs-toggle="dropdown"
-                                  type="button">
-                            <i class="fa-solid fa-ellipsis"></i>
-                          </button>
-                          <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" href="">수정</a></li>
-                            <li><a class="dropdown-item" href="">삭제</a></li>
-                            <li><a class="btnReReplyWriteView dropdown-item">대댓글 달기</a></li>
-                          </ul>
-                        </div>
-                      </div>
-                    </div>
-                  </li>
-                </ul>
+              <div class="reply_list_area">
+                <ul></ul>
               </div>
-                        <!--  댓글 페이징               -->
-                <div class="mt-2">
-                    <ul class="pagination replyPaging"></ul>
-                </div>
+              <!--  댓글 페이징               -->
+              <div class="mt-2">
+                <ul class="pagination pagination-sm justify-content-center replyPaging"></ul>
+              </div>
 
-                <div class="reply_write_area pt-3">
+              <div class="reply_write_area pt-3">
                 <div class="mb-2">
                   <textarea class="form-control" id="replyText" name="replyText"
                             placeholder="댓글 내용을 입력해주세요(최대 1000자)"></textarea>
@@ -214,122 +126,133 @@
     let size = 5;
 
     // 댓글 수 표시 갱신
-    function setReplyCount(n){
+    function setReplyCount(n) {
         document.querySelectorAll('[data-reply-count]')
             .forEach(el => el.textContent = String(n ?? 0));
     }
 
     // 댓글 목록 출력
-    function printReplies(page, size){
+    function printReplies(page, size) {
         axios.get(`/noticereplies/list/${bno}?page=${page}&size=${size}`)
-            .then(res=>{
+            .then(res => {
                 const data = res.data;
                 const dtoList = data.dtoList || [];
 
                 if (typeof data.total === 'number') setReplyCount(data.total);
 
                 let str = "";
-                if(dtoList.length === 0){
+                if (dtoList.length === 0) {
                     str = `<li class="border-bottom py-3 text-secondary">등록된 댓글이 없습니다.</li>`;
                 } else {
-                    dtoList.forEach(dto=>{
+                    dtoList.forEach(dto => {
                         str += `
-                        <li class="reply_list border-bottom d-flex justify-content-between" data-rno="${dto.rno}">
-                            <div>
-                                <b>${dto.nickname || '작성자'}</b><small class="text-muted ms-2">
-                                ${dto.regDate} ${dto.updateDate ? `<small class="text-muted ms-2">(수정됨 ${dto.updateDate})</small>` : ''}
-                                </small><br> ${dto.content}
+                        <li class="reply_list border-bottom" data-rno="${dto.rno}">
+                            <div class="row g-2 py-2">
+                                <div class="col">
+                                  <b>${dto.nickname || '작성자'}</b>
+                                  <div>${dto.content}</div>
+                                  <small class="">
+                                  ${dto.regDate} ${dto.updateDate ? `<small class="text-muted ms-2">(수정됨 ${dto.updateDate})</small>` : ''}
+                                  </small>
+                                </div>
+                                <div class="col-auto">
+                                    <div class="btn-group">
+                                        <button class="btn btn-xs rounded-2 btn-outline-gray"
+                                                type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                          <i class="fa-solid fa-ellipsis"></i>
+                                        </button>
+                                        <ul class="dropdown-menu dropdown-menu-end">
+                                          <li><a class="dropdown-item btnEdit" href="#">수정</a></li>
+                                          <li><a class="dropdown-item btnDel" href="#">삭제</a></li>
+                                        </ul>
+                                    </div>
+                                </div>
                             </div>
-
-                           <div class="flex-shrink-1">
-                              <div class="btn-group">
-                                <button class="btn btn-xs rounded-2 btn-outline-gray"
-                                        type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                  <i class="fa-solid fa-ellipsis"></i>
-                                </button>
-                                <ul class="dropdown-menu dropdown-menu-end">
-                                  <li><a class="dropdown-item btnEdit" href="#">수정</a></li>
-                                  <li><a class="dropdown-item btnDel" href="#">삭제</a></li>
-                                </ul>
-                              </div>
-                            </div>
-
                         </li>`;
                     });
                 }
                 replyList.innerHTML = str;
                 printPages(data); //  페이징 표시 추가
             })
-            .catch(err=>{
+            .catch(err => {
                 console.error(err);
                 replyList.innerHTML = `<li class="border-bottom py-3 text-secondary">댓글을 불러오는 중 오류가 발생했습니다.</li>`;
             });
     }
 
     // 페이지 표시
-    function printPages(data){
-        if(!data || !data.total){ replyPaging.innerHTML = ""; return; }
+    function printPages(data) {
+        if (!data || !data.total) {
+            replyPaging.innerHTML = "";
+            return;
+        }
 
         let html = "";
-        if (data.prev){
-            html += `<li class="page-item"><a class="page-link" data-page="${data.start-1}">«</a></li>`;
+        if (data.prev) {
+            html += `<li class="page-item"><a class="page-link" data-page="${data.start - 1}">«</a></li>`;
         }
-        for (let i = data.start; i <= data.end; i++){
-            html += `<li class="page-item ${i===data.page?'active':''}">
+        for (let i = data.start; i <= data.end; i++) {
+            html += `<li class="page-item ${i === data.page ? 'active' : ''}">
                         <a class="page-link" data-page="${i}">${i}</a>
                      </li>`;
         }
-        if (data.next){
-            html += `<li class="page-item"><a class="page-link" data-page="${data.end+1}">»</a></li>`;
+        if (data.next) {
+            html += `<li class="page-item"><a class="page-link" data-page="${data.end + 1}">»</a></li>`;
         }
         replyPaging.innerHTML = html;
     }
 
     // 페이지 클릭 이벤트
-    replyPaging?.addEventListener("click", (e)=>{
+    replyPaging?.addEventListener("click", (e) => {
         e.preventDefault();
         const a = e.target.closest("a");
-        if(!a) return;
+        if (!a) return;
         page = Number(a.dataset.page);
         printReplies(page, size);
     });
 
     // 댓글 등록
-    btnWrite.addEventListener("click", ()=>{
+    btnWrite.addEventListener("click", () => {
         const content = replyText.value.trim();
-        if(!content) return alert("내용을 입력하세요!");
-        axios.post(`/noticereplies/`, { bno, content })
-            .then(res=>{
+        if (!content) return alert("내용을 입력하세요!");
+        axios.post(`/noticereplies/`, {bno, content})
+            .then(res => {
                 alert("댓글이 등록되었습니다!");
                 replyText.value = "";
                 printReplies(1, size);
             })
-            .catch(err=>{
+            .catch(err => {
                 alert("등록 실패!");
                 console.error(err);
             });
     });
 
     // 수정/삭제
-    replyList.addEventListener("click", e=>{
+    replyList.addEventListener("click", e => {
         const li = e.target.closest("li.reply_list");
         const rno = li?.dataset?.rno;
-        if(!rno) return;
+        if (!rno) return;
 
         // 수정
-        if(e.target.classList.contains("btnEdit")){
+        if (e.target.classList.contains("btnEdit")) {
             const oldContent = li.querySelector(".replyContent")?.textContent.trim() ?? "";
             const newContent = prompt("새 내용 입력:", oldContent);
-            if(!newContent || newContent === oldContent) return;
-            axios.put(`/noticereplies/${rno}`, { content: newContent })
-                .then(()=>{ alert("수정 완료"); printReplies(page, size); });
+            if (!newContent || newContent === oldContent) return;
+            axios.put(`/noticereplies/${rno}`, {content: newContent})
+                .then(() => {
+                    alert("수정 완료");
+                    printReplies(page, size);
+                });
         }
 
         // 삭제
-        if(e.target.classList.contains("btnDel")){
-            if(!confirm("삭제하시겠습니까?")) return;
+        if (e.target.classList.contains("btnDel")) {
+            if (!confirm("삭제하시겠습니까?")) return;
             axios.post(`/noticereplies/delete/${rno}`)
-                .then(()=>{ alert("삭제 완료"); printReplies(page, size); });
+                .then(() => {
+                    alert("삭제 완료");
+                    printReplies(page, size);
+                });
         }
     });
 

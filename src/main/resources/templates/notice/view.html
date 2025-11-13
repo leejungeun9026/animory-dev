@@ -4,102 +4,116 @@
       xmlns:th="http://www.thymeleaf.org">
 
 <div layout:fragment="content">
-    <!-- /* view 화면 html 코드 작성 부분 */ -->
-    <div class="page_title mb-4">
-        <a href="/notice/list" class="d-inline-flex align-items-baseline">
-            <small class="text-danger">공지사항 게시판 <i class="fa-solid fa-chevron-right fs-xs"></i></small>
-        </a>
-        <h3 class="memomentKkukkkuk fw-normal mt-2">게시글 보기</h3>
+  <!-- /* view 화면 html 코드 작성 부분 */ -->
+  <div class="page_title mb-4">
+    <a class="d-inline-flex align-items-baseline" href="/notice/list">
+      <small class="text-danger">공지사항 게시판 <i class="fa-solid fa-chevron-right fs-xs"></i></small>
+    </a>
+    <h3 class="memomentKkukkkuk fw-normal mt-2">게시글 보기</h3>
+  </div>
+  <div class="board_area">
+    <div class="card rounded-3">
+      <div class="card-body">
+        <table class="table table-borderless">
+          <thead>
+          <tr>
+            <td class="tb_title border-bottom pb-3 px-0">
+              <div class="d-flex gap-2 flex-nowrap align-items-end mb-2"></div>
+              <h4 class="py-2" th:text="${notice.title}"></h4>
+              <div class="d-flex gap-2 flex-nowrap text-secondary">
+                <p th:text="${#temporals.format(notice.regDate, 'yyyy-MM-dd')}">2025-10-10</p>
+                <p class="ms-auto"><i class="fa-regular fa-eye me-1"></i><span th:text="${notice.readCount}">1</span>
+                </p>
+                <p><i class="fa-regular fa-comment-dots me-1"></i>
+                  <span data-reply-count>[[${notice.replyCount}]]</span>
+                </p>
+              </div>
+            </td>
+          </tr>
+          </thead>
+          <tbody>
+          <!-- 첨부파일이 있으면 노출 -->
+          <tr th:if="${notice.noticeFileDTOs != null and notice.noticeFileDTOs.size() > 0}">
+            <td class="px-0 py-3">
+              <ul>
+                <li th:each="file : ${notice.noticeFileDTOs}">
+                  <div class="img_wrap" th:if="${file.image}">
+                    <img alt="" th:src="|/uploads/notice/${file.uuid}_${file.fileName}|" >
+                  </div>
+                </li>
+              </ul>
+            </td>
+          </tr>
+          <!-- 첨부파일이 있으면 노출 끝 -->
+          <tr>
+            <td class="px-0 py-3">
+              <div class="tb_content" th:text="${notice.content}">내용</div>
+            </td>
+          </tr>
+          <!-- 첨부파일 다운 -->
+          <tr th:if="${notice.noticeFileDTOs != null and notice.noticeFileDTOs.size() > 0}">
+            <td class="px-0 py-3">
+              <p><i class="fa-regular fa-floppy-disk me-1"></i>
+                다운로드
+              </p>
+              <ul id="fileList" class="list-group mt-1">
+                <li class="list-group-item px-2" th:each="file : ${notice.noticeFileDTOs}">
+                  <div class="d-flex align-items-center gap-2">
+                    <i class="fa-regular fa-square-caret-down"></i>
+                    <a class="text-link text-info"
+                       th:download="${file.fileName}"
+                       th:href="@{|/uploads/notice/${file.uuid}_${file.fileName}|}"
+                       th:text="${file.fileName}"></a>
+                  </div>
+                </li>
+              </ul>
+            </td>
+          </tr>
+          <!-- // 첨부파일 다운 끝 -->
+          <tr>
+            <td class="px-0 pt-3">
+              <p><i class="fa-regular fa-comment-dots me-1"></i>
+                댓글 <span data-reply-count>[[${notice.replyCount}]]</span>
+              </p>
+              <div class="reply_list_area">
+                <ul></ul>
+              </div>
+              <!-- reply 페이징 추가                   -->
+              <div class="mt-2">
+                <ul class="pagination pagination-sm justify-content-center replyPaging"></ul>
+              </div>
+              <div class="reply_write_area pt-3">
+                <div class="mb-2">
+                  <textarea class="form-control" id="replyText" name="replyText"
+                            placeholder="댓글 내용을 입력해주세요(최대 1000자)"></textarea>
+                </div>
+                <div class="d-flex">
+                  <button class="btnReplyRegister ms-auto btn btn-main">댓글 쓰기</button>
+                </div>
+              </div>
+            </td>
+          </tr>
+          </tbody>
+        </table>
+      </div>
     </div>
-    <div class="board_area">
-        <div class="card rounded-3">
-            <div class="card-body">
-                <table class="table table-borderless">
-                    <thead>
-                    <tr>
-                        <td class="tb_title border-bottom pb-3 px-0">
-                            <div class="d-flex gap-2 flex-nowrap align-items-end mb-2"></div>
-                            <h4 class="py-2" th:text="${notice.title}">제목</h4>
-                            <div class="d-flex gap-2 flex-nowrap text-secondary">
-                                <p>작성자</p>
-                                <p th:text="${#temporals.format(notice.regDate, 'yyyy-MM-dd')}">2025-10-10</p>
-                                <p class="ms-auto"><i class="fa-regular fa-eye me-1"></i><span th:text="${notice.readCount}">1</span></p>
-                                <p><i class="fa-regular fa-comment-dots me-1"></i>
-                                    <span data-reply-count>[[${notice.replyCount}]]</span>
-                                </p>
-
-                            </div>
-                        </td>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    <!-- 첨부파일이 있으면 노출 -->
-                    <!--           첨부파일 썸네일 없음(다운가능)         -->
-                    <tr th:if="${notice.noticeFileDTOs != null and notice.noticeFileDTOs.size() > 0}">
-                        <td class="px-0 py-3">
-                            <ul>
-                                <li th:each="file : ${notice.noticeFileDTOs}">
-                                    <a th:href="@{|/uploads/notice/${file.uuid}_${file.fileName}|}"
-                                       th:download="${file.fileName}"
-                                       th:text="${file.fileName}"
-                                       class="text-decoration-underline text-primary"></a>
-                                </li>
-                            </ul>
-                        </td>
-                    </tr>
-
-
-                    <!-- 첨부파일이 있으면 노출 끝 -->
-                    <tr>
-                        <td class="px-0 py-3">
-                            <div class="tb_content" th:text="${notice.content}">내용</div>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td class="px-0 pt-3">
-                            <p><i class="fa-regular fa-comment-dots me-1"></i>
-                                <span data-reply-count>[[${notice.replyCount}]]</span>
-                            </p>
-
-                            <div class="reply_list_area">
-                                <ul></ul>
-                            </div>
-                            <!-- reply 페이징 추가                   -->
-                            <div class="mt-2">
-                                <ul class="pagination replyPaging"></ul>
-                            </div>
-
-                            <div class="reply_write_area pt-3">
-                                <div class="mb-2">
-                                    <textarea name="replyText" id="replyText" class="form-control" placeholder="댓글 내용을 입력해주세요(최대 1000자)"></textarea>
-                                </div>
-                                <div class="d-flex">
-                                    <button class="btnReplyRegister ms-auto btn btn-main">댓글 쓰기</button>
-                                </div>
-                            </div>
-                        </td>
-                    </tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    </div>
-    <!-- /* //view 화면 html 코드 작성 끝 */ -->
+  </div>
+  <!-- /* //view 화면 html 코드 작성 끝 */ -->
 </div>
 
 <script layout:fragment="pagescript" th:inline="javascript">
 
-        // 기본 엘리먼트/상태
-        const bno = [[${notice.bno}]];
-        const replyList   = document.querySelector(".reply_list_area ul");
-        const replyText   = document.querySelector("#replyText");
-        const btnWrite    = document.querySelector(".btnReplyRegister");
-        const replyPaging = document.querySelector(".replyPaging"); // HTML에 <ul class="pagination replyPaging"></ul> 있어야 함
-        let page = 1, size = 5;
+    // 기본 엘리먼트/상태
+    const bno = [[${notice.bno}]];
+    const replyList = document.querySelector(".reply_list_area ul");
+    const replyText = document.querySelector("#replyText");
+    const btnWrite = document.querySelector(".btnReplyRegister");
+    const replyPaging = document.querySelector(".replyPaging"); // HTML에 <ul class="pagination replyPaging"></ul> 있어야 함
+    let page = 1, size = 5;
 
-        // 공통 fetch
-        async function api(url, method = "GET", data) {
-        const opt = { method, headers: { "Content-Type": "application/json" } };
+    // 공통 fetch
+    async function api(url, method = "GET", data) {
+        const opt = {method, headers: {"Content-Type": "application/json"}};
         if (data) opt.body = JSON.stringify(data);
         const res = await fetch(url, opt);
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
@@ -107,123 +121,129 @@
         return ct.includes("application/json") ? res.json() : res.text();
     }
 
-        // replyCount 갱신
-        function setReplyCount(n){
+    // replyCount 갱신
+    function setReplyCount(n) {
         document.querySelectorAll("[data-reply-count]")
             .forEach(el => el.textContent = String(n ?? 0));
     }
 
-        // 페이지바 렌더
-        function printPages(data){
-        if (!replyPaging || !data || !data.total){ return; }
+    // 페이지바 렌더
+    function printPages(data) {
+        if (!replyPaging || !data || !data.total) {
+            return;
+        }
         let html = "";
-        if (data.prev) html += `<li class="page-item"><a class="page-link" data-page="${data.start-1}">«</a></li>`;
-        for (let i = data.start; i <= data.end; i++){
-        html += `<li class="page-item ${i===data.page?'active':''}">
+        if (data.prev) html += `<li class="page-item"><a class="page-link" data-page="${data.start - 1}">«</a></li>`;
+        for (let i = data.start; i <= data.end; i++) {
+            html += `<li class="page-item ${i === data.page ? 'active' : ''}">
                  <a class="page-link" data-page="${i}">${i}</a>
                </li>`;
-    }
-        if (data.next) html += `<li class="page-item"><a class="page-link" data-page="${data.end+1}">»</a></li>`;
+        }
+        if (data.next) html += `<li class="page-item"><a class="page-link" data-page="${data.end + 1}">»</a></li>`;
         replyPaging.innerHTML = html;
     }
 
-        // 목록 로드
-        async function load(p = page, s = size){
-        try{
-        const data = await api(`/noticereplies/list/${bno}?page=${p}&size=${s}`);
-        setReplyCount(typeof data.total === "number" ? data.total : 0);
+    // 목록 로드
+    async function load(p = page, s = size) {
+        try {
+            const data = await api(`/noticereplies/list/${bno}?page=${p}&size=${s}`);
+            setReplyCount(typeof data.total === "number" ? data.total : 0);
 
-        const list = Array.isArray(data.dtoList) ? data.dtoList : [];
-        replyList.innerHTML = list.length ? list.map(r => `
-        <li class="reply_list border-bottom d-flex justify-content-between align-items-start py-2" data-rno="${r.rno}">
-          <div>
-            <b>${r.nickname || "익명"}</b><br>
-            <small class="text-muted" style="margin-left:8px;">${r.regDate || ""}</small>
-            ${r.updateDate ? `<small class="text-muted ms-2">(수정됨 ${r.updateDate})</small>` : ""}
-            <div class="replyContent">${r.deleted ? '<span class="text-secondary">삭제된 댓글입니다.</span>' : (r.content ?? "")}</div>
-          </div>
-          ${(!r.deleted && (r.owner || r.admin)) ? `
-         <div class="flex-shrink-1">
-            <div class="btn-group">
-              <button type="button" class="btn btn-xs rounded-2 btn-outline-gray" data-bs-toggle="dropdown" aria-expanded="false">
-                <i class="fa-solid fa-ellipsis"></i>
-              </button>
-              <ul class="dropdown-menu dropdown-menu-end">
-                <li><a class="dropdown-item modifyBtn" href="#">수정</a></li>
-                <li><a class="dropdown-item deleteBtn" href="#">삭제</a></li>
-              </ul>
+            const list = Array.isArray(data.dtoList) ? data.dtoList : [];
+            replyList.innerHTML = list.length ? list.map(r => `
+        <li class="reply_list border-bottom" data-rno="${r.rno}">
+          <div class="row g-2 py-2">
+            <div class="col">
+              <p><b>${r.nickname || "익명"}</b></p>
+              <div class="replyContent">${r.deleted ? '<span class="text-secondary">삭제된 댓글입니다.</span>' : (r.content ?? "")}</div>
+              <small class="text-secondary">${r.regDate || ""}
+              ${r.updateDate ? `(수정됨 ${r.updateDate})</small>` : ""}
+              </small>
             </div>
-          </div>` : ``}
+            ${(!r.deleted && (r.owner || r.admin)) ? `
+           <div class="col-auto">
+              <div class="btn-group">
+                <button type="button" class="btn btn-xs rounded-2 btn-outline-gray" data-bs-toggle="dropdown" aria-expanded="false">
+                  <i class="fa-solid fa-ellipsis"></i>
+                </button>
+                <ul class="dropdown-menu dropdown-menu-end">
+                  <li><a class="dropdown-item modifyBtn" href="#">수정</a></li>
+                  <li><a class="dropdown-item deleteBtn" href="#">삭제</a></li>
+                </ul>
+              </div>
+            </div>` : ``}
+          </div>
         </li>
       `).join("") : `<li class="p-2 text-muted">등록된 댓글이 없습니다.</li>`;
 
-        printPages(data);
-    }catch(e){
-        console.error(e);
-        replyList.innerHTML = `<li class="p-2 text-muted">댓글을 불러오는 중 오류가 발생했습니다.</li>`;
-        if (replyPaging) replyPaging.innerHTML = "";
-    }
+            printPages(data);
+        } catch (e) {
+            console.error(e);
+            replyList.innerHTML = `<li class="p-2 text-muted">댓글을 불러오는 중 오류가 발생했습니다.</li>`;
+            if (replyPaging) replyPaging.innerHTML = "";
+        }
     }
 
-        // 등록
-        btnWrite?.addEventListener("click", async () => {
+    // 등록
+    btnWrite?.addEventListener("click", async () => {
         const content = (replyText?.value || "").trim();
         if (!content) return alert("댓글 내용을 입력해주세요.");
-        try{
-        await api(`/noticereplies/`, "POST", { bno, content });
-        replyText.value = "";
-        load(1, size); // 첫 페이지로
-    }catch(e){
-        console.error(e); alert("등록 실패");
-    }
+        try {
+            await api(`/noticereplies/`, "POST", {bno, content});
+            replyText.value = "";
+            load(1, size); // 첫 페이지로
+        } catch (e) {
+            console.error(e);
+            alert("등록 실패");
+        }
     });
 
-        // 수정 / 삭제 (이벤트 위임)
-        replyList?.addEventListener("click", async (e) => {
-            const a = e.target.closest("a.modifyBtn, a.deleteBtn");
-            if (!a) return;
+    // 수정 / 삭제 (이벤트 위임)
+    replyList?.addEventListener("click", async (e) => {
+        const a = e.target.closest("a.modifyBtn, a.deleteBtn");
+        if (!a) return;
 
-            e.preventDefault();
-            e.stopPropagation();
+        e.preventDefault();
+        e.stopPropagation();
 
-            const li  = a.closest("li.reply_list");
-            const rno = li?.dataset?.rno;
-            if (!rno) return;
+        const li = a.closest("li.reply_list");
+        const rno = li?.dataset?.rno;
+        if (!rno) return;
 
-            // 수정
-            if (a.classList.contains("modifyBtn")) {
-                const old = li.querySelector(".replyContent")?.textContent?.trim() || "";
-                const content = prompt("새 내용 입력:", old);
-                if (!content || content === old) return;
+        // 수정
+        if (a.classList.contains("modifyBtn")) {
+            const old = li.querySelector(".replyContent")?.textContent?.trim() || "";
+            const content = prompt("새 내용 입력:", old);
+            if (!content || content === old) return;
 
-                try {
-                    await api(`/noticereplies/${rno}`, "PUT", { content });
-                    await load(page, size);
-                } catch (err) {
-                    console.error(err);
-                    alert("수정 실패");
-                }
-                return;
+            try {
+                await api(`/noticereplies/${rno}`, "PUT", {content});
+                await load(page, size);
+            } catch (err) {
+                console.error(err);
+                alert("수정 실패");
             }
+            return;
+        }
 
-            // 삭제
-            if (a.classList.contains("deleteBtn")) {
-                if (!confirm("삭제하시겠습니까?")) return;
+        // 삭제
+        if (a.classList.contains("deleteBtn")) {
+            if (!confirm("삭제하시겠습니까?")) return;
 
-                try {
-                    // 서버가 현재 POST /delete/{rno}를 받도록 되어 있다면 아래 라인을 사용
-                    await api(`/noticereplies/delete/${rno}`, "POST");
-                    await load(page, size);
-                } catch (err) {
-                    console.error(err);
-                    alert("삭제 실패");
-                }
+            try {
+                // 서버가 현재 POST /delete/{rno}를 받도록 되어 있다면 아래 라인을 사용
+                await api(`/noticereplies/delete/${rno}`, "POST");
+                await load(page, size);
+            } catch (err) {
+                console.error(err);
+                alert("삭제 실패");
             }
-        });
+        }
+    });
 
 
-        // 페이지 클릭
-        replyPaging?.addEventListener("click", (e)=>{
+    // 페이지 클릭
+    replyPaging?.addEventListener("click", (e) => {
         e.preventDefault();
         const a = e.target.closest("a");
         if (!a) return;
@@ -231,8 +251,8 @@
         load(page, size);
     });
 
-        // 초기 로딩
-        load(page, size);
+    // 초기 로딩
+    load(page, size);
 </script>
 
 </html>

@@ -1,131 +1,136 @@
 <!DOCTYPE html>
 <html lang="en" layout:decorate="~{include/user}"
-      xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity6">
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity6"
+      xmlns:th="http://www.thymeleaf.org">
 
 <div layout:fragment="content">
-    <!-- /* view 화면 html 코드 작성 부분 */ -->
-    <div class="page_title mb-4 mb-md-5">
-        <h3 class="memomentKkukkkuk fw-normal mb-2">공지사항 게시판</h3>
-        <small class="text-secondary">공지사항 게시판은 관리자만 작성 가능</small>
+  <!-- /* view 화면 html 코드 작성 부분 */ -->
+  <div class="page_title mb-4 mb-md-5">
+    <h3 class="memomentKkukkkuk fw-normal mb-2">공지사항</h3>
+    <small class="text-secondary">애니모리의 주요 안내사항을 알려드려요!</small>
+  </div>
+  <div class="board_area">
+    <div class="row g-4">
+      <div class="col-12 col-sm-10 col-md-8 col-lg-6 mx-auto">
+        <section class="search_area">
+          <form th:action="@{/notice/list}">
+            <div class="d-flex gap-2">
+              <select class="form-select form-select-sm w-auto flex-shrink-1" id="" name="type"
+                      th:value="${pageRequestDTO.type}">
+                <option th:selected="${pageRequestDTO.type == 'tc'}" value="tc">제목+내용</option>
+                <option th:selected="${pageRequestDTO.type == 't'}" value="t">제목</option>
+                <option th:selected="${pageRequestDTO.type == 'c'}" value="c">내용</option>
+                <option th:selected="${pageRequestDTO.type == 'w'}" value="w">작성자</option>
+              </select>
+              <input class="form-control form-control-sm" name="keyword" placeholder="검색어를 입력하세요" th:value="${pageRequestDTO.keyword}"
+                     type="text">
+              <button class="btn btn-sm btn-secondary text-nowrap" type="submit"><i
+                  class="fa-solid fa-magnifying-glass me-1"></i>검색
+              </button>
+              <button class="btn btn-sm btn-gray text-nowrap" th:onclick="|location.href='@{/notice/list}'|"
+                      type="button">초기화
+              </button>
+              </a>
+            </div>
+          </form>
+        </section>
+      </div>
+      <div class="col-12">
+        <section class="search_result_area">
+          <div class="d-flex align-items-end mb-2"></div>
+          <table class="table border-top align-middle">
+            <colgroup>
+              <col style="width:40px;">
+              <col style="width:calc(100% - 40px);">
+            </colgroup>
+            <thead>
+            <tr>
+              <td>no.</td>
+              <td>내용</td>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="notice,stat : ${responseDTO.dtoList}">
+              <td>
+                <span th:if="${notice.pinned}" class="badge badge-danger">고정</span>
+                <span th:unless="${notice.pinned}">[[${notice.bno}]]</span>
+              </td>
+              <td>
+                <div class="py-2">
+                  <a class="d-block mb-1" th:href="@{/notice/view(bno=${notice.bno})}">
+                    <h5 class="text-overflew-line-2">
+                      <span th:if="${notice.pinned}">📌</span>
+                      <span>[[${notice.title}]]</span>
+                    </h5>
+                  </a>
+                  <div class="d-flex align-items-center gap-2 flex-nowrap text-secondary">
+                    <p>[[${#temporals.format(notice.regDate, 'yyyy-MM-dd')}]]</p>
+                    <small class="opacity-50" th:if="${notice.updateDate != null and notice.updateDate.isAfter(notice.regDate)}">&middot; 수정됨</small>
+                    <p class="ms-auto"><i class="fa-regular fa-eye me-1"></i><span
+                        th:text="${notice.readCount}">1</span></p>
+                    <p>
+                      <i class="fa-regular fa-comment-dots me-1"></i>
+                      <span th:text="${notice.replyCount}">0</span>
+                    </p>
+                  </div>
+                </div>
+              </td>
+            </tr>
+            <tr th:if="${#lists.isEmpty(responseDTO.dtoList)}">
+              <td colspan="2">
+                <p class="py-3 text-center">게시글이 없어요</p>
+              </td>
+            </tr>
+            </tbody>
+          </table>
+        </section>
+      </div>
+      <div class="col-12 col-sm-10 col-md-8 col-lg-6 mx-auto">
+        <section class="paging_area">
+          <nav aria-label="Page navigation">
+            <ul class="pagination pagination-sm justify-content-center mb-0">
+              <li class="page-item">
+                <a class="page-link" th:data-num="1"><i class="fa-solid fa-angles-left"></i></a>
+              </li>
+              <li class="page-item" th:if="${responseDTO.prev}">
+                <a class="page-link" th:data-num="${responseDTO.start -1}"><i class="fa-solid fa-chevron-left"></i></a>
+              </li>
+              <th:block th:each="i:${#numbers.sequence(responseDTO.start, responseDTO.end)}">
+                <li th:class="${responseDTO.page==i}?'page-item active':'page-item'">
+                  <a class="page-link" th:data-num="${i}">[[${i}]]</a>
+                </li>
+              </th:block>
+              <li class="page-item" th:if="${responseDTO.next}">
+                <a class="page-link" th:data-num="${responseDTO.end +1}"><i class="fa-solid fa-chevron-right"></i></a>
+              </li>
+              <li class="page-item">
+                <a class="page-link" th:data-num="${responseDTO.last}"><i class="fa-solid fa-angles-right"></i></a>
+              </li>
+            </ul>
+          </nav>
+        </section>
+      </div>
     </div>
-    <div class="board_area">
-        <div class="row g-4">
-            <div class="col-12 col-sm-10 col-md-8 col-lg-6 mx-auto">
-                <section class="search_area">
-                    <form th:action="@{/notice/list}">
-                        <div class="d-flex gap-2">
-                            <select name="type" id="" class="form-select form-select-sm w-auto flex-shrink-1" th:value="${pageRequestDTO.type}">
-                                <option value="tc" th:selected="${pageRequestDTO.type == 'tc'}">제목+내용</option>
-                                <option value="t" th:selected="${pageRequestDTO.type == 't'}">제목</option>
-                                <option value="c" th:selected="${pageRequestDTO.type == 'c'}">내용</option>
-                                <option value="w" th:selected="${pageRequestDTO.type == 'w'}">작성자</option>
-                            </select>
-                            <input name="keyword" type="text" class="form-control form-control-sm" placeholder="검색어를 입력하세요" th:value="${pageRequestDTO.keyword}">
-                            <button type="submit" class="btn btn-sm btn-secondary text-nowrap"><i class="fa-solid fa-magnifying-glass me-1"></i>검색</button>
-                            <button type="button" class="btn btn-sm btn-gray text-nowrap" th:onclick="|location.href='@{/notice/list}'|">초기화</button>
-                            </a>
-                        </div>
-                    </form>
-                </section>
-            </div>
-            <div class="col-12">
-                <section class="search_result_area">
-                    <div class="d-flex align-items-end mb-2"></div>
-                    <table class="table border-top align-middle">
-                        <colgroup>
-                            <col style="width:40px;">
-                            <col style="width:calc(100% - 40px);">
-                        </colgroup>
-                        <thead>
-                        <tr>
-                            <td>no.</td>
-                            <td>내용</td>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        <tr th:each="notice,stat : ${responseDTO.dtoList}">
-                            <td th:text="${stat.count}">1</td>
-                            <td>
-                                <div class="py-2">
-                                    <a th:href="@{/notice/view(bno=${notice.bno})}" class="d-block mb-1">
-                                        <h5 class="text-overflew-line-2">
-                                            <span th:if="${notice.pinned}" class="me-1" aria-hidden="true">📌</span>
-                                            <span th:text="${notice.title}">글 제목 자리</span>
-                                            <span th:if="${notice.updateDate != null and notice.updateDate.isAfter(notice.regDate)}" class="text-muted">(수정됨)</span>
-                                        </h5>
-
-                                    </a>
-                                    <div class="d-flex gap-2 flex-nowrap text-secondary">
-                                        <p>관리자</p>
-                                        <p th:text="${#temporals.format(notice.regDate, 'yyyy-MM-dd')}">2000-01-01</p>
-                                        <p class="ms-auto"><i class="fa-regular fa-eye me-1"></i><span th:text="${notice.readCount}">1</span></p>
-                                        <p>
-                                            <i class="fa-regular fa-comment-dots me-1"></i>
-                                            <span th:text="${notice.replyCount}">0</span>
-                                        </p>
-
-                                    </div>
-                                </div>
-                            </td>
-                        </tr>
-
-                        <tr th:if="${#lists.isEmpty(responseDTO.dtoList)}">
-                            <td colspan="2">
-                                <p class="py-3 text-center">게시글이 없어요</p>
-                            </td>
-                        </tr>
-                        </tbody>
-                    </table>
-                </section>
-            </div>
-            <div class="col-12 col-sm-10 col-md-8 col-lg-6 mx-auto">
-                <section class="paging_area">
-                    <nav aria-label="Page navigation">
-                        <ul class="pagination pagination-sm justify-content-center mb-0">
-                            <li class="page-item">
-                                <a class="page-link" th:data-num="1"><i class="fa-solid fa-angles-left"></i></a>
-                            </li>
-                            <li class="page-item" th:if="${responseDTO.prev}">
-                                <a class="page-link" th:data-num="${responseDTO.start -1}"><i class="fa-solid fa-chevron-left"></i></a>
-                            </li>
-                            <th:block th:each="i:${#numbers.sequence(responseDTO.start, responseDTO.end)}">
-                                <li th:class="${responseDTO.page==i}?'page-item active':'page-item'">
-                                    <a class="page-link" th:data-num="${i}">[[${i}]]</a>
-                                </li>
-                            </th:block>
-                            <li class="page-item" th:if="${responseDTO.next}">
-                                <a class="page-link" th:data-num="${responseDTO.end +1}"><i class="fa-solid fa-chevron-right"></i></a>
-                            </li>
-                            <li class="page-item">
-                                <a class="page-link" th:data-num="${responseDTO.last}"><i class="fa-solid fa-angles-right"></i></a>
-                            </li>
-                        </ul>
-                    </nav>
-                </section>
-            </div>
-        </div>
 
 
-
-    </div>
-    <!-- /* //view 화면 html 코드 작성 끝 */ -->
+  </div>
+  <!-- /* //view 화면 html 코드 작성 끝 */ -->
 </div>
 
 <script layout:fragment="pagescript" th:inline="javascript">
     // 페이지에 필요한 스크립트 작성 부분
-    document.querySelector(".pagination").addEventListener("click", function (e){
+    document.querySelector(".pagination").addEventListener("click", function (e) {
         e.preventDefault()
         e.stopPropagation()
 
         const target = e.target.closest('a')
-        if(!target){
+        if (!target) {
             return
         }
         const num = target.getAttribute("data-num")
         const formOjb = document.querySelector("form")
-        formOjb.innerHTML+=`<input type='hidden' name='page' value='${num}'>`
+        formOjb.innerHTML += `<input type='hidden' name='page' value='${num}'>`
         formOjb.submit()
     })
 

@@ -79,7 +79,7 @@ public class FreeController {
     public String registerGet(@AuthenticationPrincipal PrincipalDetails principalDetails, Model model) {
         Member member = principalDetails.getMember();
         model.addAttribute("member", member);
-        return "free/register"; // templates/free/register.html
+        return "free/register";
     }
 
     @GetMapping("/modify")
