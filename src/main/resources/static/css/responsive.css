@@ -22,7 +22,7 @@
     }
 
     .mvSwiper .swiper-slide {
-        margin: 24px 12px;
+        margin: 48px 12px 0px;
     }
 
 }
@@ -104,10 +104,6 @@
         cursor: pointer;
     }
 
-    .mvSwiper {
-        margin-bottom: 24px;
-    }
-
     .mvSwiper .swiper-slide {
         width: 100%;
         margin: 0;
@@ -116,6 +112,9 @@
         border-radius: 0;
     }
 
+    .freeSwiper .swiper-slide {
+        width: 40%;
+    }
 
     .free_thumb {
         width: 114px;
@@ -137,6 +136,9 @@
 
 
 @media all and (max-width: 576px) { /* breakpoints-sm */
+    .freeSwiper .swiper-slide {
+        width: 80%;
+    }
 }
 /* breakpoints-sm 576 끝 */
 

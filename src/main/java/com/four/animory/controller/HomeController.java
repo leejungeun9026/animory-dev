@@ -35,18 +35,19 @@ public class HomeController {
 
 
     @GetMapping({"/", "/index"})
-  public String index(Model model){
-    List<FreeBoardDTO> freeBoard = freeBoardService.getTop10FreeBoardList();
-    List<MateBoardDTO> mateBoard = mateBoardService.getTop10MateBoardList();
-    List<SprBoardDTO> sprBoard = sprBoardService.getTop10SprBoards();
-    List<NoticeBoardDTO>noticeBoard = noticeService.getTop10NoticeBoardList();
-    List<SitterBoardListDTO> sitterBoard = sitterBoardService.getRecent(4);
-    log.info(mateBoard);
-    model.addAttribute("freeBoard", freeBoard);
-    model.addAttribute("sprBoard", sprBoard);
-    model.addAttribute("noticeBoard", noticeBoard);
-    model.addAttribute("sitterBoard", sitterBoard);
-    return "index";
+    public String index(Model model){
+      List<FreeBoardDTO> freeBoard = freeBoardService.getTop10FreeBoardList();
+      List<MateBoardDTO> mateBoard = mateBoardService.getTop10MateBoardList();
+      List<SprBoardDTO> sprBoard = sprBoardService.getTop10SprBoards();
+      List<SitterBoardListDTO> sitterBoard = sitterBoardService.getRecent(10);
+      List<NoticeBoardDTO>noticeBoard = noticeService.getTop10NoticeBoardList();
+      log.info(freeBoard);
+      model.addAttribute("freeBoard", freeBoard);
+      model.addAttribute("mateBoard", mateBoard);
+      model.addAttribute("sprBoard", sprBoard);
+      model.addAttribute("sitterBoard", sitterBoard);
+      model.addAttribute("noticeBoard", noticeBoard);
+      return "index";
   }
 
   @GetMapping("/maptest")

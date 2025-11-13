@@ -195,7 +195,7 @@ body {
 .mvSwiper .swiper-slide {
     width: 80%;
     max-width: 1174px;
-    margin: 48px 20px;
+    margin: 48px 20px 0;
 }
 
 .mvSwiper .swiper-slide > a {
@@ -210,10 +210,57 @@ body {
     height: 100%;
 }
 
+.noticeSwiper {
+    width: 100%;
+    height: 24px;
+}
 
+.noticeSwiper .swiper-slide{
+    height: 24px;
+}
 
-
-
+/* freeSwiper */
+.freeSwiper {
+    padding: 0 16px;
+}
+.freeSwiper .swiper-slide {
+    width: 28%;
+}
+.item_card {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    width: 100%;
+}
+.card__img {
+    position: relative;
+    width: 100%;
+    height: 240px;
+    border-radius: 16px;
+    overflow: hidden;
+}
+.card__img img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+}
+.card__img .category_badge {
+    position: absolute;
+    left: 12px;
+    top: 8px;
+}
+.card__img .options {
+    position: absolute;
+    right: 12px;
+    bottom: 8px;
+}
+.card__body {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    width: 100%;
+}
 
 /******************** Common ********************/
 #main_container {
@@ -285,3 +332,4 @@ td img {
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
 }
+
