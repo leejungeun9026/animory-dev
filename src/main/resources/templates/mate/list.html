@@ -154,6 +154,9 @@
             </div>
         </div>
     </div>
+
+
+
     <div class="modal" id="alertModal" tabindex="-1">
         <div class="modal-dialog modal-dialog-centered modal-sm modal-360">
             <div class="modal-content">
@@ -170,61 +173,38 @@
     </div>
     <!-- /* //view 화면 html 코드 작성 끝 */ -->
 </div>
+
 <script layout:fragment="pagescript" th:inline="javascript">
-    const memberMid = /*[[${memberDTO.mid != null ? memberDTO.mid : null}]]*/ null;
-    const alertModal = new bootstrap.Modal(document.getElementById('alertModal'))
-    const alertModalBody = document.querySelector("#alertModal .modal-body")
-    const alertModalFooter = document.querySelector("#alertModal .modal-footer")
 
-    if (memberMid !== null) {
-        const hasPet = [[${petCount}]]
-        const btnRegister = document.getElementById("btnRegister")
-        btnRegister.addEventListener("click", function (e) {
-            if (hasPet === 0) {
-                e.preventDefault()
-                alertModalBody.innerHTML = `<p>펫 정보가 있는 회원만 작성할 수 있어요</p>`
-                alertModalFooter.innerHTML = `
-              <div class="d-flex justify-content-center gap-2 flex-nowrap w-100">
-                  <button class="btn btn-lg btn-gray w-100" data-bs-dismiss="modal" type="button">취소</button>
-                  <a href="/member/modifyPet?mid=${memberMid}" class=" btn btn-lg btn-main w-100" type="button">반려동물 등록하기</a>
-              </div>`
-                alertModal.show()
-            }
-        })
-    }
+     const loginUser = /*[[${loginUser != null ? loginUser : null}]]*/ null;
+     const alertModal = new bootstrap.Modal(document.getElementById('alertModal'))
+     const alertModalBody = document.querySelector("#alertModal .modal-body")
+     const alertModalFooter = document.querySelector("#alertModal .modal-footer")
 
-    // 페이지에 필요한 스크립트 작성 부분
-    /////// 사용자 정보 - 시도,시군구 정보 초기화 ///////
-    // const searchSido = /*[[${matePageRequestDTO.sido != null ? matePageRequestDTO.sido : null}]]*/ null;
-    // const searchSigungu = /*[[${matePageRequestDTO.sigungu != null ? matePageRequestDTO.sigungu : null}]]*/ null;
-    // const sido = document.querySelector("#sido");
-    // const sigungu = document.querySelector("#sigungu");
-    //
-    // async function loadSido() {
-    //     const {data} = await axios.get('/api/regions/sido');
-    //     sido.innerHTML = `<option value="">지역 전체</option>` +
-    //         data.map(s => `<option value="${s.name}" data-sido-id="${s.id}">${s.name}</option>`).join('');
-    // }
-    //
-    // async function loadSigungu(sidoId) {
-    //     if (!sidoId) {
-    //         sigungu.innerHTML = '<option value="">시/군/구</option>';
-    //         return;
-    //     }
-    //     const {data} = await axios.get('/api/regions/sigungu', {params: {sidoId}});
-    //     sigungu.innerHTML =
-    //         '<option value="">전체</option>' +
-    //         data.map(g => `<option value="${g.name}" ${searchSigungu === g.name ? 'selected' : ''}>${g.name}</option>`).join('');
-    //     // ↑ 여기에서 백틱 닫힘이 정확해야 해요. (오류 원인 fix)
-    // }
-    //
-    // sido.addEventListener('change', (e) => {
-    //     const selectedOption = e.target.selectedOptions[0]; // 선택된 <option> 요소
-    //     const sidoId = selectedOption.dataset.sidoId;       // data-sidoid 값 읽기
-    //     loadSigungu(sidoId);
-    // });
-    //
-    // loadSido()
+     if (loginUser !== null) {
+         const hasPet = [[${petCount}]]
+         const btnRegister = document.getElementById("btnRegister")
+         btnRegister.addEventListener("click", function (e) {
+             if (hasPet === 0) {
+                 e.preventDefault()
+                 alertModalBody.innerHTML = `<p>펫 정보가 있는 회원만 작성할 수 있어요</p>`
+                 alertModalFooter.innerHTML = `
+               <div class="d-flex justify-content-center gap-2 flex-nowrap w-100">
+                   <button class="btn btn-lg btn-gray w-100" data-bs-dismiss="modal" type="button">취소</button>
+                   <a href="/member/modifyPet?mid=${loginUser.mid}" class=" btn btn-lg btn-main w-100" type="button">반려동물 등록하기</a>
+               </div>`
+                 alertModal.show()
+             }
+         })
+     }
+
+
+
+
+
+
+
+
 
     /// 페이징
     document.querySelector(".pagination").addEventListener("click", function (e) {

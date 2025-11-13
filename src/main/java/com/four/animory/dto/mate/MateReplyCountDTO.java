@@ -9,14 +9,6 @@ import java.util.List;
 
 @Data
 public class MateReplyCountDTO {
-//    private Long bno;
-//    private String title;
-//    private String nickname;
-//    private int readcount;
-//    private LocalDateTime regDate;
-//    private Long replyCount;
-
-
 
     private Long bno;
     private String category;
@@ -41,11 +33,10 @@ public class MateReplyCountDTO {
     public boolean getExpired() {
         if (dueDate == null || dueDate.isBlank()) return false;
         try {
-            // "yyyy-MM-dd'T'HH:mm" or "yyyy-MM-dd'T'HH:mm:ss" 포맷 가정
             LocalDateTime due = LocalDateTime.parse(dueDate);
             return LocalDateTime.now().isAfter(due);
         } catch (DateTimeParseException e) {
-            return false; // 파싱 실패 시 그냥 미지남으로 처리
+            return false;
         }
     }
 

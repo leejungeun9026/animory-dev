@@ -34,17 +34,14 @@ public class MatePageResponseDTO<E> {
 
     this.first = 1;
 
-    // 전체 마지막 페이지 (total이 0이면 1페이지로 간주)
     this.last = Math.max(1, (int) Math.ceil((double) total / this.size));
 
     int tempEnd = (int) (Math.ceil(this.page / (double) pageBlockSize) * pageBlockSize);
     this.start = tempEnd - (pageBlockSize - 1);
     this.end = Math.min(tempEnd, this.last);
 
-    // 보정
     if (this.start < 1) this.start = 1;
 
-    // 이전/다음 블록 여부
     this.prev = this.start > 1;
     this.next = this.end < this.last;
   }

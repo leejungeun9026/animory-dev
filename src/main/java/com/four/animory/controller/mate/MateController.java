@@ -49,11 +49,11 @@ public class MateController {
 
     @GetMapping("/list")
     public void replyCountList(@AuthenticationPrincipal PrincipalDetails principal, MatePageRequestDTO matePageRequestDTO, Model model) {
-        MemberDTO memberDTO = null;
+        MemberDTO loginUser = null;
         if(principal != null){
-            memberDTO = userService.getMemberByUsername(principal.getMember().getUsername());
-            int petCount = userService.getPetListByMemberId(memberDTO.getMid()).size();
-            model.addAttribute("memberDTO", memberDTO);
+            loginUser = userService.getMemberByUsername(principal.getMember().getUsername());
+            int petCount = userService.getPetListByMemberId(loginUser.getMid()).size();
+            model.addAttribute("loginUser", loginUser);
             model.addAttribute("petCount", petCount);
         }
         log.info("replyCountList");
@@ -76,24 +76,24 @@ public class MateController {
 
     @PostMapping("/register")
     public String registerPost(UploadFileDTO uploadFileDTO, MateBoardDTO mateBoardDTO, @AuthenticationPrincipal PrincipalDetails principalDetails) {
-        List<MateFileDTO> fileDTOS = null; //리턴형은 리스트 스트링이야 아래에 함수 만들었어
-        if (uploadFileDTO.getFiles() != null && //getFiles하면 파일의 리스트를 가지고 올수있어. files라는게 있어서 null은
-                // 아닌데 파일을 선택을 안해서 업로드가 안됨. 파일 없으면 글 못씀.
-                !uploadFileDTO.getFiles().get(0).getOriginalFilename().equals("")) { //(파일 이름이 공백이 아닐때) 파일을 안넣어도 업로드됨.
-            fileDTOS = fileUpload(uploadFileDTO); //맨 아래 만든 uploadDTO에서 리턴한 파일 이름 list가 가!!!!
+        List<MateFileDTO> fileDTOS = null;
+        if (uploadFileDTO.getFiles() != null &&
+
+                !uploadFileDTO.getFiles().get(0).getOriginalFilename().equals("")) {
+            fileDTOS = fileUpload(uploadFileDTO);
         }
         mateBoardDTO.setMateFileDTOs(fileDTOS);
         mateBoardDTO.setUsername(principalDetails.getUsername());
         log.info("registerPost mataBoardDTO"+mateBoardDTO);
         Long bno = mateService.registerMateBoard(mateBoardDTO);
         log.info("board insert success : bno=" + bno);
-        return "redirect:/mate/list"; //서비스로 넘긴다!
+        return "redirect:/mate/list";
     }
 
     private List<MateFileDTO> fileUpload(UploadFileDTO uploadFileDTO) {
         List<MateFileDTO> list = new ArrayList<>();
-        if (uploadFileDTO.getFiles() != null) { //파일이 있으면 실행!
-            uploadFileDTO.getFiles().forEach(multifile -> { // uploadFileDTO.getFiles() 하면 파일리스나와 하나씩 꺼내서 멀티파일에 할당
+        if (uploadFileDTO.getFiles() != null) {
+            uploadFileDTO.getFiles().forEach(multifile -> {
                 String originalFileName = multifile.getOriginalFilename();
                 log.info("originalFileName" + originalFileName);
                 String uuid = UUID.randomUUID().toString();
@@ -115,8 +115,7 @@ public class MateController {
                         .filename(originalFileName)
                         .image(image)
                         .build();
-                list.add(mateFileDTO); //파일을 db에 저장해야하니까. list에 담고. list를 리턴해줘.
-//                list.add(uuid+"-"+originalFileName); 원래 이랬는데, 위의 .image가 따라다녀야해서 추가 작업을 함.
+                list.add(mateFileDTO);
             });
         }
         return list;
@@ -128,7 +127,6 @@ public class MateController {
             String filename = mateFileDTO.getUuid() + "_" + mateFileDTO.getFilename();
             Resource resource = new FileSystemResource(
                     uploadPath + File.separator + filename);
-            //path가 서버에 저장된 파일 이름
             String resourceName = resource.getFilename();
             boolean removed = false;
             try {
@@ -172,8 +170,6 @@ public class MateController {
         int updated = mateService.increaseLikeCountAndGet(bno);
         return Map.of("likecount", updated);
     }
-
-
 }
 
 

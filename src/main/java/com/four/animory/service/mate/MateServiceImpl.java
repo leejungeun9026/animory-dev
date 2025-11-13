@@ -78,13 +78,6 @@ public class MateServiceImpl implements MateService {
     public void updateMateBoard(MateBoardDTO mateBoardDTO) {
         MateBoard mateBoard = mateBoardRepository.findById(mateBoardDTO.getBno()).orElse(null); // 기존의 board 데이터 가져오기
         mateBoard.change(mateBoardDTO.getContent(), mateBoardDTO.getContent(), mateBoardDTO.getCategory());
-//        //1112추가
-//        if(mateBoardDTO.getMateFileDTOs() != null) {
-//            mateBoard.removeFile();
-//            for (MateFileDTO fileDTO : mateBoardDTO.getMateFileDTOs()) {
-//                mateBoard.addFile(fileDTO.getUuid(), fileDTO.getFilename(), fileDTO.isImage());
-//            }
-//        }
         mateBoardRepository.save(mateBoard);
     }
 
@@ -101,7 +94,7 @@ public class MateServiceImpl implements MateService {
     public List<MateBoardDTO> getTop10MateBoardList() {
         List<MateBoard> boardList = mateBoardRepository.findTop10ByOrderByBnoDesc();
         return boardList.stream()
-                .map(this::entityToDTO)  // entityToDTO는 아래에 정의
+                .map(this::entityToDTO)
                 .collect(Collectors.toList());
     }
 
@@ -110,8 +103,7 @@ public class MateServiceImpl implements MateService {
         MateBoard board = mateBoardRepository.findById(bno)
                 .orElseThrow(() -> new IllegalArgumentException("게시글 없음"));
         board.setLikecount(board.getLikecount() + 1); // dirty checking으로 update
-        // save(board); // 변경감지로 자동 flush 되므로 생략 가능 (넣어도 무방)
-        return board.getLikecount(); // 증가된 최신값 반환
+           return board.getLikecount();
     }
 
     // 검색 + 페이징 -> DTO 변환
@@ -121,14 +113,14 @@ public class MateServiceImpl implements MateService {
         Page<MateBoard> result = mateBoardRepository.searchAll(
                 matePageRequestDTO.getFields(),
                 matePageRequestDTO.getKeyword(),
-                pageable); //동적 쿼리를 통해 검색해 오고 아래의 내용을 추출해 LIST에 넣어
+                pageable);
 
         List<MateBoardDTO> dtoList = result.getContent().stream()
                 .map(board -> entityToDTO(board))
                 .collect(Collectors.toList());
-        int total = (int)result.getTotalElements(); //total record count
-        MatePageResponseDTO<MateBoardDTO> responseDTO=MatePageResponseDTO.<MateBoardDTO>withAll() //BoardDTO 객체로 만들거야
-                .matePageRequestDTO(matePageRequestDTO) //DTO에 있는 정보 + LIST + TOTAL 정보 넣고 BUILD
+        int total = (int)result.getTotalElements();
+        MatePageResponseDTO<MateBoardDTO> responseDTO=MatePageResponseDTO.<MateBoardDTO>withAll()
+                .matePageRequestDTO(matePageRequestDTO)
                 .dtoList(dtoList)
                 .total(total)
                 .build();
@@ -150,6 +142,4 @@ public class MateServiceImpl implements MateService {
                 .total((int)result.getTotalElements())
                 .build();
     }
-
-
 }

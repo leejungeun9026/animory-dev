@@ -24,14 +24,11 @@ public class MateFile implements Comparable<MateFile> {
     @JoinColumn(name = "bno")
     private MateBoard mateBoard;
 
-    // OneToMany에서 순서에 맞게 정렬하기 위함
-
-
     @Override
     public int compareTo(MateFile other) {
         return this.ord - other.ord;
     }
-    // 게시판 파일이 바뀔 대
+
     public void changeMateBoard(MateBoard mateBoard) {
         this.mateBoard = mateBoard;
     }
