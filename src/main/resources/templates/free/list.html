@@ -50,38 +50,44 @@
             </tr>
             </thead>
             <tbody>
-            <tr th:each="board : ${freePageResponseDTO.dtoList}">
-              <td th:text="${board.bno}"></td>
-              <td>
-                <div class="py-2">
-                  <div class="d-flex gap-2 flex-nowrap mb-2">
-                    <p th:text="${board.btype}" class="badge"
-                       th:classappend="${board.btype == '자유'} ? ' badge-success' :
-                   (${board.btype == '정보'} ? ' badge-info' : ' badge-secondary')">
-                    </p>
-                  </div>
-                  <a th:href="|@{/free/view(bno=${board.bno})}&${freePageRequestDTO.getLink()}|" class="d-block mb-1">
-                    <h5 class="text-overflew-line-2" >[[${board.title}]]
-                        <span class="badge progress-bar-success" style="background-color:cornflowerblue">[[${board.replycount}]]</span>
-                    </h5>
-                  </a>
-                  <div class="d-flex gap-2 flex-nowrap text-secondary">
-                    <p>[[${board.nickname}]]</p>
-                    <p th:text="${#temporals.format(board.updateDate, 'yyyy.MM.dd HH:mm')}"></p>
-                    <p class="ms-auto"><i class="fa-regular fa-eye me-1"></i>
-                        <span th:text="${board.readcount}"></span>
-                    </p>
-                    <p>
-                        <i th:class="${board.likecount >= 1} ? 'fa-solid fa-heart me-1 text-danger' : 'fa-regular fa-heart me-1 text-danger'"></i>
-                        <span>[[${board.likecount}]]</span>
-                    </p>
-                    <p><i class="fa-regular fa-comment-dots me-1"></i>
-                        <span th:text="${board.replycount}"></span>
-                    </p>
-                  </div>
-                </div>
-              </td>
-            </tr>
+                <tr th:each="board : ${freePageResponseDTO.dtoList}" th:with="thumb=${board.thumbnailFilename}">
+                  <td th:text="${board.bno}"></td>
+                  <td>
+                      <div class="d-flex align-items-start gap-3 py-2">
+                          <img th:if="${thumb != null}" th:src="@{/uploads/free/{thumb}(thumb=${thumb})}"
+                                  alt="썸네일" width="100" height="95" style="display:block; border-radius:8px;">
+                              <img th:if="${thumb == null}" th:src="@{/uploads/free/images/no-img.png}"
+                                   alt="기본 이미지" width="100" height="95" style="display:block; border-radius:8px;">
+                      <div>
+                        <div class="py-2">
+                          <div class="d-flex gap-2 flex-nowrap mb-2">
+                            <p th:text="${board.btype}" class="badge"
+                               th:classappend="${board.btype == '자유'} ? ' badge-success' :
+                           (${board.btype == '정보'} ? ' badge-info' : ' badge-secondary')">
+                            </p>
+                          </div>
+                          <a th:href="|@{/free/view(bno=${board.bno})}&${freePageRequestDTO.getLink()}|" class="d-block mb-1">
+                            <h5 class="text-overflew-line-2" >[[${board.title}]]
+                                <span class="badge progress-bar-success" style="background-color:cornflowerblue">[[${board.replycount}]]</span>
+                            </h5>
+                          </a>
+                          <div class="d-flex gap-2 flex-nowrap text-secondary">
+                            <p>[[${board.nickname}]]</p>
+                            <p th:text="${#temporals.format(board.updateDate, 'yyyy-MM-dd HH:mm')}"></p>
+                                <p class="ms-auto"><i class="fa-regular fa-eye me-1"></i>
+                                    <span th:text="${board.readcount}"></span>
+                                </p>
+                                <p class="ms-auto">
+                                    <i th:class="${board.likecount >= 1} ? 'fa-solid fa-heart me-1 text-danger' : 'fa-regular fa-heart me-1 text-danger'"></i>
+                                    <span>[[${board.likecount}]]</span>
+                                </p>
+                                <p class="ms-auto"><i class="fa-regular fa-comment-dots me-1"></i>
+                                    <span th:text="${board.replycount}"></span>
+                                </p>
+                          </div>
+                        </div>
+                  </td>
+                </tr>
             </tbody>
           </table>
         </section>

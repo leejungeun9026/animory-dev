@@ -1,12 +1,11 @@
 package com.four.animory.repository.free;
 
 import com.four.animory.domain.free.FreeBoard;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
+import com.four.animory.dto.free.FreeBoardListReplyCountDTO;
+import com.four.animory.dto.free.upload.FreeFileThumbnailDTO;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -21,5 +20,20 @@ public interface FreeBoardRepository extends JpaRepository<FreeBoard, Long>, Fre
     Optional<FreeBoard> findByIdWithImages(Long bno);
 
     List<FreeBoard> findTop10ByOrderByBnoDesc();
+
+    @Query("""
+        select new com.four.animory.dto.free.upload.FreeFileThumbnailDTO(
+            fb.bno,
+            f.filename,
+            f.uuid
+        )
+        from FreeBoard fb
+        join fb.fileSet f
+        where f.image = true
+          and f.ord = 0
+        order by fb.bno desc
+    """)
+    List<FreeFileThumbnailDTO> findFirstImageForAllBoards();
+
 
 }

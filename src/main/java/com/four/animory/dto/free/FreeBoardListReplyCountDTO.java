@@ -16,4 +16,13 @@ public class FreeBoardListReplyCountDTO {
     private LocalDateTime updateDate;
     private Long replycount;
     private int likecount;
+
+    private String thumbnailFilename;
+    public void setThumbnailFilename(String s) {
+        this.thumbnailFilename = s;
+    }
+    public String getThumbnailFilename() {
+        return thumbnailFilename;
+    }
+
 }

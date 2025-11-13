@@ -4,6 +4,7 @@ import com.four.animory.config.auth.PrincipalDetails;
 import com.four.animory.domain.free.FreeBoard;
 import com.four.animory.domain.user.Member;
 import com.four.animory.dto.free.*;
+import com.four.animory.dto.free.upload.FreeFileThumbnailDTO;
 import com.four.animory.service.free.FreeService;
 
 import lombok.extern.log4j.Log4j2;
@@ -39,19 +40,50 @@ public class FreeController {
         return "free/list";
     }
 
+//    @GetMapping("/list")
+//    public String replyCountList(FreePageRequestDTO freePageRequestDTO, Model model) {
+//        List<FreeBoardDTO> freeboardList = freeService.findAllFreeBoards();
+//        model.addAttribute("freeboardList", freeboardList);
+//
+//        // 게시글 썸네일 리스트
+//        List<FreeFileThumbnailDTO> thumbnails = freeService.getBoardThumbnails();
+//        model.addAttribute("thumbnails", thumbnails);
+//
+//        FreePageResponseDTO<FreeBoardListReplyCountDTO> freePageResponseDTO =
+//        freeService.getListReplyCount(freePageRequestDTO);
+//        model.addAttribute("freePageResponseDTO", freePageResponseDTO);
+//        model.addAttribute("freePageRequestDTO",  freePageRequestDTO);
+//        return "free/list";
+//    }
+
     @GetMapping("/list")
     public String replyCountList(FreePageRequestDTO freePageRequestDTO, Model model) {
+        // 기존 게시글 리스트
         List<FreeBoardDTO> freeboardList = freeService.findAllFreeBoards();
         model.addAttribute("freeboardList", freeboardList);
-
+        // 게시글 썸네일 리스트
+        List<FreeFileThumbnailDTO> thumbnails = freeService.getBoardThumbnails();
+        // 댓글 수 포함 게시글 리스트
         FreePageResponseDTO<FreeBoardListReplyCountDTO> freePageResponseDTO =
-        freeService.getListReplyCount(freePageRequestDTO);
+                freeService.getListReplyCount(freePageRequestDTO);
+        List<FreeBoardListReplyCountDTO> boardList = freePageResponseDTO.getDtoList();
+        // bno 기준으로 DTO에 썸네일 매칭
+        for (FreeBoardListReplyCountDTO board : boardList) {
+            for (FreeFileThumbnailDTO thumb : thumbnails) {
+                if (board.getBno().equals(thumb.getBno())) {
+                    board.setThumbnailFilename(thumb.getThumbnailUuid() + "_" + thumb.getThumbnailName());
+                    break;
+                }
+            }
+        }
         model.addAttribute("freePageResponseDTO", freePageResponseDTO);
-        model.addAttribute("freePageRequestDTO",  freePageRequestDTO);
+        model.addAttribute("freePageRequestDTO", freePageRequestDTO);
         return "free/list";
     }
 
-    @GetMapping("/view")
+
+
+        @GetMapping("/view")
     public void view(Long bno, Integer mode, Model model) {
         if (mode == null) mode = 1;
         model.addAttribute("freeBoard", freeService.findFreeBoardById(bno, mode));
@@ -113,5 +145,6 @@ public class FreeController {
     public FreeBoardDTO updatelikecount(Long bno) {
         return freeService.updateLikecount(bno);
     }
+
 
 }
