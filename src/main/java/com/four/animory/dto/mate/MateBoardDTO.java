@@ -45,21 +45,21 @@ public class MateBoardDTO {
     @Future
     private String dueDate;
 
-//    //추가
-//    public boolean getExpired() {
-//        if (dueDate == null || dueDate.isBlank()) return false;
-//        try {
-//            // "yyyy-MM-dd'T'HH:mm" or "yyyy-MM-dd'T'HH:mm:ss" 포맷 가정
-//            LocalDateTime due = LocalDateTime.parse(dueDate);
-//            return LocalDateTime.now().isAfter(due);
-//        } catch (DateTimeParseException e) {
-//            return false;
-//        }
-//    }
-//
-//    public String getDueDisplay() {
-//        return (dueDate == null) ? "" : dueDate.replace('T', ' ');
-//    }
+    //추가
+    public boolean getExpired() {
+        if (dueDate == null || dueDate.isBlank()) return false;
+        try {
+            // "yyyy-MM-dd'T'HH:mm" or "yyyy-MM-dd'T'HH:mm:ss" 포맷 가정
+            LocalDateTime due = LocalDateTime.parse(dueDate);
+            return LocalDateTime.now().isAfter(due);
+        } catch (DateTimeParseException e) {
+            return false;
+        }
+    }
+
+    public String getDueDisplay() {
+        return (dueDate == null) ? "" : dueDate.replace('T', ' ');
+    }
 
 
 

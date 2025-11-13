@@ -71,7 +71,7 @@
                             <ul>
                                 <li class="mb-2" th:each="file:${board.mateFileDTOs}">
                                     <div class="img_wrap">
-                                        <img th:src="|/uploads/${file.uuid}_${file.filename}|">
+                                        <img th:src="|/uploads/mate/${file.uuid}_${file.filename}|">
                                     </div>
                                 </li>
                             </ul>
@@ -164,9 +164,6 @@
 
     let page = 1;
     let size = 10;
-
-
-
 
         /* ============================
            1. 댓글 리스트 렌더링
@@ -432,5 +429,3 @@
     });
 </script>
 
-
-</html>
