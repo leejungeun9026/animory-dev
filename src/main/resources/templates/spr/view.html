@@ -5,129 +5,145 @@
       xmlns:th="http://www.thymeleaf.org">
 
 <div layout:fragment="content">
-<!-- /* view 화면 html 코드 작성 부분 */ -->
-    <div class="page_title mb-4">
-        <a href="/spr/list" class="d-inline-flex align-items-baseline">
-            <small class="text-danger">나눔/공구/신고 게시판 <i class="fa-solid fa-chevron-right fs-xs"></i></small>
-        </a>
-        <h3 class="memomentKkukkkuk fw-normal mt-2">게시글 보기</h3>
+  <!-- /* view 화면 html 코드 작성 부분 */ -->
+  <div class="page_title mb-4">
+    <a class="d-inline-flex align-items-baseline" href="/spr/list">
+      <small class="text-danger">사고팔개 게시판 <i class="fa-solid fa-chevron-right fs-xs"></i></small>
+    </a>
+    <h3 class="memomentKkukkkuk fw-normal mt-2">게시글 보기</h3>
+  </div>
+  <div class="board_area">
+    <div class="card rounded-3">
+      <div class="card-body">
+        <table class="table table-borderless">
+          <thead>
+          <tr>
+            <td class="tb_title border-bottom pb-3 px-0">
+              <div class="d-flex gap-2 flex-nowrap align-items-end mb-2">
+                <div class="d-flex gap-2 flex-nowrap align-items-center">
+                  <p class="badge text-bg-danger" th:if="${board.category == '신고'}">&#x1F6AB; [[${board.category}]]</p>
+                  <p class="badge badge-warning" th:if="${board.category == '공구'}">&#x1F6D2; [[${board.category}]]</p>
+                  <p class="badge badge-warning" th:if="${board.category == '나눔'}">&#x1F381; [[${board.category}]]</p>
+                  <!-- 나눔 / 공구 카테고리일 때 진행중 / 완료 표시 뱃지 -->
+                  <p class="badge badge-info"
+                     th:if="${board.category == '나눔' || board.category == '공구'} and ${board.complete == false}">
+                    [[${board.category}]]중
+                  </p>
+                  <p class="badge badge-success"
+                     th:if="${board.category == '나눔' || board.category == '공구'} and ${board.complete == true}">
+                    [[${board.category}]]완료
+                  </p>
+                  <!-- 공구일때 마감일 표시 -->
+                  <p class="text-nowrap badge badge-danger"
+                     th:if="${board.category == '공구'} and ${board.complete == false}">[[${board.dueDate}]]까지</p>
+                  <!-- 나눔 카테고리일 때 시도 시군구 표시 뱃지 -->
+                  <p class="badge badge-gray" th:if="${board.category == '나눔'}">[[${board.sido}]] /
+                    [[${board.sigungu}]]</p>
+                </div>
+                <!-- 로그인 사용자 == 글작성자 같을 경우 / Role이 어드민일 경우에 노출 -->
+                <div class="d-flex gap-1 flex-nowrap ms-auto"
+                     th:if="${#authentication.principal.username==board.username || #authentication.principal.authorities[0].authority == 'ADMIN'}">
+                  <a class="btn btn-danger" th:href="@{/spr/remove(bno=${board.bno})}">삭제</a>
+                  <a class="btn btn-gray" th:href="@{/spr/modify(bno=${board.bno}, mode=2)}">수정</a>
+                </div>
+                <!-- // 로그인 사용자 == 글작성자 같을 경우 / Role이 어드민일 경우에 노출 끝 -->
+              </div>
+              <h4 class="py-2">[[${board.title}]]</h4>
+              <div class="d-flex gap-2 flex-nowrap text-secondary">
+                <p>[[${board.author}]]</p>
+                <p>[[${#temporals.format(board.regDate, 'yyyy-MM-dd HH:mm:dd')}]]</p>
+                <p class="ms-auto"><i class="fa-regular fa-eye me-1"></i>[[${board.readcount}]]</p>
+                <p th:if="${board.recommend >= 1}"><i class="fa-solid fa-heart me-1 text-danger" id="likeIcon"></i><span
+                    id="likeCount">[[${board.recommend}]]</span></p>
+                <p th:if="${board.recommend == 0}"><i class="fa-regular fa-heart me-1 text-danger"
+                                                      id="likeIcon"></i><span
+                    id="likeCount">[[${board.recommend}]]</span></p>
+                <p><i class="fa-regular fa-comment-dots me-1"></i>[[${board.replyCount}]]</p>
+              </div>
+            </td>
+          </tr>
+          </thead>
+          <tbody>
+          <!-- 첨부파일이 있으면 노출 -->
+          <tr>
+            <td class="px-0 py-3">
+              <ul th:if="${board.sprFileDTOs != null && board.sprFileDTOs.size() >0}">
+                <li class="mb-2" th:each="fileDTO:${board.sprFileDTOs}">
+                  <div class="img_wrap">
+                    <div th:if="${fileDTO.image}">
+                      <img th:src="|/uploads/spr/${fileDTO.uuid}_${fileDTO.fileName}|">
+                    </div>
+                  </div>
+                </li>
+              </ul>
+            </td>
+          </tr>
+          <!-- 첨부파일이 있으면 노출 끝 -->
+          <tr>
+            <td class="px-0 py-3">
+              <div class="tb_content">[[${board.content}]]</div>
+            </td>
+          </tr>
+          <!--                        <tr>-->
+          <!--                            <td class="px-0 py-3">-->
+          <!--                                <div th:align="center">-->
+          <!--                                    <button type="button" class="btn btn-outline-danger" id="likeBtn">좋아요!</button>-->
+          <!--                                </div>-->
+          <!--                                <div class="tb_content" th:align="right" th:if="${board.category == '공구'}">(마감일)[[${board.dueDate}]]</div>-->
+          <!--                            </td>-->
+          <!--                        </tr>-->
+          <tr>
+            <td class="px-0 pt-3">
+              <p><i class="fa-regular fa-comment-dots me-1"></i>댓글 <b class="text-danger">[[${board.replyCount}]]</b>
+              </p>
+              <div class="reply_list_area">
+                <ul class="replyList"></ul>
+              </div>
+              <div class="mt-2">
+                <ul class="pagination pagination-sm justify-content-center replyPaging"></ul>
+              </div>
+              <div class="replyModal">
+                <div class="reply_write_area pt-3">
+                  <div class="mb-2">
+                    <textarea class="replyText form-control" name="replyText"
+                              placeholder="댓글 내용을 입력해주세요(최대 1000자)"></textarea>
+                  </div>
+                  <div class="d-flex align-items-start">
+                    <div class="form-check mb-0">
+                      <input class="form-check-input secretCheck" id="secret" name="secret" type="checkbox">
+                      <label class="form-check-label" for="secret">비밀댓글</label>
+                    </div>
+                    <button class="btnReplyRegister ms-auto btn btn-main" type="button">댓글 쓰기</button>
+                  </div>
+                </div>
+              </div>
+              <div class="modal modifyModal" tabindex="-1">
+                <div class="modal-dialog modal-dialog-centered modal-sm">
+                  <div class="modal-content">
+                    <div class="modal-header border-bottom-0">
+                      <h5 class="modal-title">댓글 수정하기</h5>
+                      <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body py-0">
+                      <input class="form-control modifyText" type="text" aria-label="댓글 내용">
+                    </div>
+                    <div class="modal-footer border-top-0">
+                      <div class="d-flex justify-content-center gap-2 flex-nowrap w-100">
+                        <button class="btn btn-lg btn-gray w-100 modifyCloseBtn" type="button">취소</button>
+                        <button class="btn btn-lg btn-main w-100 modifyBtn2" type="button">저장</button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </td>
+          </tr>
+          </tbody>
+        </table>
+      </div>
     </div>
-    <div class="board_area">
-        <div class="card rounded-3">
-            <div class="card-body">
-                <table class="table table-borderless">
-                    <thead>
-                        <tr>
-                            <td class="tb_title border-bottom pb-3 px-0">
-                                <div class="d-flex gap-2 flex-nowrap align-items-end mb-2">
-                                    <div class="d-flex gap-2 flex-nowrap align-items-center">
-                                        <p class="badge badge-secondary"><i class="fa-solid fa-list"></i>&nbsp;[[${board.category}]]</p>
-                                        <!-- 나눔 / 공구 카테고리일 때 진행중 / 완료 표시 뱃지 -->
-                                        <p class="badge badge-info" th:if="${board.category == '나눔' || board.category == '공구'} and ${board.complete == false}"><i class="fa-solid fa-hourglass-half"></i>&nbsp;[[${board.category}]]중</p>
-                                        <p class="badge badge-danger" th:if="${board.category == '나눔' || board.category == '공구'} and ${board.complete == true}"><i class="fa-solid fa-store-slash"></i>&nbsp;[[${board.category}]]완료</p>
-                                        <!-- 표시 뱃지 끝 -->
-                                        <!-- 나눔 카테고리일 때 시도 시군구 표시 뱃지 -->
-                                        <p class="badge badge-success" th:if="${board.category == '나눔'}"><i class="fa-solid fa-map-location-dot"></i>&nbsp;[[${board.sido}]] [[${board.sigungu}]]</p>
-                                        <!-- 표시 뱃지 끝 -->
-                                    </div>
-                                    <!-- 로그인 사용자 == 글작성자 같을 경우 / Role이 어드민일 경우에 노출 -->
-                                    <div class="d-flex gap-1 flex-nowrap ms-auto" th:if="${#authentication.principal.username==board.username || #authentication.principal.authorities[0].authority == 'ADMIN'}">
-                                        <a th:href="@{/spr/remove(bno=${board.bno})}" class="btn btn-danger">삭제</a>
-                                        <a th:href="@{/spr/modify(bno=${board.bno}, mode=2)}" class="btn btn-gray">수정</a>
-                                    </div>
-                                    <!-- // 로그인 사용자 == 글작성자 같을 경우 / Role이 어드민일 경우에 노출 끝 -->
-                                </div>
-                            <h4 class="py-2">[[${board.title}]]</h4>
-                                <div class="d-flex gap-2 flex-nowrap text-secondary">
-                                    <p>[[${board.author}]]</p>
-                                    <p>[[${#temporals.format(board.regDate, 'yyyy-MM-dd HH:mm:dd')}]]</p>
-                                    <p class="ms-auto"><i class="fa-regular fa-eye me-1"></i>[[${board.readcount}]]</p>
-                                    <p th:if="${board.recommend >= 1}"><i class="fa-solid fa-heart me-1 text-danger" id="likeIcon"></i><span id="likeCount">[[${board.recommend}]]</span></p>
-                                    <p th:if="${board.recommend == 0}"><i class="fa-regular fa-heart me-1 text-danger" id="likeIcon"></i><span id="likeCount">[[${board.recommend}]]</span></p>
-                                    <p><i class="fa-regular fa-comment-dots me-1"></i>[[${board.replyCount}]]</p>
-                                </div>
-                            </td>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <!-- 첨부파일이 있으면 노출 -->
-                        <tr>
-                            <td class="px-0 py-3">
-                                <ul>
-                                    <li>
-                                        <div class="img_wrap" th:if="${board.sprFileDTOs != null && board.sprFileDTOs.size() >0}">
-                                            <div th:each="fileDTO:${board.sprFileDTOs}">
-                                                <div th:if="${fileDTO.image}">
-                                                    <img th:src="|/uploads/spr/s_${fileDTO.uuid}_${fileDTO.fileName}|">
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </li>
-                                </ul>
-                            </td>
-                        </tr>
-                        <!-- 첨부파일이 있으면 노출 끝 -->
-                        <tr>
-                            <td class="px-0 py-3">
-                                <div class="tb_content">[[${board.content}]]</div>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td class="px-0 py-3">
-                                <div th:align="center">
-                                    <button type="button" class="btn btn-outline-danger" id="likeBtn">좋아요!</button>
-                                </div>
-                                <div class="tb_content" th:align="right" th:if="${board.category == '공구'}">(마감일)[[${board.dueDate}]]</div>
-                            </td>
-                        </tr>
-
-
-
-                        <tr>
-                            <td class="px-0 pt-3">
-                                <p><i class="fa-regular fa-comment-dots me-1"></i>댓글 <b class="text-danger">[[${board.replyCount}]]</b></p>
-                                <div class="reply_list_area">
-                                    <ul class="replyList"></ul>
-                                </div>
-                                <div>
-                                    <ul class="pagination replyPaging"></ul>
-                                </div>
-                                <div class="replyModal">
-                                    <div class="reply_write_area pt-3">
-                                        <div class="mb-2">
-                                            <textarea name="replyText" class="replyText form-control" placeholder="댓글 내용을 입력해주세요(최대 1000자)"></textarea>
-                                        </div>
-                                        <div class="d-flex">
-                                            <label class="form-check-label" for="secret">비밀댓글</label>
-                                            <input class="form-check-input secretCheck" name="secret" type="checkbox" id="secret">
-                                            <button type="button" class="btnReplyRegister ms-auto btn btn-main">댓글 쓰기</button>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="modal modifyModal" tabindex="-1">
-                                    <div class="modal-dialog">
-                                        <div class="modal-content">
-                                            <div class="modal-body">
-                                                <div class="input-group mb-3">
-                                                    <span>수정할 댓글을 적어주세요</span><br>
-                                                    <input type="text" class="form-control modifyText">
-                                                </div>
-                                            </div>
-                                            <div class="modal-footer">
-                                                <button type="button" class="btn btn-dark modifyCloseBtn">닫기</button>
-                                                <button type="button" class="btn btn-primary modifyBtn2">수정</button>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    </div>
-<!-- /* //view 화면 html 코드 작성 끝 */ -->
+  </div>
+  <!-- /* //view 화면 html 코드 작성 끝 */ -->
 </div>
 
 <script layout:fragment="pagescript" th:inline="javascript">
@@ -208,34 +224,30 @@
     }
 
 
-
-    function renderReply(dto){
+    function renderReply(dto) {
         let contentHtml = "";
 
-        if(dto.deleted){
+        if (dto.deleted) {
             contentHtml = `<div class="replyContent text-muted">삭제된 댓글입니다.</div>`;
-        }
-        else if(dto.secret){
-            if(dto.parentRno){
+        } else if (dto.secret) {
+            if (dto.parentRno) {
                 // 비밀 대댓글 → 작성자, 부모댓글작성자, 관리자만 열람
-                if(dto.username === loginUser || dto.parentUsername === loginUser || loginRole === "ADMIN"){
+                if (dto.username === loginUser || dto.parentUsername === loginUser || loginRole === "ADMIN") {
                     contentHtml = `<b>${dto.author}</b> <div class="replyContent"><span style="color:#0078ff;">@${dto.parentAuthor}</span> ${dto.content}</div>`;
                 } else {
                     contentHtml = `<div class="replyContent">비밀 대댓글입니다.</div>`;
                 }
-            }
-            else {
+            } else {
                 // 비밀 댓글 → 작성자, 게시글작성자, 관리자만 열람
-                if(dto.username === loginUser || boardUsername === loginUser || loginRole === "ADMIN"){
+                if (dto.username === loginUser || boardUsername === loginUser || loginRole === "ADMIN") {
                     contentHtml = `<b>${dto.author}</b><div class="replyContent">${dto.content}</div>`;
                 } else {
                     contentHtml = `<div class="replyContent">비밀 댓글입니다.</div>`;
                 }
             }
-        }
-        else {
+        } else {
             // 일반 댓글
-            if(dto.parentRno){
+            if (dto.parentRno) {
                 contentHtml = `<b>${dto.author}</b> <div class="replyContent"><span style="color:#0078ff;">@${dto.parentAuthor}</span> ${dto.content}</div>`;
             } else {
                 contentHtml = `<b>${dto.author}</b><div class="replyContent">${dto.content}</div>`;
@@ -243,7 +255,7 @@
         }
 
         return `
-    <li class="reply_list" data-rno="${dto.rno}">
+    <li class="reply_list border-bottom" data-rno="${dto.rno}">
         <div class="d-flex justify-content-start align-items-start gap-2 py-2">
             <div class="flex-grow-1">
                 ${contentHtml}
@@ -255,17 +267,17 @@
     </li>`;
     }
 
-    function printList(dtoList){
+    function printList(dtoList) {
         // 1) 댓글 맵 생성
         const replyMap = {};
         dtoList.forEach(dto => {
-            replyMap[dto.rno] = { ...dto, children: [] };
+            replyMap[dto.rno] = {...dto, children: []};
         });
 
         // 2) 부모-자식 연결
         let rootList = [];
         dtoList.forEach(dto => {
-            if(dto.parentRno){
+            if (dto.parentRno) {
                 replyMap[dto.parentRno].children.push(replyMap[dto.rno]);
             } else {
                 rootList.push(replyMap[dto.rno]);
@@ -275,7 +287,7 @@
         // 3) 재귀 렌더링
         let html = "";
 
-        function renderTree(reply){
+        function renderTree(reply) {
             html += renderReply(reply); // 기존 렌더 함수 그대로 사용
 
             // 자식 댓글 재귀 호출
@@ -289,34 +301,33 @@
     }
 
 
-
-    function printPages(data){
-        if(!data.dtoList || data.dtoList.length === 0){
+    function printPages(data) {
+        if (!data.dtoList || data.dtoList.length === 0) {
             replyPaging.innerHTML = ''
             return
         }
-        let pageStr=''
-        if(data.prev){
-            pageStr += `<li class="page-item"><a class="page-link" data-page="${data.start -1}"><i class="fa-solid fa-chevron-left"></i></a></li>`
+        let pageStr = ''
+        if (data.prev) {
+            pageStr += `<li class="page-item"><a class="page-link" data-page="${data.start - 1}"><i class="fa-solid fa-chevron-left"></i></a></li>`
         }
-        for(let i = data.start; i <= data.end; i++){
-            pageStr += `<li class="page-item ${Number(i) === Number(data.page)?"active":""}"><a class="page-link" data-page="${i}">${i}</a></li>`
+        for (let i = data.start; i <= data.end; i++) {
+            pageStr += `<li class="page-item ${Number(i) === Number(data.page) ? "active" : ""}"><a class="page-link" data-page="${i}">${i}</a></li>`
         }
-        if(data.next){
-            pageStr += `<li class="page-item"><a class="page-link" data-page="${data.end +1}"><i class="fa-solid fa-chevron-right"></i></a></li>`
+        if (data.next) {
+            pageStr += `<li class="page-item"><a class="page-link" data-page="${data.end + 1}"><i class="fa-solid fa-chevron-right"></i></a></li>`
         }
         replyPaging.innerHTML = pageStr
     }
 
-    let page=1
-    let size=10
+    let page = 1
+    let size = 10
 
-    async function printReplies(bno, page, size, goLast){
+    async function printReplies(bno, page, size, goLast) {
 
-        const response = await axios.get(`/sprreplies/list/${bno}`, {params:{page, size: Number(size)}})
+        const response = await axios.get(`/sprreplies/list/${bno}`, {params: {page, size: Number(size)}})
         let data = response.data;
 
-        if(goLast){
+        if (goLast) {
             const total = response.data.total;
             const lastPage = Math.ceil(total / size);
             return printReplies(bno, lastPage, size, false);
@@ -324,6 +335,7 @@
         printList(data.dtoList)
         printPages(data);
     }
+
     printReplies(bno, page, size, false)
 
     const registerModal = new bootstrap.Modal(document.querySelector(".replyModal"))
@@ -331,34 +343,34 @@
     const replyText = document.querySelector(".replyText")
 
 
-    replyPaging.addEventListener("click", function (e){
+    replyPaging.addEventListener("click", function (e) {
         e.preventDefault()
         e.stopPropagation()
 
         const target = e.target.closest('a')
-        if(!target){
+        if (!target) {
             return
         }
         const pageNum = Number(target.getAttribute("data-page"));
         page = pageNum
         printReplies(bno, page, size, false)
-    },false)
+    }, false)
 
-    registerBtn.addEventListener("click", async function (e){
+    registerBtn.addEventListener("click", async function (e) {
         const isSecret = document.querySelector(".secretCheck").checked
 
         const replyObj = {
-            bno : bno,
-            content : replyText.value,
-            secret : isSecret ? 1:0,
-            deleted : false
+            bno: bno,
+            content: replyText.value,
+            secret: isSecret ? 1 : 0,
+            deleted: false
         }
-        if(replyText.value === ""){
+        if (replyText.value === "") {
             alert("댓글 내용을 입력해주세요")
             replyText.focus();
             return
         }
-        try{
+        try {
             const response = await axios.post(`/sprreplies/`, replyObj);
             const result = response.data;
 
@@ -366,11 +378,11 @@
             document.querySelector(".secretCheck").checked = false;
 
             printReplies(bno, 1, 10, false);
-        }catch (error){
+        } catch (error) {
             alert("댓글 입력 오류");
             console.log(error);
         }
-    },false)
+    }, false)
 
     const modifyModal = new bootstrap.Modal(document.querySelector(".modifyModal"))
     const modifyText = document.querySelector(".modifyText")
@@ -380,7 +392,7 @@
     replyList.addEventListener("click", async function (e) {
 
         const target = e.target.closest("a, button");
-        if(target){
+        if (target) {
             e.preventDefault()
             e.stopPropagation()
         }
@@ -391,30 +403,30 @@
         const rno = li.getAttribute("data-rno")
 
         // 대댓글 달기 버튼을 눌렀을 때 창이 열려있으면 닫고 열려있지 않다면 키게함
-        if(target.classList.contains("btnReReplyWriteView")){
+        if (target.classList.contains("btnReReplyWriteView")) {
             const exist = li.querySelector(".reReplyWriteArea")
-            if(exist){
+            if (exist) {
                 exist.remove()
                 return
             }
-            li.insertAdjacentHTML("beforeend",reReplyStr())
+            li.insertAdjacentHTML("beforeend", reReplyStr())
             return
         }
 
         // 대댓글 작성 버튼을 누를 때
-        if(target.classList.contains("btnReReplyRegister")){
+        if (target.classList.contains("btnReReplyRegister")) {
             const box = target.closest(".reReplyWriteArea")
             const reReplyText = box.querySelector("#reReplyText")
             const isSecret = box.querySelector(".secretCheck").checked
 
-            if(reReplyText.value === ""){
+            if (reReplyText.value === "") {
                 alert("대댓글 내용을 입력해주세요")
                 reReplyText.focus();
                 return
             }
-            try{
-                await axios.post(`/sprreplies/`,{
-                    bno : bno,
+            try {
+                await axios.post(`/sprreplies/`, {
+                    bno: bno,
                     content: reReplyText.value,
                     secret: isSecret ? true : false,
                     deleted: false,
@@ -422,13 +434,13 @@
                 })
                 box.remove()
                 printReplies(bno, page, size, false)
-            }catch (err){
+            } catch (err) {
                 console.log(err);
             }
             return
         }
 
-        if(target.classList.contains("btnReReplyWriteClose")){
+        if (target.classList.contains("btnReReplyWriteClose")) {
             target.closest(".reReplyWriteArea").remove()
             return
         }
@@ -473,29 +485,27 @@
 
     })
 
-    replyList.addEventListener("click", function(e){
+    replyList.addEventListener("click", function (e) {
         const target = e.target.closest(".btnReReplyWriteClose");
-        if(!target) return;
+        if (!target) return;
         const box = target.closest(".reReplyWriteArea");
         box.remove();
     });
 
 
-
-
-
-
     /////// 대댓글 textarea toggle ///////
-  function reReplyStr() {
-      return `<div class="reReplyWriteArea">
+    function reReplyStr() {
+        return `<div class="reReplyWriteArea">
                 <div class="d-flex justify-content-start align-items-start gap-2 py-2">
                   <div class="flex-grow-1">
                     <div class="mb-2">
                       <textarea name="reReplyText" id="reReplyText" class="form-control" placeholder="대댓글 내용을 입력해주세요(최대 1000자)"></textarea>
                     </div>
-                    <div class="d-flex">
-                      <input class="form-check-input secretCheck" name="secret" type="checkbox">
-                      <span>비밀대댓글</span>
+                    <div class="d-flex align-items-start">
+                      <div class="form-check mb-0">
+                        <input class="form-check-input secretCheck" name="secret" type="checkbox">
+                        <label class="form-check-label">비밀대댓글</label>
+                      </div>
                       <button class="btnReReplyRegister ms-auto btn btn-main">대댓글 쓰기</button>
                     </div>
                   </div>
@@ -506,36 +516,35 @@
                   </div>
                 </div>
               </div>`
-  }
+    }
 
 
+    // 좋아요 버튼 누르면 recommend 수 증가
+    $(document).ready(function () {
+        // likeBtn을 누르면 함수
+        $('#likeBtn').on('click', function () {
+            const bno = [[${board.bno}]]
 
-  // 좋아요 버튼 누르면 recommend 수 증가
-  $(document).ready(function(){
-      // likeBtn을 누르면 함수
-      $('#likeBtn').on('click', function (){
-          const bno = [[${board.bno}]]
+            $.ajax({
+                url: "/spr/like",
+                type: "GET",
+                data: {bno: bno},
+                success: function (response) {
+                    // 업데이트 된 레코맨드 수 가져오기
+                    var recommend = response.recommend;
+                    $('#likeCount').text(recommend);
 
-          $.ajax({
-              url : "/spr/like",
-              type : "GET",
-              data : { bno : bno},
-              success : function(response){
-                  // 업데이트 된 레코맨드 수 가져오기
-                  var recommend = response.recommend;
-                  $('#likeCount').text(recommend);
+                    //추천 수가 0에서 1이 되면 하트 아이콘이 빈하트 -> 꽉 찬 하트로 변화
+                    if (recommend > 0) {
+                        $('#likeIcon').removeClass('fa-regular').addClass('fa-solid');
+                    } else {
+                        $('#likeIcon').removeClass('fa-solid').addClass('fa-regular');
+                    }
+                }
+            })
 
-                  //추천 수가 0에서 1이 되면 하트 아이콘이 빈하트 -> 꽉 찬 하트로 변화
-                  if(recommend > 0){
-                      $('#likeIcon').removeClass('fa-regular').addClass('fa-solid');
-                  } else {
-                      $('#likeIcon').removeClass('fa-solid').addClass('fa-regular');
-                  }
-              }
-          })
-
-      })
-  })
+        })
+    })
 
 
 </script>

@@ -135,14 +135,24 @@
                     <div class="col-12">
                       <div class="mb-1">
                         <div class="d-flex gap-2 flex-nowrap mb-1">
-                          <p class="badge badge-success">[[${board.category}]]</p>
+                          <p th:if="${board.category == '신고'}" class="badge text-bg-danger">&#x1F6AB; [[${board.category}]]</p>
+                          <p th:if="${board.category == '공구'}" class="badge badge-warning">&#x1F6D2; [[${board.category}]]</p>
+                          <p th:if="${board.category == '나눔'}" class="badge badge-warning">&#x1F381; [[${board.category}]]</p>
                           <!-- 나눔 / 공구 카테고리일 때 진행중 / 완료 표시 뱃지 -->
-                          <p class="badge badge-info" th:if="${board.category == '나눔' || board.category == '공구'} and ${board.complete == false}">[[${board.category}]]중</p>
-                          <p class="badge badge-info" th:if="${board.category == '나눔' || board.category == '공구'} and ${board.complete == true}">[[${board.category}]]완료</p>
-                          <!-- 표시 뱃지 끝 -->
+                          <p class="badge badge-info" th:if="${board.category == '나눔' || board.category == '공구'} and ${board.complete == false}">
+                            [[${board.category}]]중
+                          </p>
+                          <p class="badge badge-success" th:if="${board.category == '나눔' || board.category == '공구'} and ${board.complete == true}">
+                            [[${board.category}]]완료
+                          </p>
                         </div>
-                        <a th:href="@{/spr/view(bno=${board.bno}, mode=1)}" class="d-inline-flex align-items-center gap-1 flex-nowrap w-100 mb-1">
-                          <span class="text-nowrap badge badge-danger ms-auto" th:if="${board.category == '공구'}">[[${board.dueDate}]]까지</span>
+                        <div class="d-flex gap-2 flex-nowrap mb-2" th:if="${board.category == '나눔'}">
+                          <!-- 나눔 카테고리일 때 시도 시군구 표시 뱃지 -->
+                          <p class="badge badge-gray">[[${board.sido}]] / [[${board.sigungu}]]</p>
+                        </div>
+                        <a th:href="@{/spr/view(bno=${board.bno}, mode=1)}" class="d-inline-flex justify-content-start align-items-center gap-1 flex-nowrap w-100 mb-1">
+                          <span class="text-nowrap badge badge-danger" th:if="${board.category == '공구'} and ${board.complete == false}">[[${board.dueDate}]]까지</span>
+                          <span class="text-nowrap badge badge-danger" th:if="${board.category == '공구'} and ${board.complete == true}">마감</span>
                           <h6 class="text-overflew-line-1">[[${board.title}]]</h6>
                         </a>
                       </div>
