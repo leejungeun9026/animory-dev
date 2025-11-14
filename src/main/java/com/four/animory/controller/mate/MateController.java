@@ -19,6 +19,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.io.File;
 import java.io.IOException;
@@ -143,9 +144,15 @@ public class MateController {
     }
 
     @GetMapping("/modify")
-    public String modify(Long bno, Integer mode, Model model) {
+    public String modify(Long bno, Integer mode, Model model,  @AuthenticationPrincipal PrincipalDetails principalDetails,
+                         RedirectAttributes rttr) {
         log.info("모드 확인:" + mode);
         MateBoardDTO mateBoardDTO = mateService.findMateBoardById(bno, mode);
+        String loginNickname = principalDetails.getMember().getNickname();
+        if(!mateBoardDTO.getNickname().equals(loginNickname)){
+            rttr.addFlashAttribute("error", "작성자만 수정할 수 있습니다.");
+            return "redirect:/mate/view?bno=" + bno + "&mode=0";
+        }
         model.addAttribute("mateBoard", mateBoardDTO);
         return "mate/modify";
     }
@@ -156,8 +163,15 @@ public class MateController {
         return "redirect:/mate/view?bno=" + mateBoardDTO.getBno();
     }
 
+
+
     @GetMapping("remove")
     public String removeMateBoard(Long bno) {
+        MateBoardDTO mateBoardDTO = mateService.findMateBoardById(bno, 2);
+        List<MateFileDTO> mateFileDTOS = mateBoardDTO.getMateFileDTOs();
+        if(mateFileDTOS != null && !mateFileDTOS.isEmpty()){
+            removeFile(mateFileDTOS);
+        }
         mateService.deleteMateBoardById(bno);
         return "redirect:/mate/list";
     }

@@ -39,7 +39,7 @@
                   <!-- 표시 뱃지 끝 -->
                 </div>
                 <!-- 로그인 사용자 == 글작성자 같을 경우만 노출 -->
-                <div class="d-flex gap-1 flex-nowrap ms-auto">
+                <div class="d-flex gap-1 flex-nowrap ms-auto" th:if="${#authentication.principal.username==board.username || #authentication.principal.authorities[0].authority == 'ADMIN'}">
                   <a class="btn btn-danger" th:href="@{/mate/remove(bno=${board.bno})}">삭제</a>
                   <a class="btn btn-gray" th:href="@{/mate/modify(bno=${board.bno}, mode=2)}">수정</a>
                 </div>
