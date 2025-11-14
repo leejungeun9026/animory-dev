@@ -440,7 +440,7 @@
         const clusterer = new kakao.maps.MarkerClusterer({
             map: map,
             averageCenter: true,
-            minLevel: 5
+            minLevel: 6
         });
 
         const listEl = document.getElementById('mapList');
@@ -592,7 +592,6 @@
                     const id = Number(li.dataset.id);
                     const found = markerModels.find(m => m.data.id === id);
                     if (!found) return;
-                    map.panTo(found.marker.getPosition());
                     closeOverlay();
                     found.overlay.setMap(map);
                     activeOverlay = found.overlay;
