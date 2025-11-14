@@ -402,16 +402,29 @@
             }
 
             try {
-                await axios.post(`/freeReplies/`, {
+                // 서버에 대댓글 등록
+                const response = await axios.post(`/freeReplies/`, {
                     bno: bno,
                     content: reReplyText.value,
                     deleted: false,
                     parentRno: rno
                 });
+
                 box.remove();
-                printReplies(bno, page, size, false);
+
+                // 기존 댓글 + 새 댓글 모두 트리 구조로 렌더링
+                // 1) 현재 댓글 리스트를 다시 가져오기
+                const listResponse = await axios.get(`/freeReplies/list/${bno}`, {
+                    params: { page: 1, size: page * size } // 지금까지 불러온 페이지 전체
+                });
+                const allReplies = listResponse.data.dtoList;
+
+                // 2) 트리 구조로 렌더링
+                printList(allReplies);
+
             } catch (err) {
                 console.log(err);
+                alert("대댓글 등록 실패");
             }
             return;
         }
