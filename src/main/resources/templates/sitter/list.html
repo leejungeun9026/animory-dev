@@ -124,7 +124,7 @@
               <li th:class="${pageResponseDTO.page == pageResponseDTO.first ? 'page-item disabled' : 'page-item'}">
                 <a class="page-link" th:data-num="${pageResponseDTO.first}"><i class="fa-solid fa-angles-left"></i></a>
               </li>
-              <li th:class="${!pageResponseDTO.prev ? 'page-item disabled' : 'page-item'}">
+              <li th:if="${pageResponseDTO.prev}" class="page-item">
                 <a class="page-link" th:data-num="${pageResponseDTO.start - 1}"><i class="fa-solid fa-chevron-left"></i></a>
               </li>
               <th:block th:each="i:${#numbers.sequence(pageResponseDTO.start, pageResponseDTO.end)}">
@@ -132,7 +132,7 @@
                   <a class="page-link" th:data-num="${i}">[[${i}]]</a>
                 </li>
               </th:block>
-              <li th:class="${!pageResponseDTO.next ? 'page-item disabled' : 'page-item'}">
+              <li th:if="${pageResponseDTO.next}" class="page-item">
                 <a class="page-link" th:data-num="${pageResponseDTO.end + 1}"><i class="fa-solid fa-chevron-right"></i></a>
               </li>
               <li th:class="${pageResponseDTO.page == pageResponseDTO.last ? 'page-item disabled' : 'page-item'}">

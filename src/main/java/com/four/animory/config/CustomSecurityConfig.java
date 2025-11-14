@@ -30,7 +30,7 @@ public class CustomSecurityConfig {
         .authorizeHttpRequests(authorizeRequest -> authorizeRequest
             .dispatcherTypeMatchers(DispatcherType.FORWARD).permitAll()
             .requestMatchers("/", "/index","/member/login", "/member/loginRegister", "/member/join", "/member/joinRegister").permitAll()
-            .requestMatchers(HttpMethod.GET, "/api/regions/**").permitAll()
+            .requestMatchers(HttpMethod.GET, "/api/regions/**", "/api/hospital").permitAll()
             .requestMatchers("/member/mypage", "/member/modifyPet").authenticated()
             .requestMatchers("/free/list", "/mate/list", "/spr/list", "/sitter/list", "/notice/list").permitAll()
             .requestMatchers("/free/**", "/mate/**", "/spr/**","/sprreplies/**", "/sitter/**", "/notice/**").authenticated()

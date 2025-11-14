@@ -8,6 +8,26 @@
       <ul class="swiper-wrapper">
         <li class="swiper-slide">
           <a href="">
+            <img alt="" src="/images/TPL04990_Banner_Template.jpg">
+          </a>
+        </li>
+        <li class="swiper-slide">
+          <a href="">
+            <img alt="" src="/images/TPL00669.jpg">
+          </a>
+        </li>
+        <li class="swiper-slide">
+          <a href="">
+            <img alt="" src="/images/TPL04605_Banner_Template.jpg">
+          </a>
+        </li>
+        <li class="swiper-slide">
+          <a href="">
+            <img alt="" src="/images/TPL00981.jpg">
+          </a>
+        </li>
+        <li class="swiper-slide">
+          <a href="">
             <img alt="" src="/images/TPL06363_Banner_Template.jpg">
           </a>
         </li>
@@ -322,9 +342,28 @@
     </div>
   </section>
   <!-- // SPR BOARD END -->
+
+  <section class="main_board_list col mt-3 mt-md-4">
+    <div class="card rounded-4 h-100">
+      <div class="card-body p-4">
+        <div class="section_title mb-2 mb-md-3">
+          <h4 class="memomentKkukkkuk fw-normal"><i class="fa-solid fa-hospital text-primary"></i> 동물병원 찾기</h4>
+        </div>
+        <div class="row g-3">
+          <div class="col-12 col-lg-7 col-xl-8">
+            <div id="map" class="kakaomap"></div>
+          </div>
+          <div class="col-12 col-lg-5 col-xl-4">
+            <ul id="mapList"></ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
 </div>
 
 <script layout:fragment="pagescript" th:inline="javascript">
+    ////////// swiper 관련 //////////
     var swiper = new Swiper(".mvSwiper", {
         slidesPerView: 1,
         loop: true,
@@ -355,6 +394,224 @@
         pagination: {
             clickable: true,
         },
+    });
+
+    ////////// kakaomap //////////
+    // ===== 0) 좌표계 정의 =====
+    proj4.defs("EPSG:5174",
+        "+proj=tmerc +lat_0=38 +lon_0=127 +k=1 " +
+        "+x_0=200000 +y_0=500000 +ellps=bessel " +
+        "+towgs84=147,-507,-687,0,0,0,0 +units=m +no_defs"
+    );
+    proj4.defs("EPSG:4326", "+proj=longlat +datum=WGS84 +no_defs");
+
+    // 거리 계산 함수는 그대로 사용
+    function distance(center, position) {
+        const lat1 = center.getLat(), lng1 = center.getLng();
+        const lat2 = position.getLat(), lng2 = position.getLng();
+        const R = 6371000;
+        const toRad = Math.PI / 180;
+        const dLat = (lat2 - lat1) * toRad;
+        const dLng = (lng2 - lng1) * toRad;
+        const a =
+            Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+            Math.cos(lat1 * toRad) * Math.cos(lat2 * toRad) *
+            Math.sin(dLng / 2) * Math.sin(dLng / 2);
+        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        return R * c;
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+        // ===== 1) 지도 초기화 =====
+        const mapContainer = document.getElementById('map');
+        const map = new kakao.maps.Map(mapContainer, {
+            center: new kakao.maps.LatLng(35.157744, 129.059039),
+            level: 5
+        });
+
+        var mapTypeControl = new kakao.maps.MapTypeControl();
+        map.addControl(mapTypeControl, kakao.maps.ControlPosition.TOPRIGHT);
+
+        var zoomControl = new kakao.maps.ZoomControl();
+        map.addControl(zoomControl, kakao.maps.ControlPosition.RIGHT);
+
+
+        // (선택) 클러스터러 쓰고 싶으면 여기서 생성
+        const clusterer = new kakao.maps.MarkerClusterer({
+            map: map,
+            averageCenter: true,
+            minLevel: 5
+        });
+
+        const listEl = document.getElementById('mapList');
+        let markerModels = [];   // { marker, overlay, data }
+        let activeOverlay = null;
+
+        function closeOverlay() {
+            if (activeOverlay) {
+                activeOverlay.setMap(null);
+                activeOverlay = null;
+            }
+        }
+
+        function clearMarkers() {
+            markerModels.forEach(m => {
+                m.marker.setMap(null);
+                m.overlay.setMap(null);
+            });
+            markerModels = [];
+
+            if (clusterer) {
+                clusterer.clear();
+            }
+        }
+
+        // ✅ 현재 지도 영역 기준으로 서버에서 병원 조회
+        async function loadHospitalsInBounds() {
+            const bounds = map.getBounds();
+            const sw = bounds.getSouthWest(); // 남서쪽 (minLat, minLng)
+            const ne = bounds.getNorthEast(); // 북동쪽 (maxLat, maxLng)
+
+            // kakao map은 WGS84(4326) → DB는 5174라고 가정
+            // SW, NE 를 5174 로 변환
+            const [minLng, minLat] = proj4("EPSG:4326", "EPSG:5174", [sw.getLng(), sw.getLat()]);
+            const [maxLng, maxLat] = proj4("EPSG:4326", "EPSG:5174", [ne.getLng(), ne.getLat()]);
+
+            // 서버에서 이 범위 안에 있는 병원만 가져옴
+            const response = await axios.get("/api/hospital", {
+                params: {
+                    minLng,
+                    minLat,
+                    maxLng,
+                    maxLat
+                }
+            });
+
+            // 서버 응답: 여전히 EPSG:5174 기준 (p.lng, p.lat) 라고 가정
+            const rawHospital = response.data;
+
+            // === 기존 마커들 제거 ===
+            clearMarkers();
+
+            // === 5174 → 4326 변환해서 지도에 뿌리기 ===
+            const hospital = rawHospital.map(p => {
+                const [lng, lat] = proj4("EPSG:5174", "EPSG:4326", [p.lng, p.lat]);
+                return { ...p, lng, lat };
+            });
+
+            const markers = [];
+
+            hospital.forEach(p => {
+                const position = new kakao.maps.LatLng(p.lat, p.lng);
+                const marker = new kakao.maps.Marker({ position });
+
+                const content = document.createElement('div');
+                content.className = 'overlayBox';
+                content.innerHTML = `
+                <div class="title"><b>${p.name}</b></div>
+                <div class="addr">${p.address}(${p.zip})</div>
+                <div class="tel">${p.tel}</div>
+                <div class="close"><span class="badge text-bg-danger"><i class="fa-solid fa-xmark"></i></span></div>
+            `;
+
+                const overlay = new kakao.maps.CustomOverlay({
+                    content: content,
+                    position: position,
+                    yAnchor: 1.4
+                });
+
+                content.querySelector('.close').addEventListener('click', () => {
+                    overlay.setMap(null);
+                    activeOverlay = null;
+                });
+
+                kakao.maps.event.addListener(marker, 'click', () => {
+                    closeOverlay();
+                    overlay.setMap(map);
+                    activeOverlay = overlay;
+                });
+
+                markerModels.push({ marker, overlay, data: p });
+                markers.push(marker);
+            });
+
+            // 클러스터러 사용 시 등록
+            if (clusterer) {
+                clusterer.addMarkers(markers);
+            } else {
+                // 클러스터러 안 쓴다면 직접 지도에 올리기
+                markers.forEach(m => m.setMap(map));
+            }
+
+            // 새 데이터 기준으로 리스트 갱신
+            updateVisibleList();
+        }
+
+        // ===== 리스트 갱신 =====
+        function updateVisibleList() {
+            const bounds = map.getBounds();
+            const center = map.getCenter();
+
+            // 너무 넓게 축소돼 있으면 안내만
+            if (map.getLevel() > 6) {
+                listEl.innerHTML = `
+                  <li class="border-0 py-3 rounded-3 bg-light text-center">
+                    <i class="fa-solid fa-circle-exclamation text-danger me-1"></i>
+                    지도를 더 확대하면 병원 목록이 표시됩니다.
+                  </li>`;
+                return;
+            }
+
+            let visible = markerModels.filter(m => bounds.contain(m.marker.getPosition()));
+
+            visible = visible
+                .map(m => ({ ...m, dist: distance(center, m.marker.getPosition()) }))
+                .sort((a, b) => a.dist - b.dist);
+
+            if (visible.length === 0) {
+                listEl.innerHTML = `
+                <li class="border-0 py-3 rounded-3 bg-light text-center">
+                  <i class="fa-solid fa-circle-exclamation text-danger me-1"></i>현재 화면에 보이는 병원이 없습니다.
+                </li>`;
+                return;
+            }
+
+            const MAX_LIST = 5;
+            const sliced = visible.slice(0, MAX_LIST);
+
+            listEl.innerHTML = sliced.map(({ data }, i) => `
+              <li data-id="${data.id}">
+                <h6 class="mb-1"><i class="fa-solid fa-location-dot text-info me-1"></i>${data.name}</h6>
+                <p class="ps-4">${data.address} (${data.zip})</p>
+                <p class="ps-4">${data.tel}</p>
+              </li>
+            `).join('');
+
+            listEl.querySelectorAll('li').forEach(li => {
+                li.addEventListener('click', () => {
+                    const id = Number(li.dataset.id);
+                    const found = markerModels.find(m => m.data.id === id);
+                    if (!found) return;
+                    map.panTo(found.marker.getPosition());
+                    closeOverlay();
+                    found.overlay.setMap(map);
+                    activeOverlay = found.overlay;
+                });
+            });
+        }
+
+        // ===== 이벤트 연결 =====
+        // 처음 로딩할 때 지도 영역 기준으로 병원 불러오기
+        loadHospitalsInBounds();
+
+        // 지도 이동/확대 후 idle 될 때마다 새로 서버에서 가져오기 (디바운스 추천)
+        let idleTimer = null;
+        kakao.maps.event.addListener(map, 'idle', () => {
+            if (idleTimer) clearTimeout(idleTimer);
+            idleTimer = setTimeout(() => {
+                loadHospitalsInBounds();
+            }, 300); // 0.3초 정도 디바운스
+        });
     });
 
 </script>

@@ -12,7 +12,7 @@ import java.util.*;
 @Table(name="tbl_free_board")
 @Getter
 @Setter
-@ToString(exclude = {"member", "fileSet"})
+@ToString(exclude = {"member", "fileSet", "replies"})
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
