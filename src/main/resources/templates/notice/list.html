@@ -21,7 +21,6 @@
                 <option th:selected="${pageRequestDTO.type == 'tc'}" value="tc">제목+내용</option>
                 <option th:selected="${pageRequestDTO.type == 't'}" value="t">제목</option>
                 <option th:selected="${pageRequestDTO.type == 'c'}" value="c">내용</option>
-                <option th:selected="${pageRequestDTO.type == 'w'}" value="w">작성자</option>
               </select>
               <input class="form-control form-control-sm" name="keyword" placeholder="검색어를 입력하세요" th:value="${pageRequestDTO.keyword}"
                      type="text">
